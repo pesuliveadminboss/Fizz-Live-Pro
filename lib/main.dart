@@ -387,101 +387,106 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          GestureDetector(
-            onTap: _showRechargeSheet,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
-                children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
-                ],
+  Widget _buildBody() {
+    if (_tab == 4) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const ListTile(
+              leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+              title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              tileColor: const Color(0xFF14141E),
+              title: const Text('My Gems', style: TextStyle(color: Colors.white)),
+              trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+              onTap: _showRechargeSheet,
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              tileColor: const Color(0xFF14141E),
+              title: const Text('Beans Center', style: TextStyle(color: Colors.white)),
+              trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
+              },
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              tileColor: const Color(0xFF14141E),
+              title: const Text('Daily Check-in Rewards', style: TextStyle(color: Colors.white)),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  setState(() => _userGems += 50);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                child: const Text('Claim'),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      );
+    }
+
+    if (_tab != 0) {
+      return Center(child: Text('Tab: $_tab', style: const TextStyle(color: Colors.grey)));
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.72,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
-      body: _tab == 0
-          ? GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+      itemCount: _hosts.length,
+      itemBuilder: (context, i) {
+        final h = _hosts[i];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(h['img']!, fit: BoxFit.cover),
+              Container(color: Colors.black26),
+              Positioned(
+                top: 6,
+                left: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                  child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                ),
               ),
-              itemCount: _hosts.length,
-              itemBuilder: (context, i) {
-                final h = _hosts[i];
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(h['img']!, fit: BoxFit.cover),
-                      Container(color: Colors.black26),
-                      Positioned(
-                        top: 6,
-                        left: 6,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                          child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 6,
-                        left: 6,
-                        right: 6,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                            IconButton(
-                              icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
-                              onPressed: () {
-                                if (_userGems >= 1800) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (c) => OneOnOneCallScreen(
-                                        host: h,
-                                        onCallEnded: (spent) => setState(() => _userGems -= spent),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  _showRechargeSheet();
-                                }
-                              },
+              Positioned(
+                bottom: 6,
+                left: 6,
+                right: 6,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    IconButton(
+                      icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
+                      onPressed: () {
+                        if (_userGems >= 1800) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (c) => OneOnOneCallScreen(
+                                host: h,
+                                onCallEnded: (spent) => setState(() => _userGems -= spent),
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            )
-          : (_tab == 4
-              ? Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      const ListTile(
-                        leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
-                        title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
-                      ),
-    
+                          );
+                        } else {
+                          _showRechargeSheet();
+                        }
+                      },
+                    ),
+     
