@@ -339,35 +339,43 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     itemCount: _hosts.length,
                     itemBuilder: (context, i) {
                       final h = _hosts[i];
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.network(h['img']!, fit: BoxFit.cover),
-                            Container(color: Colors.black26),
-                            Positioned(
-                              top: 6,
-                              left: 6,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                                child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (c) => LiveRoomScreen(host: h)),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Image.network(h['img']!, fit: BoxFit.cover),
+                              Container(color: Colors.black26),
+                              Positioned(
+                                top: 6,
+                                left: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                                  child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                                ),
                               ),
-                            ),
-                            Positioned(
-                              bottom: 6,
-                              left: 6,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                                  Text("ID: ${h['id']} • ${h['level']}", style: const TextStyle(color: Colors.grey, fontSize: 10)),
-                                ],
+                              Positioned(
+                                bottom: 6,
+                                left: 6,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                                    Text("ID: ${h['id']} • ${h['level']}", style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -394,3 +402,93 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 }
+
+// -------------------------------------------------------------
+// புள்ளி 21-30: நேரலை அறை & பரிசுத் தட்டு (Live Room & Gift Tray)
+// -------------------------------------------------------------
+class LiveRoomScreen extends StatefulWidget {
+  final Map<String, String> host;
+  const LiveRoomScreen({super.key, required this.host});
+
+  @override
+  State<LiveRoomScreen> createState() => _LiveRoomScreenState();
+}
+
+class _LiveRoomScreenState extends State<LiveRoomScreen> {
+  int _userGems = 1250;
+  final List<String> _comments = [
+    'System: Welcome to Fizz Live Pro!',
+    'Rahul: Hello beautiful 😍',
+    'Vicky: Sent a Rose 🌹',
+  ];
+  final TextEditingController _msg = TextEditingController();
+
+  void _showGiftTray() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final gifts = [
+              {'name': 'Kiss', 'cost': 180, 'icon': Icons.favorite},
+              {'name': 'Puppy', 'cost': 180, 'icon': Icons.pets},
+              {'name': 'Mystery', 'cost': 360, 'icon': Icons.card_giftcard},
+              {'name': 'Cruise', 'cost': 3700, 'icon': Icons.directions_boat},
+            ];
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Balance: $_userGems Gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 14)),
+                      const Text('Multiplier: 1x', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemCount: gifts.length,
+                    itemBuilder: (context, i) {
+                      final g = gifts[i];
+                      return InkWell(
+                        onTap: () {
+                          final cost = g['cost'] as int;
+                          if (_userGems >= cost) {
+                            setState(() {
+                              _userGems -= cost;
+                              _comments.add('You sent ${g['name']} 🎁');
+                            });
+                            setModalState(() {});
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Gift Sent: ${g['name']}!')),
+                            );
+                          } else {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Low balance! Please recharge.')),
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E2C),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white10),
+                          ),
+   
