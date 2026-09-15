@@ -233,6 +233,40 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildHostAvatar(String imgUrl, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white24, width: 2),
+        image: DecorationImage(image: NetworkImage(imgUrl), fit: BoxFit.cover),
+      ),
+    );
+  }
+
+  Widget _buildSocialOption(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF1E1E28),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(height: 6),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -397,44 +431,52 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
 
-  Widget _buildHostAvatar(String imgUrl, double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white24, width: 2),
-        image: DecorationImage(image: NetworkImage(imgUrl), fit: BoxFit.cover),
-      ),
-    );
-  }
+class AuthorizationScreen extends StatelessWidget {
+  const AuthorizationScreen({super.key});
 
-  Widget _buildSocialOption(IconData icon, String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
+  Widget _buildPermissionItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF1E1E28),
+              color: const Color(0xFF151520),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white12),
             ),
-            child: Icon(icon, color: Colors.white, size: 24),
+            child: Icon(icon, color: const Color(0xFFFFD700), size: 24),
           ),
-          const SizedBox(height: 6),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(color: Colors.grey[400], fontSize: 12, height: 1.3),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-}
-
-class AuthorizationScreen extends StatelessWidget {
-  const AuthorizationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -513,47 +555,4 @@ class AuthorizationScreen extends StatelessWidget {
                     'Allow all permissions',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPermissionItem(IconData icon, String title, String description) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF151520),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Icon(icon, color: const Color(0xFFFFD700), size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                
+            
