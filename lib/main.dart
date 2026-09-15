@@ -22,6 +22,9 @@ class FizzLiveProApp extends StatelessWidget {
   }
 }
 
+// -------------------------------------------------------------
+// 1. Splash Screen
+// -------------------------------------------------------------
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -69,6 +72,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+// -------------------------------------------------------------
+// 2. Secret Admin Gateway Screen
+// -------------------------------------------------------------
 class AdminGatewayScreen extends StatefulWidget {
   const AdminGatewayScreen({super.key});
 
@@ -162,6 +168,9 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   }
 }
 
+// -------------------------------------------------------------
+// 3. Login Screen
+// -------------------------------------------------------------
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -280,6 +289,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+// -------------------------------------------------------------
+// 4. Authorization Screen
+// -------------------------------------------------------------
 class AuthorizationScreen extends StatelessWidget {
   const AuthorizationScreen({super.key});
 
@@ -359,6 +371,9 @@ class AuthorizationScreen extends StatelessWidget {
   }
 }
 
+// -------------------------------------------------------------
+// 5. Call Reminder Screen
+// -------------------------------------------------------------
 class CallReminderScreen extends StatelessWidget {
   const CallReminderScreen({super.key});
 
@@ -420,6 +435,9 @@ class CallReminderScreen extends StatelessWidget {
   }
 }
 
+// -------------------------------------------------------------
+// புள்ளி 5 முதல் 20: பிரதான டேஷ்போர்டு & ஹோஸ்ட் கார்டுகள்
+// -------------------------------------------------------------
 class MainDashboardScreen extends StatefulWidget {
   const MainDashboardScreen({super.key});
 
@@ -429,42 +447,114 @@ class MainDashboardScreen extends StatefulWidget {
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tabIndex = 0;
-  final List<String> _tabs = ['For You', 'Follow', 'Game', 'Messages', 'Me'];
+  int _categoryIndex = 0;
+  int _subFilterIndex = 0;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: Text(_tabs[_tabIndex]),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFFFFD700)),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Center(
-        child: Text(
-          'Fizz Live Pro - ${_tabs[_tabIndex]}',
-          style: const TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tabIndex,
-        onTap: (i) => setState(() => _tabIndex = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
+  final List<String> _topCategories = ['Hot', 'Live', 'Party', 'Match'];
+  final List<String> _subFilters = ['All', 'Exotic', 'Pretty', 'New', 'Sexy', 'Young'];
+
+  // மாதிரி ஹோஸ்ட்கள் தரவு (புள்ளி 16-20)
+  final List<Map<String, dynamic>> _hosts = [
+    {
+      'name': 'Pooja Sharma',
+      'id': 'ID: 78921',
+      'age': '22',
+      'country': 'India',
+      'level': 'LV7',
+      'status': 'Live',
+      'isFree': true,
+      'image': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500',
+    },
+    {
+      'name': 'Ananya Roy',
+      'id': 'ID: 65412',
+      'age': '24',
+      'country': 'India',
+      'level': 'LV6',
+      'status': 'Busy',
+      'isFree': false,
+      'image': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500',
+    },
+    {
+      'name': 'Sneha Patel',
+      'id': 'ID: 99421',
+      'age': '21',
+      'country': 'India',
+      'level': 'LV8',
+      'status': 'Active',
+      'isFree': true,
+      'image': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500',
+    },
+    {
+      'name': 'Kavya Nair',
+      'id': 'ID: 33109',
+      'age': '23',
+      'country': 'India',
+      'level': 'LV5',
+      'status': 'Live',
+      'isFree': false,
+      'image': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500',
+    },
+  ];
+
+  Color _getStatusColor(String status) {
+    if (status == 'Live') return Colors.greenAccent;
+    if (status == 'Busy') return Colors.redAccent;
+    return const Color(0xFF00E5FF); // Active
   }
-}
+
+  Widget _buildHostCard(Map<String, dynamic> host) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF14141E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            // ஹோஸ்ட் புகைப்படம்
+            Positioned.fill(
+              child: Image.network(
+                host['image'],
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: const Color(0xFF222230),
+                  child: const Icon(Icons.person, color: Colors.grey, size: 50),
+                ),
+              ),
+            ),
+            // நிழல் பகுதி (Gradient Overlay)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.2),
+                      Colors.black.withOpacity(0.85),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // மேல் பகுதி: நிலை (Status) & இலவச டேக் (FREE Tag)
+            Positioned(
+              top: 8,
+              left: 8,
+              right: 8,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Live / Active / Busy பேட்ஜ்
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _getStatusColor(host['status']), width: 1.2),
+                    ),
+        
