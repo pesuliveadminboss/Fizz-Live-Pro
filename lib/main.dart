@@ -218,7 +218,8 @@ class MainDashboardScreen extends StatefulWidget {
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tab = 0;
-  int _userGems = 2500;
+  int _userGems = 1670;
+  int _selectedPack = 0;
 
   final List<Map<String, String>> _hosts = [
     {'name': 'Pooja', 'id': '78921', 'status': 'Live', 'level': 'LV7', 'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'},
@@ -226,6 +227,140 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     {'name': 'Sneha', 'id': '99421', 'status': 'Active', 'level': 'LV8', 'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400'},
     {'name': 'Kavya', 'id': '33109', 'status': 'Live', 'level': 'LV5', 'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'},
   ];
+
+  final List<Map<String, dynamic>> _rechargePacks = [
+    {'gems': 4050, 'price': '100.00', 'discount': ''},
+    {'gems': 8100, 'price': '200.00', 'discount': '17% off'},
+    {'gems': 16380, 'price': '400.00', 'discount': '17% off'},
+    {'gems': 32940, 'price': '800.00', 'discount': '17% off'},
+    {'gems': 66600, 'price': '1600.00', 'discount': '30% off'},
+    {'gems': 167400, 'price': '4000.00', 'discount': '60% off'},
+  ];
+
+  void _showExactRechargeSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox(width: 24),
+                      const Column(
+                        children: [
+                          Text('Make video calls with Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text('Call beauties with Gems', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey, size: 20),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 0.95,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: _rechargePacks.length,
+                    itemBuilder: (context, i) {
+                      final pack = _rechargePacks[i];
+                      final isSelected = _selectedPack == i;
+                      return GestureDetector(
+                        onTap: () => setSheetState(() => _selectedPack = i),
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFFFFF2DC) : const Color(0xFFF7F7F9),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? const Color(0xFFFFA500) : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.diamond, color: Color(0xFFFFA500), size: 24),
+                                  const SizedBox(height: 4),
+                                  Text('${pack['gems']}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14)),
+                                  Text('₹${pack['price']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                                ],
+                              ),
+                            ),
+                            if ((pack['discount'] as String).isNotEmpty)
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFF4D4F),
+                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomRight: Radius.circular(8)),
+                                  ),
+                                  child: Text(pack['discount'], style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.diamond, color: Color(0xFFFFA500), size: 16),
+                      const SizedBox(width: 4),
+                      Text('My Gems: $_userGems', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13)),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final added = _rechargePacks[_selectedPack]['gems'] as int;
+                        setState(() => _userGems += added);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Recharge Successful! Added $added Gems.')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFBA28A9),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(23)),
+                      ),
+                      child: const Text('Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   void _startPrivateCall(Map<String, String> host) {
     if (_userGems >= 1800) {
@@ -239,271 +374,99 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ),
       );
     } else {
-      _showRechargeDialog();
+      _showExactRechargeSheet();
     }
   }
 
-  void _showRechargeDialog() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF14141E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (c) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.diamond_outlined, color: Color(0xFFFFD700), size: 40),
-            const SizedBox(height: 10),
-            const Text('Insufficient Gems!', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            const Text('Private call requires 1800 Gems/min.', style: TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 16),
-            _rechargeOption('₹100', '1,200 Gems + 200 Free', () {
-              setState(() => _userGems += 1400);
-              Navigator.pop(context);
-            }),
-            const SizedBox(height: 8),
-            _rechargeOption('₹300', '4,000 Gems + 800 Free', () {
-              setState(() => _userGems += 4800);
-              Navigator.pop(context);
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _rechargeOption(String price, String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(12)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
-            ElevatedButton(
-              onPressed: onTap,
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-              child: Text(price),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
+  Widget _buildMeProfile() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(radius: 32, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+              const SizedBox(width: 14),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
+                  Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  SizedBox(height: 4),
+                  Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
                 ],
               ),
-            ),
+              const Spacer(),
+              IconButton(icon: const Icon(Icons.settings, color: Colors.grey), onPressed: () {}),
+            ],
           ),
-        ],
-      ),
-      body: _tab == 0
-          ? GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _hosts.length,
-              itemBuilder: (context, i) {
-                final h = _hosts[i];
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(h['img']!, fit: BoxFit.cover),
-                      Container(color: Colors.black26),
-                      Positioned(
-                        top: 6,
-                        left: 6,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                          child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 6,
-                        left: 6,
-                        right: 6,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                                Text(h['level']!, style: const TextStyle(color: Color(0xFFFFD700), fontSize: 10)),
-                              ],
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
-                              onPressed: () => _startPrivateCall(h),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            )
-          : Center(child: Text('Tab: $_tab', style: const TextStyle(color: Colors.grey))),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
-
-// -------------------------------------------------------------
-// புள்ளி 31-34: 1-on-1 பிரைவேட் வீடியோ கால் திரை
-// -------------------------------------------------------------
-class OneOnOneCallScreen extends StatefulWidget {
-  final Map<String, String> host;
-  final Function(int) onCallEnded;
-  const OneOnOneCallScreen({super.key, required this.host, required this.onCallEnded});
-
-  @override
-  State<OneOnOneCallScreen> createState() => _OneOnOneCallScreenState();
-}
-
-class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
-  int _seconds = 0;
-  Timer? _timer;
-  bool _isMuted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() => _seconds++);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  String _formatTime(int sec) {
-    final m = (sec ~/ 60).toString().padLeft(2, '0');
-    final s = (sec % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.network(widget.host['img']!, fit: BoxFit.cover),
-          ),
-          Positioned.fill(child: Container(color: Colors.black38)),
-          SafeArea(
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                          const Text('1800 Gems / min', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
-                        child: Text(_formatTime(_seconds), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('My Level: Lv.4', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('Lv.5', style: TextStyle(color: Colors.grey[400])),
+                  ],
                 ),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: _isMuted ? Colors.red : Colors.white24,
-                        child: IconButton(
-                          icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
-                          onPressed: () => setState(() => _isMuted = !_isMuted),
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.red,
-                        child: IconButton(
-                          icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
-                          onPressed: () {
-                            widget.onCallEnded(1800);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.white24,
-                        child: IconButton(
-                          icon: const Icon(Icons.cameraswitch, color: Colors.white),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const SizedBox(height: 8),
+                const LinearProgressIndicator(value: 0.74, backgroundColor: Colors.white12, color: Color(0xFFFFD700)),
+                const SizedBox(height: 6),
+                const Text('Top up more to 278817 gems level up', style: TextStyle(color: Colors.grey, fontSize: 11)),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(14)),
+                  child: Column(
+                    children: [
+                      const Text('My Gems', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 18)),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _showExactRechargeSheet,
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93), minimumSize: const Size(80, 30)),
+                        child: const Text('Top Up', style: TextStyle(fontSize: 11)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(14)),
+                  child: Column(
+                    children: [
+                      const Text('Beans Center', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const SizedBox(height: 4),
+                      const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 18)),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted to Admin!')));
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black, minimumSize: const Size(80, 30)),
+                        child: const Text('Withdraw', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            shape: RoundedRectangleBor
