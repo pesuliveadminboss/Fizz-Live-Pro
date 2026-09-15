@@ -211,7 +211,7 @@ class AuthorizationScreen extends StatelessWidget {
 
 class OneOnOneCallScreen extends StatefulWidget {
   final Map<String, String> host;
-  final Function(int spent) onCallEnded;
+  final Function(int) onCallEnded;
   const OneOnOneCallScreen({super.key, required this.host, required this.onCallEnded});
 
   @override
@@ -221,14 +221,11 @@ class OneOnOneCallScreen extends StatefulWidget {
 class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
   int _seconds = 0;
   Timer? _timer;
-  bool _isMuted = false;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() => _seconds++);
-    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) => setState(() => _seconds++));
   }
 
   @override
@@ -237,20 +234,17 @@ class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
     super.dispose();
   }
 
-  String _formatTime(int sec) {
-    final m = (sec ~/ 60).toString().padLeft(2, '0');
-    final s = (sec % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
   @override
   Widget build(BuildContext context) {
+    final m = (_seconds ~/ 60).toString().padLeft(2, '0');
+    final s = (_seconds % 60).toString().padLeft(2, '0');
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
           Positioned.fill(child: Image.network(widget.host['img']!, fit: BoxFit.cover)),
-          Positioned.fill(child: Container(color: Colors.black38)),
+          Positioned.fill(child: Container(color: Colors.black45)),
           SafeArea(
             child: Column(
               children: [
@@ -259,17 +253,11 @@ class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                          const Text('1800 Gems / min', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-                        ],
-                      ),
+                      Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
-                        child: Text(_formatTime(_seconds), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        child: Text('$m:$s', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -277,37 +265,16 @@ class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: _isMuted ? Colors.red : Colors.white24,
-                        child: IconButton(
-                          icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
-                          onPressed: () => setState(() => _isMuted = !_isMuted),
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.red,
-                        child: IconButton(
-                          icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
-                          onPressed: () {
-                            widget.onCallEnded(1800);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.white24,
-                        child: IconButton(
-                          icon: const Icon(Icons.cameraswitch, color: Colors.white),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
+                  child: CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.red,
+                    child: IconButton(
+                      icon: const Icon(Icons.call_end, color: Colors.white, size: 30),
+                      onPressed: () {
+                        widget.onCallEnded(1800);
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -410,14 +377,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     },
                   ),
                   const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.diamond, color: Color(0xFFFFA500), size: 16),
-                      const SizedBox(width: 4),
-                      Text('My Gems: $_userGems', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13)),
-                    ],
-                  ),
+                  Text('My Gems: $_userGems', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
@@ -441,70 +401,113 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  void _startPrivateCall(Map<String, String> host) {
-    if (_userGems >= 1800) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (c) => OneOnOneCallScreen(
-            host: host,
-            onCallEnded: (int spent) {
-              setState(() => _userGems -= spent);
-            },
-          ),
-        ),
-      );
-    } else {
-      _showRechargeSheet();
-    }
-  }
-
-  Widget _buildMeProfile() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          const Row(
+  Widget _buildHomeGrid() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.72,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: _hosts.length,
+      itemBuilder: (context, i) {
+        final h = _hosts[i];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              CircleAvatar(radius: 32, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
-              SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-                ],
+              Image.network(h['img']!, fit: BoxFit.cover),
+              Container(color: Colors.black26),
+              Positioned(
+                top: 6,
+                left: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                  child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                ),
+              ),
+              Positioned(
+                bottom: 6,
+                left: 6,
+                right: 6,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    IconButton(
+                      icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
+                      onPressed: () {
+                        if (_userGems >= 1800) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (c) => OneOnOneCallScreen(
+                                host: h,
+                                onCallEnded: (spent) => setState(() => _userGems -= spent),
+                              ),
+                            ),
+                          );
+                        } else {
+                          _showRechargeSheet();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('My Level: Lv.4', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text('Lv.5', style: TextStyle(color: Colors.grey)),
-                  ],
-                ),
-                SizedBox(height: 8),
-                LinearProgressIndicator(value: 0.74, backgroundColor: Colors.white12, color: Color(0xFFFFD700)),
-                SizedBox(height: 6),
-                Text('Top up more to 278817 gems level up', style: TextStyle(color: Colors.grey, fontSize: 11)),
-              ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMeTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          const ListTile(
+            leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+            title: Text('Pesulive User', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('My Gems'),
+            trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+            onTap: _showRechargeSheet,
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('Beans Center'),
+            trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
+            },
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('Daily Check-in Rewards'),
+            trailing: ElevatedButton(
+              onPressed: () {
+                setState(() => _userGems += 50);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+              child: const Text('Claim'),
             ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(14)),
-                  child: Column(
-                    childr
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widge
