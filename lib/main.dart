@@ -302,9 +302,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget pageBody;
-    if (_tab == 0) {
-      pageBody = GridView.builder(
+    final List<Widget> pages = [
+      // 0: For You (Host Grid)
+      GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -350,97 +350,120 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             ),
           );
         },
-      );
-    } else if (_tab == 4) {
-      pageBody = Padding(
+      ),
+
+      // 1: Follow Page
+      ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: _hosts.length,
+        itemBuilder: (context, i) {
+          final h = _hosts[i];
+          return Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              leading: CircleAvatar(backgroundImage: NetworkImage(h['img']!)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text("Level: ${h['level']} • Status: ${h['status']}", style: const TextStyle(color: Colors.grey)),
+              trailing: ElevatedButton(
+                onPressed: () => _callHost(h),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                child: const Text('Call', style: TextStyle(fontSize: 12)),
+              ),
+            ),
+          );
+        },
+      ),
+
+      // 2: Game Tab (Lucky Spin & Mini Games)
+      Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const ListTile(
-              leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
-              title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
-            ),
-            const SizedBox(height: 16),
             Card(
               color: const Color(0xFF14141E),
               child: ListTile(
-                title: const Text('My Gems', style: TextStyle(color: Colors.white)),
-                trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-                onTap: _showRechargeSheet,
-              ),
-            ),
-            Card(
-              color: const Color(0xFF14141E),
-              child: ListTile(
-                title: const Text('Beans Center', style: TextStyle(color: Colors.white)),
-                trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
-                },
-              ),
-            ),
-            Card(
-              color: const Color(0xFF14141E),
-              child: ListTile(
-                title: const Text('Daily Check-in Rewards', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.casino_rounded, color: Color(0xFFFFD700), size: 36),
+                title: const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: const Text('Spin with 100 gems & win up to 5000 gems!', style: TextStyle(color: Colors.grey, fontSize: 12)),
                 trailing: ElevatedButton(
                   onPressed: () {
-                    setState(() => _userGems += 50);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
+                    if (_userGems >= 100) {
+                      setState(() => _userGems += 200); // Net win +100
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Jackpot! You won 300 Gems!')));
+                    } else {
+                      _showRechargeSheet();
+                    }
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                  child: const Text('Claim'),
+                  child: const Text('Play', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Card(
+              color: const Color(0xFF14141E),
+              child: ListTile(
+                leading: const Icon(Icons.card_giftcard, color: Color(0xFFFF2E93), size: 36),
+                title: const Text('Treasure Box', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: const Text('Open secret box to get SVIP Badge', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('SVIP Entry Effect Unlocked!')));
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
+                  child: const Text('Open', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
           ],
         ),
-      );
-    } else {
-      pageBody = Center(child: Text('Tab: $_tab', style: const TextStyle(color: Colors.grey)));
-    }
+      ),
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          GestureDetector(
-            onTap: _showRechargeSheet,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
-                children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
-                ],
+      // 3: Messages Tab (Inbox & System Alerts)
+      ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          const Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              leading: CircleAvatar(backgroundColor: Color(0xFFFFD700), child: Icon(Icons.notifications, color: Colors.black)),
+              title: Text('System Announcement', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text('Welcome to Fizz Live Pro! 50 Free gems credited.', style: TextStyle(color: Colors.grey)),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              leading: const CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+              title: const Text('Pooja (Host)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: const Text('Hey! Missed your call, are you online now?', style: TextStyle(color: Colors.greenAccent)),
+              trailing: IconButton(
+                icon: const Icon(Icons.video_call, color: Color(0xFFFF2E93)),
+                onPressed: () => _callHost(_hosts[0]),
+              ),
+            ),
+          ),
+          Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              leading: const CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200')),
+              title: const Text('Ananya (Host)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: const Text('Thanks for the Kiss gift earlier 💕', style: TextStyle(color: Colors.grey)),
+              trailing: IconButton(
+                icon: const Icon(Icons.video_call, color: Color(0xFFFF2E93)),
+                onPressed: () => _callHost(_hosts[1]),
               ),
             ),
           ),
         ],
       ),
-      body: pageBody,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
 
+      // 4: Me Profile Tab
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const ListTile(
+              leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+       
