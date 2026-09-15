@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -74,10 +75,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
 
   void _checkPin() {
     if (_pin.text.trim() == "7777") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const LoginScreen()));
     } else {
       setState(() => _err = "Invalid PIN! Access Denied.");
       _pin.clear();
@@ -187,11 +185,10 @@ class AuthorizationScreen extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('Authorization Settings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),
-              const Text('Allow required permissions for video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              const Text('Allow permissions for 1-on-1 private video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
               const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700)), title: Text('Camera'), subtitle: Text('For video calls and streaming')),
               const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700)), title: Text('Microphone'), subtitle: Text('For voice talk')),
-              const ListTile(leading: Icon(Icons.notifications, color: Color(0xFFFFD700)), title: Text('Notification'), subtitle: Text('For call alerts')),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -221,8 +218,7 @@ class MainDashboardScreen extends StatefulWidget {
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tab = 0;
-  final List<String> _cats = ['Hot', 'Live', 'Party', 'Match'];
-  int _cat = 0;
+  int _userGems = 2500;
 
   final List<Map<String, String>> _hosts = [
     {'name': 'Pooja', 'id': '78921', 'status': 'Live', 'level': 'LV7', 'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'},
@@ -231,6 +227,74 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     {'name': 'Kavya', 'id': '33109', 'status': 'Live', 'level': 'LV5', 'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'},
   ];
 
+  void _startPrivateCall(Map<String, String> host) {
+    if (_userGems >= 1800) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => OneOnOneCallScreen(
+            host: host,
+            onCallEnded: (spent) => setState(() => _userGems -= spent),
+          ),
+        ),
+      );
+    } else {
+      _showRechargeDialog();
+    }
+  }
+
+  void _showRechargeDialog() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (c) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.diamond_outlined, color: Color(0xFFFFD700), size: 40),
+            const SizedBox(height: 10),
+            const Text('Insufficient Gems!', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            const Text('Private call requires 1800 Gems/min.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const SizedBox(height: 16),
+            _rechargeOption('₹100', '1,200 Gems + 200 Free', () {
+              setState(() => _userGems += 1400);
+              Navigator.pop(context);
+            }),
+            const SizedBox(height: 8),
+            _rechargeOption('₹300', '4,000 Gems + 800 Free', () {
+              setState(() => _userGems += 4800);
+              Navigator.pop(context);
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _rechargeOption(String price, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(12)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+            ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+              child: Text(price),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -238,79 +302,76 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         backgroundColor: const Color(0xFF101016),
         title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         actions: [
-          IconButton(icon: const Icon(Icons.search, color: Color(0xFFFFD700)), onPressed: () {}),
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                children: [
+                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
+                  const SizedBox(width: 4),
+                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       body: _tab == 0
-          ? Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: List.generate(_cats.length, (i) {
-                    return TextButton(
-                      onPressed: () => setState(() => _cat = i),
-                      child: Text(
-                        _cats[i],
-                        style: TextStyle(
-                          color: _cat == i ? const Color(0xFFFFD700) : Colors.grey,
-                          fontWeight: _cat == i ? FontWeight.bold : FontWeight.normal,
+          ? GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.72,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: _hosts.length,
+              itemBuilder: (context, i) {
+                final h = _hosts[i];
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(h['img']!, fit: BoxFit.cover),
+                      Container(color: Colors.black26),
+                      Positioned(
+                        top: 6,
+                        left: 6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                          child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
                         ),
                       ),
-                    );
-                  }),
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(8),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: _hosts.length,
-                    itemBuilder: (context, i) {
-                      final h = _hosts[i];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (c) => LiveRoomScreen(host: h)));
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Image.network(h['img']!, fit: BoxFit.cover),
-                              Container(color: Colors.black26),
-                              Positioned(
-                                top: 6,
-                                left: 6,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                                  child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 6,
-                                left: 6,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                                    Text("ID: ${h['id']} • ${h['level']}", style: const TextStyle(color: Colors.grey, fontSize: 10)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                      Positioned(
+                        bottom: 6,
+                        left: 6,
+                        right: 6,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                                Text(h['level']!, style: const TextStyle(color: Color(0xFFFFD700), fontSize: 10)),
+                              ],
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
+                              onPressed: () => _startPrivateCall(h),
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                );
+              },
             )
           : Center(child: Text('Tab: $_tab', style: const TextStyle(color: Colors.grey))),
       bottomNavigationBar: BottomNavigationBar(
@@ -332,68 +393,41 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 }
 
-class LiveRoomScreen extends StatefulWidget {
+// -------------------------------------------------------------
+// புள்ளி 31-34: 1-on-1 பிரைவேட் வீடியோ கால் திரை
+// -------------------------------------------------------------
+class OneOnOneCallScreen extends StatefulWidget {
   final Map<String, String> host;
-  const LiveRoomScreen({super.key, required this.host});
+  final Function(int) onCallEnded;
+  const OneOnOneCallScreen({super.key, required this.host, required this.onCallEnded});
 
   @override
-  State<LiveRoomScreen> createState() => _LiveRoomScreenState();
+  State<OneOnOneCallScreen> createState() => _OneOnOneCallScreenState();
 }
 
-class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  int _gems = 1200;
-  final List<String> _msgs = ['Welcome to Live Room!', 'Rahul: Hi dear 💕'];
+class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
+  int _seconds = 0;
+  Timer? _timer;
+  bool _isMuted = false;
 
-  void _openGifts() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF14141E),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Gems Balance: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _giftItem('Kiss', 180, Icons.favorite),
-                  _giftItem('Rose', 99, Icons.local_florist),
-                  _giftItem('Car', 999, Icons.directions_car),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() => _seconds++);
+    });
   }
 
-  Widget _giftItem(String name, int cost, IconData icon) {
-    return InkWell(
-      onTap: () {
-        if (_gems >= cost) {
-          setState(() {
-            _gems -= cost;
-            _msgs.add('You sent $name 🎁');
-          });
-          Navigator.pop(context);
-        } else {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Low balance!')));
-        }
-      },
-      child: Column(
-        children: [
-          CircleAvatar(backgroundColor: const Color(0xFF1E1E2C), child: Icon(icon, color: const Color(0xFFFF2E93))),
-          const SizedBox(height: 4),
-          Text(name, style: const TextStyle(color: Colors.white, fontSize: 12)),
-          Text('$cost', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 11)),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _formatTime(int sec) {
+    final m = (sec ~/ 60).toString().padLeft(2, '0');
+    final s = (sec % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   @override
@@ -402,49 +436,65 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: Image.network(widget.host['img']!, fit: BoxFit.cover)),
-          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(
+            child: Image.network(widget.host['img']!, fit: BoxFit.cover),
+          ),
+          Positioned.fill(child: Container(color: Colors.black38)),
           SafeArea(
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(icon: const Icon(Icons.arrow_back_ios, color: Colors.white), onPressed: () => Navigator.pop(context)),
-                      CircleAvatar(radius: 16, backgroundImage: NetworkImage(widget.host['img']!)),
-                      const SizedBox(width: 8),
-                      Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                        child: const Text('Follow'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                          const Text('1800 Gems / min', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
+                        child: Text(_formatTime(_seconds), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  height: 100,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ListView.builder(
-                    itemCount: _msgs.length,
-                    itemBuilder: (c, i) => Text(_msgs[i], style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                  ),
-                ),
                 Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(24),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(hintText: 'Say hi...', hintStyle: TextStyle(color: Colors.grey)),
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: _isMuted ? Colors.red : Colors.white24,
+                        child: IconButton(
+                          icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
+                          onPressed: () => setState(() => _isMuted = !_isMuted),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.card_giftcard, color: Color(0xFFFFD700), size: 30),
-                        onPressed: _openGifts,
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.red,
+                        child: IconButton(
+                          icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
+                          onPressed: () {
+                            widget.onCallEnded(1800);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.white24,
+                        child: IconButton(
+                          icon: const Icon(Icons.cameraswitch, color: Colors.white),
+                          onPressed: () {},
+                        ),
                       ),
                     ],
                   ),
