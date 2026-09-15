@@ -29,10 +29,11 @@ jobs:
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
 
-      - name: Configure Android Permissions & MinSDK
+      - name: Configure Android Permissions & MinSDK 22
         run: |
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
-          sed -i 's/minSdkVersion .*/minSdkVersion 21/' android/app/build.gradle || true
+          sed -i 's/minSdkVersion .*/minSdkVersion 22/' android/app/build.gradle || true
+          sed -i 's/flutter.minSdkVersion/22/' android/app/build.gradle || true
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
 
       - name: Get Dependencies
