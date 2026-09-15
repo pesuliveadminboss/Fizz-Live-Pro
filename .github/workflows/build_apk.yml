@@ -25,10 +25,13 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
-      # அடிப்படை ஆண்ட்ராய்டு ஃபைல்களைத் தானாக உருவாக்குகிறது
       - name: Scaffold Android Files
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
+
+      - name: Set App Name
+        run: |
+          sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
 
       - name: Get Dependencies
         run: flutter pub get
