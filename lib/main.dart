@@ -28,9 +28,6 @@ class FizzLiveProApp extends StatelessWidget {
   }
 }
 
-// -------------------------------------------------------------
-// 1. Splash Screen
-// -------------------------------------------------------------
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -101,9 +98,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// -------------------------------------------------------------
-// 2. Secret Admin Gateway
-// -------------------------------------------------------------
 class AdminGatewayScreen extends StatefulWidget {
   const AdminGatewayScreen({super.key});
 
@@ -212,9 +206,6 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   }
 }
 
-// -------------------------------------------------------------
-// 3. Login Screen (Matching Screenshots)
-// -------------------------------------------------------------
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -225,7 +216,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _agreedToPolicy = true;
 
-  void _proceedToNext() {
+  void _proceedToPermissions() {
     if (!_agreedToPolicy) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -236,11 +227,9 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Login Success! Proceeding to Permissions screen.'),
-        backgroundColor: Colors.green,
-      ),
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const AuthorizationScreen()),
     );
   }
 
@@ -252,7 +241,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color(0xFF07070A),
       body: Stack(
         children: [
-          // Floating Host Bubbles
           Positioned(
             top: size.height * 0.08,
             left: 20,
@@ -283,8 +271,6 @@ class _LoginScreenState extends State<LoginScreen> {
             right: size.width * 0.25,
             child: _buildHostAvatar("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200", 65),
           ),
-
-          // Neon Accent Ring
           Positioned(
             top: size.height * 0.56,
             right: 45,
@@ -297,8 +283,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-
-          // Bottom Login Sheet
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -317,7 +301,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Fast Login Button
                   Container(
                     width: double.infinity,
                     height: 50,
@@ -328,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     child: ElevatedButton(
-                      onPressed: _proceedToNext,
+                      onPressed: _proceedToPermissions,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -341,8 +324,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Divider
                   Row(
                     children: [
                       Expanded(child: Container(height: 1, color: Colors.white12)),
@@ -354,19 +335,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Social Icons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildSocialOption(Icons.g_mobiledata_rounded, "Google", _proceedToNext),
-                      _buildSocialOption(Icons.phone_android_rounded, "Phone", _proceedToNext),
-                      _buildSocialOption(Icons.person_rounded, "Guest", _proceedToNext),
+                      _buildSocialOption(Icons.g_mobiledata_rounded, "Google", _proceedToPermissions),
+                      _buildSocialOption(Icons.phone_android_rounded, "Phone", _proceedToPermissions),
+                      _buildSocialOption(Icons.person_rounded, "Guest", _proceedToPermissions),
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Policy Agreement
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -401,8 +378,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Help Option
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -457,3 +432,128 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+class AuthorizationScreen extends StatelessWidget {
+  const AuthorizationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                'Authorization Settings',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'To enjoy seamless live stream & video calls, please allow the required device permissions.',
+                style: TextStyle(color: Colors.grey[400], fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 32),
+              _buildPermissionItem(
+                Icons.videocam_rounded,
+                'Camera',
+                'Required for 1-on-1 private video calls and live broadcasting.',
+              ),
+              _buildPermissionItem(
+                Icons.mic_rounded,
+                'Microphone',
+                'Required for real-time voice communication during calls.',
+              ),
+              _buildPermissionItem(
+                Icons.phone_in_talk_rounded,
+                'Phone',
+                'Ensures video calls pause correctly during incoming carrier calls.',
+              ),
+              _buildPermissionItem(
+                Icons.notifications_active_rounded,
+                'Notifications',
+                'Get notified instantly when hosts invite you or send messages.',
+              ),
+              const Spacer(),
+              Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(26),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF00E5FF), Color(0xFF10B981)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00E5FF).withOpacity(0.3),
+                      blurRadius: 16,
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CallReminderScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                  ),
+                  child: Text(
+                    'Allow all permissions',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFF151520),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: Icon(icon, color: const Color(0xFFFFD700), size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                
