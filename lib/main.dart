@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1800), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -135,13 +135,6 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  void _goNext(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const AuthorizationScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,21 +154,14 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => _goNext(context),
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const AuthorizationScreen()));
+                  },
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(icon: const Icon(Icons.g_mobiledata, size: 30), onPressed: () => _goNext(context)),
-                  IconButton(icon: const Icon(Icons.phone_android, size: 24), onPressed: () => _goNext(context)),
-                  IconButton(icon: const Icon(Icons.person, size: 24), onPressed: () => _goNext(context)),
-                ],
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               const Text('Agree to Terms & Privacy Policy', style: TextStyle(color: Colors.grey, fontSize: 11)),
             ],
           ),
@@ -212,65 +198,11 @@ class AuthorizationScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CallReminderScreen()),
-                    );
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const MainDashboardScreen()));
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
                   child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CallReminderScreen extends StatelessWidget {
-  const CallReminderScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.ring_volume_rounded, color: Color(0xFFFF2E93), size: 60),
-              const SizedBox(height: 20),
-              const Text('Never Miss a Call', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 10),
-              const Text('Enable notifications to receive instant video calls.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 13)),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MainDashboardScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                  child: const Text('Turn on notifications', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MainDashboardScreen()),
-                  );
-                },
-                child: const Text('Maybe later', style: TextStyle(color: Colors.grey)),
               ),
             ],
           ),
@@ -341,10 +273,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       final h = _hosts[i];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (c) => LiveRoomScreen(host: h)),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (c) => LiveRoomScreen(host: h)));
                         },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
@@ -403,9 +332,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 }
 
-// -------------------------------------------------------------
-// புள்ளி 21-30: நேரலை அறை & பரிசுத் தட்டு (Live Room & Gift Tray)
-// -------------------------------------------------------------
 class LiveRoomScreen extends StatefulWidget {
   final Map<String, String> host;
   const LiveRoomScreen({super.key, required this.host});
@@ -415,80 +341,119 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  int _userGems = 1250;
-  final List<String> _comments = [
-    'System: Welcome to Fizz Live Pro!',
-    'Rahul: Hello beautiful 😍',
-    'Vicky: Sent a Rose 🌹',
-  ];
-  final TextEditingController _msg = TextEditingController();
+  int _gems = 1200;
+  final List<String> _msgs = ['Welcome to Live Room!', 'Rahul: Hi dear 💕'];
 
-  void _showGiftTray() {
+  void _openGifts() {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF14141E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final gifts = [
-              {'name': 'Kiss', 'cost': 180, 'icon': Icons.favorite},
-              {'name': 'Puppy', 'cost': 180, 'icon': Icons.pets},
-              {'name': 'Mystery', 'cost': 360, 'icon': Icons.card_giftcard},
-              {'name': 'Cruise', 'cost': 3700, 'icon': Icons.directions_boat},
-            ];
-
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Gems Balance: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  _giftItem('Kiss', 180, Icons.favorite),
+                  _giftItem('Rose', 99, Icons.local_florist),
+                  _giftItem('Car', 999, Icons.directions_car),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _giftItem(String name, int cost, IconData icon) {
+    return InkWell(
+      onTap: () {
+        if (_gems >= cost) {
+          setState(() {
+            _gems -= cost;
+            _msgs.add('You sent $name 🎁');
+          });
+          Navigator.pop(context);
+        } else {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Low balance!')));
+        }
+      },
+      child: Column(
+        children: [
+          CircleAvatar(backgroundColor: const Color(0xFF1E1E2C), child: Icon(icon, color: const Color(0xFFFF2E93))),
+          const SizedBox(height: 4),
+          Text(name, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text('$cost', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 11)),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned.fill(child: Image.network(widget.host['img']!, fit: BoxFit.cover)),
+          Positioned.fill(child: Container(color: Colors.black45)),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
                     children: [
-                      Text('Balance: $_userGems Gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 14)),
-                      const Text('Multiplier: 1x', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      IconButton(icon: const Icon(Icons.arrow_back_ios, color: Colors.white), onPressed: () => Navigator.pop(context)),
+                      CircleAvatar(radius: 16, backgroundImage: NetworkImage(widget.host['img']!)),
+                      const SizedBox(width: 8),
+                      Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                        child: const Text('Follow'),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: 0.8,
-                    ),
-                    itemCount: gifts.length,
-                    itemBuilder: (context, i) {
-                      final g = gifts[i];
-                      return InkWell(
-                        onTap: () {
-                          final cost = g['cost'] as int;
-                          if (_userGems >= cost) {
-                            setState(() {
-                              _userGems -= cost;
-                              _comments.add('You sent ${g['name']} 🎁');
-                            });
-                            setModalState(() {});
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Gift Sent: ${g['name']}!')),
-                            );
-                          } else {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Low balance! Please recharge.')),
-                            );
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E2C),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.white10),
-                          ),
-   
+                ),
+                const Spacer(),
+                Container(
+                  height: 100,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ListView.builder(
+                    itemCount: _msgs.length,
+                    itemBuilder: (c, i) => Text(_msgs[i], style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(hintText: 'Say hi...', hintStyle: TextStyle(color: Colors.grey)),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.card_giftcard, color: Color(0xFFFFD700), size: 30),
+                        onPressed: _openGifts,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
