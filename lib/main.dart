@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MaterialApp(
-    title: 'Fizz Live Pro',
     debugShowCheckedModeBanner: false,
     home: SplashScreen(),
   ));
@@ -12,7 +11,6 @@ void main() {
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -23,10 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (c) => const AdminGatewayScreen()),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const AdminGatewayScreen()));
       }
     });
   }
@@ -51,7 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
 class AdminGatewayScreen extends StatefulWidget {
   const AdminGatewayScreen({super.key});
-
   @override
   State<AdminGatewayScreen> createState() => _AdminGatewayScreenState();
 }
@@ -284,14 +278,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _userGems = 1670;
   int _selectedPack = 0;
 
-  final List<Map<String, String>> _hosts = [
+  final List<Map<String, String>> _hosts = const [
     {'name': 'Pooja', 'id': '78921', 'status': 'Live', 'level': 'LV7', 'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400'},
     {'name': 'Ananya', 'id': '65412', 'status': 'Busy', 'level': 'LV6', 'img': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400'},
     {'name': 'Sneha', 'id': '99421', 'status': 'Active', 'level': 'LV8', 'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400'},
     {'name': 'Kavya', 'id': '33109', 'status': 'Live', 'level': 'LV5', 'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'},
   ];
 
-  final List<Map<String, dynamic>> _rechargePacks = [
+  final List<Map<String, dynamic>> _rechargePacks = const [
     {'gems': 4050, 'price': '100.00', 'discount': ''},
     {'gems': 8100, 'price': '200.00', 'discount': '17% off'},
     {'gems': 16380, 'price': '400.00', 'discount': '17% off'},
@@ -387,55 +381,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _buildBody() {
-    if (_tab == 4) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const ListTile(
-              leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
-              title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              tileColor: const Color(0xFF14141E),
-              title: const Text('My Gems', style: TextStyle(color: Colors.white)),
-              trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-              onTap: _showRechargeSheet,
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              tileColor: const Color(0xFF14141E),
-              title: const Text('Beans Center', style: TextStyle(color: Colors.white)),
-              trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
-              },
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              tileColor: const Color(0xFF14141E),
-              title: const Text('Daily Check-in Rewards', style: TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  setState(() => _userGems += 50);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                child: const Text('Claim'),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_tab != 0) {
-      return Center(child: Text('Tab: $_tab', style: const TextStyle(color: Colors.grey)));
-    }
-
+  Widget _homeView() {
     return GridView.builder(
       padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -489,4 +435,63 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         }
                       },
                     ),
-     
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _meView() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          const ListTile(
+            leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+            title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('My Gems', style: TextStyle(color: Colors.white)),
+            trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+            onTap: _showRechargeSheet,
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('Beans Center', style: TextStyle(color: Colors.white)),
+            trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
+            },
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            tileColor: const Color(0xFF14141E),
+            title: const Text('Daily Check-in Rewards', style: TextStyle(color: Colors.white)),
+            trailing: ElevatedButton(
+              onPressed: () {
+                setState(() => _userGems += 50);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+              child: const Text('Claim'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget currentBody;
+    if (_tab == 0) {
+      currentBody = _homeView();
+    } else if
