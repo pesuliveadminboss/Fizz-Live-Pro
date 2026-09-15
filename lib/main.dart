@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +16,6 @@ class FizzLiveProApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF07070A),
         primaryColor: const Color(0xFFFFD700),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFFD700),
-          secondary: Color(0xFF00E5FF),
-          surface: Color(0xFF141419),
-        ),
       ),
       home: const SplashScreen(),
     );
@@ -39,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2200), () {
+    Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -56,39 +50,16 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFFF2E93), width: 2.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFFF2E93).withOpacity(0.35),
-                    blurRadius: 20,
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.videocam_rounded, size: 52, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
+          children: const [
+            Icon(Icons.videocam_rounded, size: 70, color: Color(0xFFFF2E93)),
+            SizedBox(height: 16),
             Text(
-              'FIZZ',
-              style: GoogleFonts.montserrat(
-                fontSize: 34,
-                fontWeight: FontWeight.w900,
+              'FIZZ LIVE PRO',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
                 letterSpacing: 4,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              'LIVE PRO',
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 8,
-                color: const Color(0xFFFFD700),
+                color: Color(0xFFFFD700),
               ),
             ),
           ],
@@ -108,7 +79,7 @@ class AdminGatewayScreen extends StatefulWidget {
 class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   final TextEditingController _pinController = TextEditingController();
   final String _masterPin = "7777";
-  String _errorMessage = "";
+  String _errorText = "";
 
   void _verifyPin() {
     if (_pinController.text.trim() == _masterPin) {
@@ -118,7 +89,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
       );
     } else {
       setState(() {
-        _errorMessage = "Invalid PIN! Access Denied.";
+        _errorText = "Invalid PIN! Access Denied.";
       });
       _pinController.clear();
     }
@@ -130,7 +101,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
       backgroundColor: const Color(0xFF07070A),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0),
+          padding: const EdgeInsets.all(24.0),
           child: Center(
             child: SingleChildScrollView(
               child: Column(
@@ -138,62 +109,47 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                 children: [
                   const Icon(Icons.admin_panel_settings_rounded, size: 60, color: Color(0xFFFFD700)),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Admin Verification',
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Enter secret Admin PIN to proceed',
-                    style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[400]),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Enter secret PIN to proceed',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
                   TextField(
                     controller: _pinController,
                     keyboardType: TextInputType.number,
                     obscureText: true,
                     textAlign: TextAlign.center,
                     maxLength: 4,
-                    style: const TextStyle(
-                      color: Color(0xFFFFD700),
-                      fontSize: 26,
-                      letterSpacing: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(color: Color(0xFFFFD700), fontSize: 26, letterSpacing: 12),
                     decoration: InputDecoration(
                       counterText: "",
                       filled: true,
                       fillColor: const Color(0xFF14141E),
                       hintText: "••••",
-                      hintStyle: TextStyle(color: Colors.grey[600], fontSize: 24, letterSpacing: 12),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF262635)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFFFD700), width: 1.5),
-                      ),
+                      hintStyle: const TextStyle(color: Colors.grey, letterSpacing: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  if (_errorMessage.isNotEmpty)
-                    Text(_errorMessage, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
-                  const SizedBox(height: 22),
+                  if (_errorText.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Text(_errorText, style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+                  ],
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 48,
                     child: ElevatedButton(
                       onPressed: _verifyPin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFD700),
                         foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Text(
-                        'Unlock App',
-                        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
+                      child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -214,53 +170,44 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _agreedToPolicy = true;
+  bool _agreed = true;
 
-  void _proceedToPermissions() {
-    if (!_agreedToPolicy) {
+  void _proceed() {
+    if (!_agreed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please agree to User Agreement & Privacy Policy'),
-          backgroundColor: Colors.redAccent,
-        ),
+        const SnackBar(content: Text('Please agree to Terms & Privacy Policy')),
       );
       return;
     }
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const AuthorizationScreen()),
     );
   }
 
-  Widget _buildHostAvatar(String imgUrl, double size) {
+  Widget _buildAvatar(String url, double size) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white24, width: 2),
-        image: DecorationImage(image: NetworkImage(imgUrl), fit: BoxFit.cover),
+        image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
       ),
     );
   }
 
-  Widget _buildSocialOption(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildSocialBtn(IconData icon, String label) {
     return InkWell(
-      onTap: onTap,
+      onTap: _proceed,
       child: Column(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF1E1E28),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: const Color(0xFF1E1E28),
+            child: Icon(icon, color: Colors.white, size: 22),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
         ],
       ),
@@ -269,158 +216,58 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final h = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Stack(
         children: [
-          Positioned(
-            top: size.height * 0.08,
-            left: 20,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200", 75),
-          ),
-          Positioned(
-            top: size.height * 0.05,
-            right: 40,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200", 65),
-          ),
-          Positioned(
-            top: size.height * 0.22,
-            left: size.width * 0.32,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200", 95),
-          ),
-          Positioned(
-            top: size.height * 0.20,
-            right: 20,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", 80),
-          ),
-          Positioned(
-            top: size.height * 0.42,
-            left: 25,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200", 85),
-          ),
-          Positioned(
-            top: size.height * 0.40,
-            right: size.width * 0.25,
-            child: _buildHostAvatar("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200", 65),
-          ),
-          Positioned(
-            top: size.height * 0.56,
-            right: 45,
-            child: Container(
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFFF2E93), width: 2),
-              ),
-            ),
-          ),
+          Positioned(top: h * 0.08, left: 24, child: _buildAvatar("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200", 70)),
+          Positioned(top: h * 0.06, right: 36, child: _buildAvatar("https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200", 60)),
+          Positioned(top: h * 0.22, left: w * 0.35, child: _buildAvatar("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200", 90)),
+          Positioned(top: h * 0.20, right: 20, child: _buildAvatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", 75)),
+          Positioned(top: h * 0.40, left: 30, child: _buildAvatar("https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200", 80)),
+          Positioned(top: h * 0.38, right: w * 0.25, child: _buildAvatar("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200", 65)),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    const Color(0xFF07070A).withOpacity(0.95),
-                    const Color(0xFF07070A),
-                  ],
-                ),
-              ),
+              color: const Color(0xFF07070A).withOpacity(0.95),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
+                  SizedBox(
                     width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFBA28A9), Color(0xFFFF2E93)],
-                      ),
-                    ),
+                    height: 48,
                     child: ElevatedButton(
-                      onPressed: _proceedToPermissions,
+                      onPressed: _proceed,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                        backgroundColor: const Color(0xFFFF2E93),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                       ),
-                      child: Text(
-                        'Fast Login',
-                        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
+                      child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Container(height: 1, color: Colors.white12)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('or', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-                      ),
-                      Expanded(child: Container(height: 1, color: Colors.white12)),
-                    ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildSocialOption(Icons.g_mobiledata_rounded, "Google", _proceedToPermissions),
-                      _buildSocialOption(Icons.phone_android_rounded, "Phone", _proceedToPermissions),
-                      _buildSocialOption(Icons.person_rounded, "Guest", _proceedToPermissions),
+                      _buildSocialBtn(Icons.g_mobiledata_rounded, "Google"),
+                      _buildSocialBtn(Icons.phone_android_rounded, "Phone"),
+                      _buildSocialBtn(Icons.person_rounded, "Guest"),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      GestureDetector(
-                        onTap: () => setState(() => _agreedToPolicy = !_agreedToPolicy),
-                        child: Icon(
-                          _agreedToPolicy ? Icons.check_circle : Icons.radio_button_unchecked,
-                          size: 18,
-                          color: _agreedToPolicy ? const Color(0xFFFF2E93) : Colors.grey,
-                        ),
+                      Checkbox(
+                        value: _agreed,
+                        activeColor: const Color(0xFFFF2E93),
+                        onChanged: (val) => setState(() => _agreed = val ?? true),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text.rich(
-                          TextSpan(
-                            text: 'Agree to ',
-                            style: const TextStyle(color: Colors.grey, fontSize: 11),
-                            children: [
-                              TextSpan(
-                                text: 'User Agreement ',
-                                style: const TextStyle(color: Color(0xFFFF2E93), fontWeight: FontWeight.bold),
-                              ),
-                              const TextSpan(text: 'and '),
-                              TextSpan(
-                                text: 'Privacy Policy',
-                                style: const TextStyle(color: Color(0xFFFF2E93), fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.headset_mic_rounded, size: 14, color: Colors.grey),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Having login issues? Find help',
-                        style: TextStyle(color: Colors.grey[400], fontSize: 11),
-                      ),
+                      const Text('Agree to User Agreement & Privacy Policy', style: TextStyle(color: Colors.grey, fontSize: 11)),
                     ],
                   ),
                 ],
@@ -436,40 +283,22 @@ class _LoginScreenState extends State<LoginScreen> {
 class AuthorizationScreen extends StatelessWidget {
   const AuthorizationScreen({super.key});
 
-  Widget _buildPermissionItem(IconData icon, String title, String description) {
+  Widget _buildItem(IconData icon, String title, String desc) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
+      padding: const EdgeInsets.only(bottom: 18.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF151520),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Icon(icon, color: const Color(0xFFFFD700), size: 24),
+          CircleAvatar(
+            backgroundColor: const Color(0xFF14141E),
+            child: Icon(icon, color: const Color(0xFFFFD700)),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12, height: 1.3),
-                ),
+                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                Text(desc, style: const TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
           ),
@@ -484,61 +313,29 @@ class AuthorizationScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF07070A),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Authorization Settings',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 8),
-              Text(
-                'To enjoy seamless live stream & video calls, please allow the required device permissions.',
-                style: TextStyle(color: Colors.grey[400], fontSize: 13, height: 1.4),
+              const Text(
+                'Allow required permissions for seamless live video call experience.',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
-              const SizedBox(height: 32),
-              _buildPermissionItem(
-                Icons.videocam_rounded,
-                'Camera',
-                'Required for 1-on-1 private video calls and live broadcasting.',
-              ),
-              _buildPermissionItem(
-                Icons.mic_rounded,
-                'Microphone',
-                'Required for real-time voice communication during calls.',
-              ),
-              _buildPermissionItem(
-                Icons.phone_in_talk_rounded,
-                'Phone',
-                'Ensures video calls pause correctly during incoming carrier calls.',
-              ),
-              _buildPermissionItem(
-                Icons.notifications_active_rounded,
-                'Notifications',
-                'Get notified instantly when hosts invite you or send messages.',
-              ),
+              const SizedBox(height: 28),
+              _buildItem(Icons.videocam_rounded, 'Camera', 'Required for live video broadcasting and 1-on-1 calls.'),
+              _buildItem(Icons.mic_rounded, 'Microphone', 'Required for real-time audio voice talk.'),
+              _buildItem(Icons.phone_in_talk_rounded, 'Phone', 'Manages calls when carrier calls arrive.'),
+              _buildItem(Icons.notifications_active_rounded, 'Notification', 'Instant alerts for invitations and messages.'),
               const Spacer(),
-              Container(
+              SizedBox(
                 width: double.infinity,
-                height: 52,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(26),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF00E5FF), Color(0xFF10B981)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00E5FF).withOpacity(0.3),
-                      blurRadius: 16,
-                    ),
-                  ],
-                ),
+                height: 48,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -547,12 +344,127 @@ class AuthorizationScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                    backgroundColor: const Color(0xFF00E5FF),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                   ),
-                  child: Text(
-                    'Allow all permissions',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-            
+                  child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CallReminderScreen extends StatelessWidget {
+  const CallReminderScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.ring_volume_rounded, color: Color(0xFFFF2E93), size: 60),
+              const SizedBox(height: 20),
+              const Text(
+                'Never Miss a Call',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Enable notifications to receive instant video calls and messages from hosts.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MainDashboardScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF2E93),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  ),
+                  child: const Text('Turn on notifications', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MainDashboardScreen()),
+                  );
+                },
+                child: const Text('Maybe later', style: TextStyle(color: Colors.grey)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MainDashboardScreen extends StatefulWidget {
+  const MainDashboardScreen({super.key});
+
+  @override
+  State<MainDashboardScreen> createState() => _MainDashboardScreenState();
+}
+
+class _MainDashboardScreenState extends State<MainDashboardScreen> {
+  int _tabIndex = 0;
+  final List<String> _tabs = ['For You', 'Follow', 'Game', 'Messages', 'Me'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: Text(_tabs[_tabIndex]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Color(0xFFFFD700)),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Center(
+        child: Text(
+          'Fizz Live Pro - ${_tabs[_tabIndex]}',
+          style: const TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tabIndex,
+        onTap: (i) => setState(() => _tabIndex = i),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0E0E14),
+        selectedItemColor: const Color(0xFFFFD700),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
+        ],
+      ),
+    );
+  }
+}
