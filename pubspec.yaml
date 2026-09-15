@@ -1,16 +1,15 @@
 name: fizz_live_pro
-description: "Fizz Live Pro - Video Call App"
-publish_to: "none"
+description: "Fizz Live Pro video streaming application"
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.2.1
-  shared_preferences: ^2.3.2
+  zego_uikit_prebuilt_call: ^4.16.10
 
 dev_dependencies:
   flutter_test:
