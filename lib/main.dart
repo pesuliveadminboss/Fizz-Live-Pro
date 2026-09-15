@@ -3,24 +3,11 @@ import 'package:flutter/material.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FizzLiveProApp());
-}
-
-class FizzLiveProApp extends StatelessWidget {
-  const FizzLiveProApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fizz Live Pro',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF07070A),
-        primaryColor: const Color(0xFFFFD700),
-      ),
-      home: const SplashScreen(),
-    );
-  }
+  runApp(const MaterialApp(
+    title: 'Fizz Live Pro',
+    debugShowCheckedModeBanner: false,
+    home: SplashScreen(),
+  ));
 }
 
 class SplashScreen extends StatefulWidget {
@@ -187,8 +174,8 @@ class AuthorizationScreen extends StatelessWidget {
               const SizedBox(height: 8),
               const Text('Allow permissions for 1-on-1 private video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
-              const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700)), title: Text('Camera'), subtitle: Text('For video calls and streaming')),
-              const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700)), title: Text('Microphone'), subtitle: Text('For voice talk')),
+              const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700)), title: Text('Camera', style: TextStyle(color: Colors.white)), subtitle: Text('For video calls and streaming', style: TextStyle(color: Colors.grey))),
+              const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700)), title: Text('Microphone', style: TextStyle(color: Colors.white)), subtitle: Text('For voice talk', style: TextStyle(color: Colors.grey))),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -219,13 +206,13 @@ class OneOnOneCallScreen extends StatefulWidget {
 }
 
 class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
-  int _seconds = 0;
+  int _sec = 0;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) => setState(() => _seconds++));
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) => setState(() => _sec++));
   }
 
   @override
@@ -236,9 +223,8 @@ class _OneOnOneCallScreenState extends State<OneOnOneCallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final m = (_seconds ~/ 60).toString().padLeft(2, '0');
-    final s = (_seconds % 60).toString().padLeft(2, '0');
-
+    final m = (_sec ~/ 60).toString().padLeft(2, '0');
+    final s = (_sec % 60).toString().padLeft(2, '0');
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -401,113 +387,101 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _buildHomeGrid() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.72,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: _hosts.length,
-      itemBuilder: (context, i) {
-        final h = _hosts[i];
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.network(h['img']!, fit: BoxFit.cover),
-              Container(color: Colors.black26),
-              Positioned(
-                top: 6,
-                left: 6,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                  child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                ),
-              ),
-              Positioned(
-                bottom: 6,
-                left: 6,
-                right: 6,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                    IconButton(
-                      icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
-                      onPressed: () {
-                        if (_userGems >= 1800) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (c) => OneOnOneCallScreen(
-                                host: h,
-                                onCallEnded: (spent) => setState(() => _userGems -= spent),
-                              ),
-                            ),
-                          );
-                        } else {
-                          _showRechargeSheet();
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMeTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          const ListTile(
-            leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
-            title: Text('Pesulive User', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            tileColor: const Color(0xFF14141E),
-            title: const Text('My Gems'),
-            trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        actions: [
+          GestureDetector(
             onTap: _showRechargeSheet,
-          ),
-          const SizedBox(height: 10),
-          ListTile(
-            tileColor: const Color(0xFF14141E),
-            title: const Text('Beans Center'),
-            trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
-            },
-          ),
-          const SizedBox(height: 10),
-          ListTile(
-            tileColor: const Color(0xFF14141E),
-            title: const Text('Daily Check-in Rewards'),
-            trailing: ElevatedButton(
-              onPressed: () {
-                setState(() => _userGems += 50);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-              child: const Text('Claim'),
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                children: [
+                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
+                  const SizedBox(width: 4),
+                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  Widge
+      body: _tab == 0
+          ? GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.72,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: _hosts.length,
+              itemBuilder: (context, i) {
+                final h = _hosts[i];
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(h['img']!, fit: BoxFit.cover),
+                      Container(color: Colors.black26),
+                      Positioned(
+                        top: 6,
+                        left: 6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                          child: Text(h['status']!, style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 6,
+                        left: 6,
+                        right: 6,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                            IconButton(
+                              icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
+                              onPressed: () {
+                                if (_userGems >= 1800) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (c) => OneOnOneCallScreen(
+                                        host: h,
+                                        onCallEnded: (spent) => setState(() => _userGems -= spent),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  _showRechargeSheet();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            )
+          : (_tab == 4
+              ? Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      const ListTile(
+                        leading: CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')),
+                        title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
+                      ),
+    
