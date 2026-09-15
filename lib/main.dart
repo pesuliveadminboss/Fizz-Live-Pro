@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 1800), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -55,12 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 16),
             Text(
               'FIZZ LIVE PRO',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 4,
-                color: Color(0xFFFFD700),
-              ),
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Color(0xFFFFD700)),
             ),
           ],
         ),
@@ -215,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -224,7 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       IconButton(icon: const Icon(Icons.person, size: 24), onPressed: _proceed),
                     ],
                   ),
-                  const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -233,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         activeColor: const Color(0xFFFF2E93),
                         onChanged: (v) => setState(() => _agreed = v ?? true),
                       ),
-                      const Text('Agree to User Agreement & Privacy Policy', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('Agree to Terms & Privacy Policy', style: TextStyle(color: Colors.grey, fontSize: 11)),
                     ],
                   ),
                 ],
@@ -262,7 +256,7 @@ class AuthorizationScreen extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('Authorization Settings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),
-              const Text('Allow required permissions for seamless experience.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              const Text('Allow required permissions for video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 28),
               const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700)), title: Text('Camera'), subtitle: Text('For video calls and streaming')),
               const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700)), title: Text('Microphone'), subtitle: Text('For voice talk')),
@@ -330,16 +324,6 @@ class CallReminderScreen extends StatelessWidget {
                   child: const Text('Turn on notifications', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MainDashboardScreen()),
-                  );
-                },
-                child: const Text('Maybe later', style: TextStyle(color: Colors.grey)),
-              ),
             ],
           ),
         ),
@@ -399,7 +383,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
                   ),
                 ),
               ),
@@ -426,10 +410,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   if (host['free'])
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF2E93),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
+                      decoration: BoxDecoration(color: const Color(0xFFFF2E93), borderRadius: BorderRadius.circular(6)),
                       child: const Text('FREE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
                     ),
                 ],
@@ -515,4 +496,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 Expanded(
                   child: GridView.builder(
                     padding: const EdgeInsets.all(10),
-                    gridDelegate: co
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: _hosts.length,
+                    itemBuilder: (c, i) => _buildHostCard(_hosts[i]),
+                  ),
+                ),
+              ],
+            )
+          : Center(child: Text('Tab $_tab Under Construction', style: const TextStyle(color: Colors.grey))),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tab,
+        o
