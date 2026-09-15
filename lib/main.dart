@@ -445,6 +445,61 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
+  Widget _buildHomeTab() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_cats.length, (i) {
+              return GestureDetector(
+                onTap: () => setState(() => _cat = i),
+                child: Text(
+                  _cats[i],
+                  style: TextStyle(
+                    color: _cat == i ? const Color(0xFFFFD700) : Colors.grey,
+                    fontWeight: _cat == i ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 15,
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        SizedBox(
+          height: 36,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _subs.length,
+            itemBuilder: (c, i) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: ChoiceChip(
+                label: Text(_subs[i]),
+                selected: _sub == i,
+                selectedColor: const Color(0xFFFF2E93),
+                onSelected: (v) => setState(() => _sub = i),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: _hosts.length,
+            itemBuilder: (c, i) => _buildHostCard(_hosts[i]),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -456,59 +511,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ],
       ),
       body: _tab == 0
-          ? Column(
-              children: [
-                SizedBox(
-                  height: 40,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(_cats.length, (i) {
-                      return GestureDetector(
-                        onTap: () => setState(() => _cat = i),
-                        child: Text(
-                          _cats[i],
-                          style: TextStyle(
-                            color: _cat == i ? const Color(0xFFFFD700) : Colors.grey,
-                            fontWeight: _cat == i ? FontWeight.bold : FontWeight.normal,
-                            fontSize: 15,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-                SizedBox(
-                  height: 36,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _subs.length,
-                    itemBuilder: (c, i) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ChoiceChip(
-                        label: Text(_subs[i]),
-                        selected: _sub == i,
-                        selectedColor: const Color(0xFFFF2E93),
-                        onSelected: (v) => setState(() => _sub = i),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(10),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemCount: _hosts.length,
-                    itemBuilder: (c, i) => _buildHostCard(_hosts[i]),
-                  ),
-                ),
-              ],
-            )
+          ? _buildHomeTab()
           : Center(child: Text('Tab $_tab Under Construction', style: const TextStyle(color: Colors.grey))),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _tab,
-        o
+        onTap: (i) => setState(() => _tab = i),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0E0E14),
+        selectedItemColor: const Color(0xFFFFD700),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
+   
