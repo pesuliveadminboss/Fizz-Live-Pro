@@ -111,13 +111,33 @@ class LiveStreamRoom extends StatefulWidget {
 class _LiveStreamRoomState extends State<LiveStreamRoom> {
   late int _g;
   String _gift = "";
+  int _likes = 120;
   final _chatCtrl = TextEditingController();
   final List<String> _roomChat = ['System: Welcome to Live Room! ❤️', 'Pooja: Hello sweet friends!'];
+  final List<Widget> _floatingHearts = [];
 
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
+  }
+
+  void _addHeart() {
+    setState(() {
+      _likes++;
+      final key = UniqueKey();
+      _floatingHearts.add(
+        Positioned(
+          key: key,
+          bottom: 80 + Random().nextDouble() * 40,
+          right: 20 + Random().nextDouble() * 30,
+          child: const Icon(Icons.favorite, color: Colors.pinkAccent, size: 28),
+        ),
+      );
+    });
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _floatingHearts.removeWhere((w) => w.key == _floatingHearts.last.key));
+    });
   }
 
   void _sendGift(String name, int cost, String em) {
@@ -132,46 +152,53 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Positioned.fill(child: Image.network(widget.host['pic']!, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[900]))),
-          Container(color: Colors.black38),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      CircleAvatar(radius: 18, backgroundImage: NetworkImage(widget.host['pic']!)),
-                      const SizedBox(width: 8),
-                      Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      const Spacer(),
-                      IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
-                    ],
+      body: GestureDetector(
+        onTap: _addHeart,
+        child: Stack(
+          children: [
+            Positioned.fill(child: Image.network(widget.host['pic']!, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[900]))),
+            Container(color: Colors.black38),
+            ..._floatingHearts,
+            SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        CircleAvatar(radius: 18, backgroundImage: NetworkImage(widget.host['pic']!)),
+                        const SizedBox(width: 8),
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          Text('❤️ $_likes likes', style: const TextStyle(color: Colors.pinkAccent, fontSize: 11)),
+                        ]),
+                        const Spacer(),
+                        IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
+                      ],
+                    ),
                   ),
-                ),
-                if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
-                const Spacer(),
-                Container(
-                  height: 100, width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: ListView.builder(itemCount: _roomChat.length, itemBuilder: (ctx, i) => Text(_roomChat[i], style: const TextStyle(color: Colors.white70, fontSize: 12))),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat...', filled: true, fillColor: Colors.black54))),
-                      IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _roomChat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
-                      IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
-                      ElevatedButton(onPressed: widget.onCall, style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), child: const Text('Call')),
-                    ],
+                  if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
+                  const Spacer(),
+                  Container(
+                    height: 90, width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: ListView.builder(itemCount: _roomChat.length, itemBuilder: (ctx, i) => Text(_roomChat[i], style: const TextStyle(color: Colors.white70, fontSize: 12))),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Tap screen to like ❤️', filled: true, fillColor: Colors.black54))),
+                        IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _roomChat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
+                        IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
+                        ElevatedButton(onPressed: widget.onCall, style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), child: const Text('Call')),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
