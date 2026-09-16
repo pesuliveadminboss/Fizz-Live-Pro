@@ -18,7 +18,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
@@ -31,20 +31,20 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(22)),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(22),
                 child: Image.network(
                   'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 80, color: Color(0xFFFF2E93)),
+                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 75, color: Color(0xFFFF2E93)),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: Color(0xFFFFD700))),
-            const SizedBox(height: 6),
+            const SizedBox(height: 14),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFFD700))),
+            const SizedBox(height: 4),
             const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
           ],
         ),
@@ -82,7 +82,7 @@ class _PinGateState extends State<PinGate> {
             children: [
               const Icon(Icons.admin_panel_settings, size: 55, color: Color(0xFFFFD700)),
               const SizedBox(height: 12),
-              const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
+              const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 12),
               TextField(
                 controller: _c,
@@ -95,7 +95,7 @@ class _PinGateState extends State<PinGate> {
               ),
               if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
               const SizedBox(height: 14),
-              ElevatedButton(onPressed: _check, child: const Text('Unlock App')),
+              ElevatedButton(onPressed: _check, child: const Text('Unlock')),
             ],
           ),
         ),
@@ -117,7 +117,7 @@ class Login extends StatelessWidget {
             const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
             const SizedBox(height: 14),
             const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 await [Permission.camera, Permission.microphone].request();
@@ -146,18 +146,17 @@ class IncomingCallScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(radius: 55, backgroundColor: Color(0xFFFF2E93), child: CircleAvatar(radius: 50, child: Icon(Icons.person, size: 55))),
-            const SizedBox(height: 20),
-            Text(host, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Incoming Private Video Call...', style: TextStyle(color: Colors.greenAccent, fontSize: 14)),
-            const Text('1800 gems/min', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-            const SizedBox(height: 50),
+            const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
+            const SizedBox(height: 16),
+            Text(host, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            const Text('Incoming Video Call... (1800/min)', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CircleAvatar(radius: 35, backgroundColor: Colors.red, child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 30), onPressed: onDecline)),
-                CircleAvatar(radius: 35, backgroundColor: Colors.green, child: IconButton(icon: const Icon(Icons.videocam, color: Colors.white, size: 30), onPressed: onAccept)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: onDecline),
+                IconButton(icon: const Icon(Icons.videocam, color: Colors.green, size: 36), onPressed: onAccept),
               ],
             ),
           ],
@@ -183,7 +182,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     setState(() => _chat.add('You: ${_msgCtrl.text}'));
     _msgCtrl.clear();
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => _chat.add('Host: Waiting in video call, call me above! 😘'));
+      if (mounted) setState(() => _chat.add('Host: Waiting in video call, tap call above! 😘'));
     });
   }
   @override
@@ -273,11 +272,11 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircleAvatar(radius: 60, child: Icon(Icons.person, size: 70)),
-                  const SizedBox(height: 12),
-                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 55)),
+                  const SizedBox(height: 10),
+                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  const Text('Live Stream Connected • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
+                  const Text('Live Stream • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
                 ],
               ),
             ),
@@ -285,12 +284,9 @@ class _CallScreenState extends State<CallScreen> {
           Positioned(
             top: 40,
             right: 16,
-            width: 100,
-            height: 140,
-            child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.pink, width: 2), borderRadius: BorderRadius.circular(12)),
-              child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
-            ),
+            width: 90,
+            height: 125,
+            child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
           ),
           SafeArea(
             child: Column(
@@ -298,7 +294,7 @@ class _CallScreenState extends State<CallScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 if (_gift.isNotEmpty) Container(margin: const EdgeInsets.only(left: 16), padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                 const Spacer(),
@@ -417,13 +413,13 @@ class _DashboardState extends State<Dashboard> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(hintText: 'Enter UPI ID (e.g. name@upi)', hintStyle: TextStyle(color: Colors.grey), filled: true, fillColor: Color(0xFF1E1E2C)),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal request submitted! Processing in 24 hrs.'), backgroundColor: Colors.green));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal request submitted!'), backgroundColor: Colors.green));
               },
-              child: const Text('Submit Withdrawal'),
+              child: const Text('Submit'),
             ),
           ],
         ),
@@ -473,29 +469,16 @@ class _DashboardState extends State<Dashboard> {
     if (_tab == 0) {
       return Column(
         children: [
-          // Top Category Tabs
-          SizedBox(
-            height: 48,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _cats.length,
-              itemBuilder: (ctx, i) {
-                final sel = _cat == i;
-                return GestureDetector(
-                  onTap: () => setState(() => _cat = i),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
-                  ),
-                );
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              for (int i = 0; i < _cats.length; i++)
+                ActionChip(
+                  label: Text(_cats[i]),
+                  backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                  onPressed: () => setState(() => _cat = i),
+                ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.all(8),
@@ -523,7 +506,6 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           const CircleAvatar(radius: 26, child: Icon(Icons.person)),
                           Text(h['name']!, style: const TextStyle(color: Colors.white)),
-                          Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
                           ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                         ],
                       ),
@@ -538,4 +520,33 @@ class _DashboardState extends State<Dashboard> {
       return ListView(
         children: [
           for (var h in _hosts)
-          
+            ListTile(
+              onTap: () => _openProfile(h),
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+            ),
+        ],
+      );
+    } else if (_tab == 2) {
+      return Center(
+        child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Play Spin & Win 150 Gems')),
+      );
+    } else if (_tab == 3) {
+      return ListView(
+        children: [
+          for (var h in _hosts)
+            ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
+            ),
+        ],
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 34, chil
