@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -152,6 +154,13 @@ class LoginScreen extends StatelessWidget {
 class AuthorizationScreen extends StatelessWidget {
   const AuthorizationScreen({super.key});
 
+  Future<void> _requestAndContinue(BuildContext context) async {
+    await [Permission.camera, Permission.microphone].request();
+    if (context.mounted) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const MainDashboardScreen()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,9 +183,7 @@ class AuthorizationScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const MainDashboardScreen()));
-                  },
+                  onPressed: () => _requestAndContinue(context),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
                   child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -184,6 +191,114 @@ class AuthorizationScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class LiveCallScreen extends StatefulWidget {
+  final String hostName;
+  final String roomID;
+  const LiveCallScreen({super.key, required this.hostName, required this.roomID});
+
+  @override
+  State<LiveCallScreen> createState() => _LiveCallScreenState();
+}
+
+class _LiveCallScreenState extends State<LiveCallScreen> {
+  Widget? _localView;
+  int? _localViewID;
+
+  @override
+  void initState() {
+    super.initState();
+    _startZegoCall();
+  }
+
+  Future<void> _startZegoCall() async {
+    const int appID = 710176630;
+    const String appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
+
+    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(
+      appID,
+      ZegoScenario.StandardVideoCall,
+      appSign: appSign,
+    ));
+
+    await ZegoExpressEngine.instance.createCanvasView((viewID) {
+      _localViewID = viewID;
+      ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(viewID));
+    }).then((widgetView) {
+      setState(() {
+        _localView = widgetView;
+      });
+    });
+
+    final user = ZegoUser('user_${DateTime.now().millisecondsSinceEpoch % 10000}', 'GuestUser');
+    await ZegoExpressEngine.instance.loginRoom(widget.roomID, user);
+    await ZegoExpressEngine.instance.startPublishingStream('stream_${user.userID}');
+  }
+
+  @override
+  void dispose() {
+    if (_localViewID != null) {
+      ZegoExpressEngine.instance.destroyCanvasView(_localViewID!);
+    }
+    ZegoExpressEngine.instance.stopPreview();
+    ZegoExpressEngine.instance.logoutRoom();
+    ZegoExpressEngine.destroyEngine();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: _localView ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93))),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)),
+                        child: Text(
+                          widget.hostName,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)),
+                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.red,
+                    child: IconButton(
+                      icon: const Icon(Icons.call_end, color: Colors.white, size: 30),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -289,7 +404,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   void _callHost(String name) {
     if (_userGems >= 1800) {
       setState(() => _userGems -= 1800);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Connected to $name! (1800 Gems spent)')));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => LiveCallScreen(
+            hostName: name,
+            roomID: 'room_${name.toLowerCase()}',
+          ),
+        ),
+      );
     } else {
       _showRechargeSheet();
     }
@@ -403,96 +526,4 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         children: [
           const ListTile(
-            leading: CircleAvatar(radius: 28, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
-            title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            subtitle: Text('ID: 207183 • Lv.4', style: TextStyle(color: Color(0xFFFFD700))),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              title: const Text('My Gems', style: TextStyle(color: Colors.white)),
-              trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-              onTap: _showRechargeSheet,
-            ),
-          ),
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              title: const Text('Beans Center', style: TextStyle(color: Colors.white)),
-              trailing: const Text('4,500', style: TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 16)),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Request Submitted!')));
-              },
-            ),
-          ),
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              title: const Text('Daily Check-in Rewards', style: TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  setState(() => _userGems += 50);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed 50 Free Gems!')));
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                child: const Text('Claim'),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget pageBody;
-    if (_tab == 0) pageBody = _tabZero();
-    else if (_tab == 1) pageBody = _tabOne();
-    else if (_tab == 2) pageBody = _tabTwo();
-    else if (_tab == 3) pageBody = _tabThree();
-    else pageBody = _tabFour();
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          GestureDetector(
-            onTap: _showRechargeSheet,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
-                children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 12)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: pageBody,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
+            leading: CircleAvatar(rad
