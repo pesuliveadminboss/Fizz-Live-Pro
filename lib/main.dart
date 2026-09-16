@@ -112,21 +112,11 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
   late int _g;
   String _gift = "";
   int _likes = 120;
-  final _chatCtrl = TextEditingController();
-  final List<String> _chat = ['Welcome to Live Room! ❤️'];
 
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
-  }
-
-  void _sendGift(String n, int c, String e) {
-    if (_g >= c) {
-      setState(() { _g -= c; _gift = "Sent $e $n!"; });
-      widget.onGems(_g);
-      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
-    }
   }
 
   @override
@@ -156,17 +146,11 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
                   ),
                   if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                   const Spacer(),
-                  Container(
-                    height: 60, padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: ListView(children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white70, fontSize: 12))]),
-                  ),
                   Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
-                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat or tap ❤️', filled: true, fillColor: Colors.black54))),
-                        IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _chat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
-                        IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
+                        const Expanded(child: Text('Tap screen to like ❤️', style: TextStyle(color: Colors.white70))),
                         ElevatedButton(onPressed: widget.onCall, child: const Text('Call')),
                       ],
                     ),
@@ -314,8 +298,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
     {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
-    {'name': 'Divya', 'city': 'Hyderabad', 'views': '6.8k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200'},
-    {'name': 'Riya', 'city': 'Kolkata', 'views': '4.5k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200'},
   ];
 
   final _packs = const [
@@ -457,11 +439,24 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ),
           ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
           Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
+          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: const TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircleAvatar(radius: 34, child: Icon(Icons.person)),
                 const SizedBox(height: 6),
-                const Text('User7789', style: TextStyle(color: Colors.whi
+                const Text('User7789', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text('👑 VIP Lv.5', style: const TextStyle(color: Colors.amber)),
+                const SizedBox(height: 6),
+                Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
