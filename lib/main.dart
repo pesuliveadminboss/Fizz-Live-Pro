@@ -201,6 +201,8 @@ class _DashboardState extends State<Dashboard> {
     {'name': 'Sneha', 'city': 'Chennai', 'views': '1.9k', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '3.5k', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
   ];
+
+  // Complete 6 Recharge Plans
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
@@ -231,11 +233,37 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _recharge() {
-    showModalBottomSheet(context: context, builder: (ctx) => ListView(padding: const EdgeInsets.all(16), children: [
-      Text('My Gems: $_gems', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      ListTile(title: const Text('4050 Gems'), trailing: ElevatedButton(onPressed: () { setState(() => _gems += 4050); Navigator.pop(ctx); }, child: const Text('₹100'))),
-      ListTile(title: const Text('8100 Gems'), trailing: ElevatedButton(onPressed: () { setState(() => _gems += 8100); Navigator.pop(ctx); }, child: const Text('₹200'))),
-    ]));
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) => ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('My: $_gems', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          for (var p in _packs)
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              leading: const Icon(Icons.diamond, color: Colors.amber),
+              title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  setState(() => _gems += (p['gems'] as int));
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
+                },
+                child: Text('₹${p['price']}'),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   void _withdraw() {
@@ -328,3 +356,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
