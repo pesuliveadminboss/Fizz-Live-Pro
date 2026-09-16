@@ -6,24 +6,23 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: SplashScreen(),
+    home: Splash(),
   ));
 }
 
-// 1. SPLASH
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class Splash extends StatefulWidget {
+  const Splash({super.key});
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<Splash> createState() => _SplashState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AdminGatewayScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
       }
     });
   }
@@ -46,23 +45,22 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// 2. ADMIN GATEWAY (PIN: 7777)
-class AdminGatewayScreen extends StatefulWidget {
-  const AdminGatewayScreen({super.key});
+class PinGate extends StatefulWidget {
+  const PinGate({super.key});
   @override
-  State<AdminGatewayScreen> createState() => _AdminGatewayScreenState();
+  State<PinGate> createState() => _PinGateState();
 }
 
-class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
-  final _pin = TextEditingController();
+class _PinGateState extends State<PinGate> {
+  final _ctrl = TextEditingController();
   String _err = "";
 
-  void _check() {
-    if (_pin.text.trim() == "7777") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+  void _verify() {
+    if (_ctrl.text.trim() == "7777") {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
     } else {
-      setState(() => _err = "Invalid PIN! Access Denied.");
-      _pin.clear();
+      setState(() => _err = "Invalid PIN!");
+      _ctrl.clear();
     }
   }
 
@@ -78,15 +76,15 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
             children: [
               const Icon(Icons.admin_panel_settings_rounded, size: 60, color: Color(0xFFFFD700)),
               const SizedBox(height: 16),
-              const Text('Admin Verification', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 16),
               TextField(
-                controller: _pin,
+                controller: _ctrl,
                 keyboardType: TextInputType.number,
                 obscureText: true,
                 textAlign: TextAlign.center,
                 maxLength: 4,
-                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 10),
+                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 8),
                 decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
               ),
               if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
@@ -95,9 +93,9 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _check,
+                  onPressed: _verify,
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                  child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -108,9 +106,8 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   }
 }
 
-// 3. FAST LOGIN
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class Login extends StatelessWidget {
+  const Login({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +129,13 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthorizationScreen())),
+                  onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Perms())),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 12),
-              const Text('By continuing, you agree to Terms & Privacy Policy', style: TextStyle(color: Colors.white38, fontSize: 11)),
-              const SizedBox(height: 10),
+              const Text('Agree to Terms & Privacy Policy', style: TextStyle(color: Colors.white38, fontSize: 11)),
             ],
           ),
         ),
@@ -148,14 +144,13 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// 4. PERMISSIONS
-class AuthorizationScreen extends StatelessWidget {
-  const AuthorizationScreen({super.key});
+class Perms extends StatelessWidget {
+  const Perms({super.key});
 
-  Future<void> _proceed(BuildContext context) async {
+  Future<void> _ask(BuildContext context) async {
     await [Permission.camera, Permission.microphone].request();
     if (context.mounted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainDashboardScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
     }
   }
 
@@ -170,20 +165,17 @@ class AuthorizationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text('Authorization Settings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text('Authorization', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),
-              const Text('Allow permissions for 1-on-1 private video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
-              const SizedBox(height: 24),
-              const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700), size: 28), title: Text('Camera', style: TextStyle(color: Colors.white)), subtitle: Text('For video calls and streaming', style: TextStyle(color: Colors.grey, fontSize: 12))),
-              const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700), size: 28), title: Text('Microphone', style: TextStyle(color: Colors.white)), subtitle: Text('For real-time voice talk', style: TextStyle(color: Colors.grey, fontSize: 12))),
+              const Text('Allow Camera & Mic for 1-on-1 calls.', style: TextStyle(color: Colors.grey)),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => _proceed(context),
+                  onPressed: () => _ask(context),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
-                  child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: const Text('Allow permissions', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -194,42 +186,41 @@ class AuthorizationScreen extends StatelessWidget {
   }
 }
 
-// 5. ZEGO RTC LIVE CALL
-class LiveCallScreen extends StatefulWidget {
-  final String hostName;
-  final String roomID;
-  const LiveCallScreen({super.key, required this.hostName, required this.roomID});
+class CallScreen extends StatefulWidget {
+  final String host;
+  final String room;
+  const CallScreen({super.key, required this.host, required this.room});
 
   @override
-  State<LiveCallScreen> createState() => _LiveCallScreenState();
+  State<CallScreen> createState() => _CallScreenState();
 }
 
-class _LiveCallScreenState extends State<LiveCallScreen> {
-  Widget? _view;
-  int? _viewID;
+class _CallScreenState extends State<CallScreen> {
+  Widget? _v;
+  int? _vid;
 
   @override
   void initState() {
     super.initState();
-    _start();
+    _initZego();
   }
 
-  Future<void> _start() async {
-    const int appID = 710176630;
-    const String appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
+  Future<void> _initZego() async {
+    const appID = 710176630;
+    const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
     await ZegoExpressEngine.instance.createCanvasView((id) {
-      _viewID = id;
+      _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
-    }).then((w) => setState(() => _view = w));
+    }).then((w) => setState(() => _v = w));
     final u = ZegoUser('u_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
-    await ZegoExpressEngine.instance.loginRoom(widget.roomID, u);
+    await ZegoExpressEngine.instance.loginRoom(widget.room, u);
     await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
   }
 
   @override
   void dispose() {
-    if (_viewID != null) ZegoExpressEngine.instance.destroyCanvasView(_viewID!);
+    if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.instance.logoutRoom();
     ZegoExpressEngine.destroyEngine();
@@ -242,7 +233,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: _view ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93)))),
+          Positioned.fill(child: _v ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93)))),
           SafeArea(
             child: Column(
               children: [
@@ -251,19 +242,15 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)), child: Text(widget.hostName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)), child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
+                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(widget.host, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                      const Chip(label: Text('LIVE', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
                     ],
                   ),
                 ),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(24),
-                  child: CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.red,
-                    child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 28), onPressed: () => Navigator.pop(context)),
-                  ),
+                  child: CircleAvatar(radius: 30, backgroundColor: Colors.red, child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white), onPressed: () => Navigator.pop(context))),
                 ),
               ],
             ),
@@ -274,14 +261,13 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
   }
 }
 
-// 6. MAIN DASHBOARD (5 Tabs, Top Categories, 6 Packs)
-class MainDashboardScreen extends StatefulWidget {
-  const MainDashboardScreen({super.key});
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
   @override
-  State<MainDashboardScreen> createState() => _MainDashboardScreenState();
+  State<Dashboard> createState() => _DashboardState();
 }
 
-class _MainDashboardScreenState extends State<MainDashboardScreen> {
+class _DashboardState extends State<Dashboard> {
   int _tab = 0;
   int _cat = 0;
   int _gems = 1670;
@@ -295,12 +281,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   ];
 
   final _packs = const [
-    {'gems': 4050, 'price': '100'},
-    {'gems': 8100, 'price': '200'},
-    {'gems': 16380, 'price': '400'},
-    {'gems': 32940, 'price': '800'},
-    {'gems': 66600, 'price': '1600'},
-    {'gems': 167400, 'price': '4000'},
+    {'gems': 4050, 'price': 100},
+    {'gems': 8100, 'price': 200},
+    {'gems': 16380, 'price': 400},
+    {'gems': 32940, 'price': 800},
+    {'gems': 66600, 'price': 1600},
+    {'gems': 167400, 'price': 4000},
   ];
 
   void _showRecharge() {
@@ -347,16 +333,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  void _call(String name) {
+  void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => LiveCallScreen(hostName: name, roomID: 'room_${name.toLowerCase()}')));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_${name.toLowerCase()}')));
     } else {
       _showRecharge();
     }
   }
 
-  Widget _tabForYou() {
+  Widget _buildForYou() {
     return Column(
       children: [
         SizedBox(
@@ -399,7 +385,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
                       const SizedBox(height: 6),
                       ElevatedButton.icon(
-                        onPressed: () => _call(h['name']!),
+                        onPressed: () => _dial(h['name']!),
                         icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
                         label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
@@ -414,7 +400,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _tabFollow() {
+  Widget _buildFollow() {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
@@ -425,14 +411,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
               title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
-              trailing: ElevatedButton(onPressed: () => _call(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
+              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
             ),
           ),
       ],
     );
   }
 
-  Widget _tabGame() {
+  Widget _buildGame() {
     return Center(
       child: Card(
         color: const Color(0xFF14141E),
@@ -463,7 +449,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _tabMessages() {
+  Widget _buildMessages() {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: const [
@@ -479,7 +465,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _tabMe() {
+  Widget _buildMe() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -495,4 +481,42 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-              
+                    Text('ID: 207183 • Lv.4 VIP', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('My Gems Balance', style: TextStyle(color: Colors.white, fontSize: 15)),
+                Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: _showRecharge,
+              icon: const Icon(Icons.diamond, color: Colors.black),
+              label: const Text('Recharge / Buy Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget page;
+    if (_tab == 0) page = _buildForYou();
+    else if (_tab == 1) page = _buildFoll
