@@ -10,7 +10,7 @@ void main() {
   ));
 }
 
-// 1. SPLASH SCREEN
+// 1. SPLASH
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -23,10 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const AdminGatewayScreen()),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AdminGatewayScreen()));
       }
     });
   }
@@ -57,15 +54,12 @@ class AdminGatewayScreen extends StatefulWidget {
 }
 
 class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
-  final TextEditingController _pin = TextEditingController();
+  final _pin = TextEditingController();
   String _err = "";
 
-  void _checkPin() {
+  void _check() {
     if (_pin.text.trim() == "7777") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
     } else {
       setState(() => _err = "Invalid PIN! Access Denied.");
       _pin.clear();
@@ -93,13 +87,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                 textAlign: TextAlign.center,
                 maxLength: 4,
                 style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 10),
-                decoration: const InputDecoration(
-                  counterText: "",
-                  filled: true,
-                  fillColor: Color(0xFF14141E),
-                  hintText: "••••",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
               ),
               if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
               const SizedBox(height: 20),
@@ -107,7 +95,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _checkPin,
+                  onPressed: _check,
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
                   child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
@@ -120,7 +108,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   }
 }
 
-// 3. FAST LOGIN SCREEN
+// 3. FAST LOGIN
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -144,12 +132,7 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AuthorizationScreen()),
-                    );
-                  },
+                  onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthorizationScreen())),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
@@ -165,17 +148,14 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// 4. PERMISSIONS SCREEN
+// 4. PERMISSIONS
 class AuthorizationScreen extends StatelessWidget {
   const AuthorizationScreen({super.key});
 
-  Future<void> _requestAndContinue(BuildContext context) async {
+  Future<void> _proceed(BuildContext context) async {
     await [Permission.camera, Permission.microphone].request();
     if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainDashboardScreen()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainDashboardScreen()));
     }
   }
 
@@ -194,22 +174,14 @@ class AuthorizationScreen extends StatelessWidget {
               const SizedBox(height: 8),
               const Text('Allow permissions for 1-on-1 private video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
-              const ListTile(
-                leading: Icon(Icons.videocam, color: Color(0xFFFFD700), size: 28),
-                title: Text('Camera', style: TextStyle(color: Colors.white)),
-                subtitle: Text('For live streaming and video chat', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ),
-              const ListTile(
-                leading: Icon(Icons.mic, color: Color(0xFFFFD700), size: 28),
-                title: Text('Microphone', style: TextStyle(color: Colors.white)),
-                subtitle: Text('For high-definition voice talk', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ),
+              const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700), size: 28), title: Text('Camera', style: TextStyle(color: Colors.white)), subtitle: Text('For video calls and streaming', style: TextStyle(color: Colors.grey, fontSize: 12))),
+              const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700), size: 28), title: Text('Microphone', style: TextStyle(color: Colors.white)), subtitle: Text('For real-time voice talk', style: TextStyle(color: Colors.grey, fontSize: 12))),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => _requestAndContinue(context),
+                  onPressed: () => _proceed(context),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
                   child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
@@ -222,7 +194,7 @@ class AuthorizationScreen extends StatelessWidget {
   }
 }
 
-// 5. ZEGO RTC LIVE VIDEO CALL SCREEN
+// 5. ZEGO RTC LIVE CALL
 class LiveCallScreen extends StatefulWidget {
   final String hostName;
   final String roomID;
@@ -233,40 +205,31 @@ class LiveCallScreen extends StatefulWidget {
 }
 
 class _LiveCallScreenState extends State<LiveCallScreen> {
-  Widget? _localView;
-  int? _localViewID;
+  Widget? _view;
+  int? _viewID;
 
   @override
   void initState() {
     super.initState();
-    _startCall();
+    _start();
   }
 
-  Future<void> _startCall() async {
+  Future<void> _start() async {
     const int appID = 710176630;
     const String appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
-
-    await ZegoExpressEngine.createEngineWithProfile(
-      ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign),
-    );
-
-    await ZegoExpressEngine.instance.createCanvasView((viewID) {
-      _localViewID = viewID;
-      ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(viewID));
-    }).then((widgetView) {
-      setState(() => _localView = widgetView);
-    });
-
-    final user = ZegoUser('u_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
-    await ZegoExpressEngine.instance.loginRoom(widget.roomID, user);
-    await ZegoExpressEngine.instance.startPublishingStream('s_${user.userID}');
+    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
+    await ZegoExpressEngine.instance.createCanvasView((id) {
+      _viewID = id;
+      ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
+    }).then((w) => setState(() => _view = w));
+    final u = ZegoUser('u_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
+    await ZegoExpressEngine.instance.loginRoom(widget.roomID, u);
+    await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
   }
 
   @override
   void dispose() {
-    if (_localViewID != null) {
-      ZegoExpressEngine.instance.destroyCanvasView(_localViewID!);
-    }
+    if (_viewID != null) ZegoExpressEngine.instance.destroyCanvasView(_viewID!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.instance.logoutRoom();
     ZegoExpressEngine.destroyEngine();
@@ -279,9 +242,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: _localView ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93))),
-          ),
+          Positioned.fill(child: _view ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93)))),
           SafeArea(
             child: Column(
               children: [
@@ -290,16 +251,8 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)),
-                        child: Text(widget.hostName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)),
-                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                      ),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)), child: Text(widget.hostName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)), child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
                     ],
                   ),
                 ),
@@ -309,10 +262,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
                   child: CircleAvatar(
                     radius: 32,
                     backgroundColor: Colors.red,
-                    child: IconButton(
-                      icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 28), onPressed: () => Navigator.pop(context)),
                   ),
                 ),
               ],
@@ -324,7 +274,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
   }
 }
 
-// 6. MAIN DASHBOARD (5 Bottom Tabs, Top Categories, Wallet & 6 Recharge Packs)
+// 6. MAIN DASHBOARD (5 Tabs, Top Categories, 6 Packs)
 class MainDashboardScreen extends StatefulWidget {
   const MainDashboardScreen({super.key});
   @override
@@ -332,23 +282,19 @@ class MainDashboardScreen extends StatefulWidget {
 }
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
-  int _currentTab = 0;
-  int _categoryIndex = 0;
-  int _userGems = 1670;
-  int _selectedPack = 0;
+  int _tab = 0;
+  int _cat = 0;
+  int _gems = 1670;
 
-  final List<String> _categories = const ['Popular', 'Nearby', 'New', 'Follow'];
-
-  final List<Map<String, String>> _hosts = const [
-    {'name': 'Pooja', 'age': '22', 'city': 'Mumbai', 'level': 'Lv.7'},
-    {'name': 'Ananya', 'age': '21', 'city': 'Delhi', 'level': 'Lv.9'},
-    {'name': 'Sneha', 'age': '23', 'city': 'Chennai', 'level': 'Lv.6'},
-    {'name': 'Kavya', 'age': '20', 'city': 'Bangalore', 'level': 'Lv.8'},
-    {'name': 'Riya', 'age': '24', 'city': 'Hyderabad', 'level': 'Lv.5'},
-    {'name': 'Diya', 'age': '22', 'city': 'Kolkata', 'level': 'Lv.7'},
+  final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
+  final _hosts = const [
+    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
+    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
   ];
 
-  final List<Map<String, dynamic>> _rechargePacks = const [
+  final _packs = const [
     {'gems': 4050, 'price': '100'},
     {'gems': 8100, 'price': '200'},
     {'gems': 16380, 'price': '400'},
@@ -357,164 +303,196 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     {'gems': 167400, 'price': '4000'},
   ];
 
-  void _showRechargeSheet() {
+  void _showRecharge() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF14141E),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      Row(
-                        children: [
-                          const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 18),
-                          const SizedBox(width: 4),
-                          Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 15)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Make 1-on-1 private video calls with gems', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  ),
-                  const SizedBox(height: 16),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1.0,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemCount: _rechargePacks.length,
-                    itemBuilder: (context, i) {
-                      final pack = _rechargePacks[i];
-                      final isSelected = _selectedPack == i;
-                      return GestureDetector(
-                        onTap: () => setSheetState(() => _selectedPack = i),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF2A2035) : const Color(0xFF1E1E2C),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? const Color(0xFFFFD700) : Colors.white12,
-                              width: isSelected ? 2 : 1,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 24),
-                              const SizedBox(height: 4),
-                              Text('${pack['gems']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                              const SizedBox(height: 2),
-                              Text('₹${pack['price']}', style: const TextStyle(color: Color(0xFFFF2E93), fontWeight: FontWeight.bold, fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final added = _rechargePacks[_selectedPack]['gems'] as int;
-                        setState(() => _userGems += added);
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Added $added Gems successfully!'), backgroundColor: Colors.green),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF2E93),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        'Pay ₹${_rechargePacks[_selectedPack]['price']} & Add Gems',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                  ),
+                  const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
                 ],
               ),
-            );
-          },
+              const SizedBox(height: 12),
+              for (var p in _packs)
+                Card(
+                  color: const Color(0xFF1E1E2C),
+                  child: ListTile(
+                    leading: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
+                    title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        setState(() => _gems += (p['gems'] as int));
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                      child: Text('₹${p['price']}', style: const TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         );
       },
     );
   }
 
-  void _callHost(String name) {
-    if (_userGems >= 1800) {
-      setState(() => _userGems -= 1800);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => LiveCallScreen(hostName: name, roomID: 'room_${name.toLowerCase()}'),
-        ),
-      );
+  void _call(String name) {
+    if (_gems >= 1800) {
+      setState(() => _gems -= 1800);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => LiveCallScreen(hostName: name, roomID: 'room_${name.toLowerCase()}')));
     } else {
-      _showRechargeSheet();
+      _showRecharge();
     }
   }
 
-  // TAB 0: FOR YOU
-  Widget _buildForYouTab() {
+  Widget _tabForYou() {
     return Column(
       children: [
-        Container(
-          height: 42,
-          margin: const EdgeInsets.symmetric(vertical: 6),
+        SizedBox(
+          height: 44,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: _categories.length,
-            itemBuilder: (context, i) {
-              final isSel = _categoryIndex == i;
+            itemCount: _cats.length,
+            itemBuilder: (ctx, i) {
+              final sel = _cat == i;
               return GestureDetector(
-                onTap: () => setState(() => _categoryIndex = i),
+                onTap: () => setState(() => _cat = i),
                 child: Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSel ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _categories[i],
-                      style: TextStyle(
-                        color: isSel ? Colors.white : Colors.grey,
-                        fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
+                  alignment: Alignment.center,
+                  child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
                 ),
               );
             },
           ),
         ),
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.78,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10
+          child: GridView.count(
+            crossAxisCount: 2,
+            childAspectRatio: 0.82,
+            padding: const EdgeInsets.all(10),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            children: [
+              for (var h in _hosts)
+                Container(
+                  decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
+                      const SizedBox(height: 6),
+                      Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                      const SizedBox(height: 6),
+                      ElevatedButton.icon(
+                        onPressed: () => _call(h['name']!),
+                        icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
+                        label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tabFollow() {
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        for (var h in _hosts)
+          Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+              trailing: ElevatedButton(onPressed: () => _call(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _tabGame() {
+    return Center(
+      child: Card(
+        color: const Color(0xFF14141E),
+        margin: const EdgeInsets.all(20),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.casino, size: 60, color: Color(0xFFFFD700)),
+              const SizedBox(height: 12),
+              const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              const Text('Spin and win bonus gems', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => _gems += 150);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                child: const Text('Play Spin', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _tabMessages() {
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: const [
+        Card(
+          color: Color(0xFF14141E),
+          child: ListTile(
+            leading: CircleAvatar(backgroundColor: Color(0xFFFF2E93), child: Icon(Icons.notifications, color: Colors.white)),
+            title: Text('System Message', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            subtitle: Text('Welcome to Fizz Live Pro! Start live calling now.', style: TextStyle(color: Colors.grey)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tabMe() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+            child: const Row(
+              children: [
+                CircleAvatar(radius: 28, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 32, color: Colors.white)),
+                SizedBox(width: 14),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              
