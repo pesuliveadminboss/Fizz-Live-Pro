@@ -31,18 +31,18 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(22)),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(20),
                 child: Image.network(
                   'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 75, color: Color(0xFFFF2E93)),
+                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93)),
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFFD700))),
             const SizedBox(height: 4),
             const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
@@ -80,10 +80,10 @@ class _PinGateState extends State<PinGate> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.admin_panel_settings, size: 55, color: Color(0xFFFFD700)),
-              const SizedBox(height: 12),
+              const Icon(Icons.admin_panel_settings, size: 50, color: Color(0xFFFFD700)),
+              const SizedBox(height: 10),
               const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: _c,
                 keyboardType: TextInputType.number,
@@ -94,7 +94,7 @@ class _PinGateState extends State<PinGate> {
                 decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••"),
               ),
               if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               ElevatedButton(onPressed: _check, child: const Text('Unlock')),
             ],
           ),
@@ -114,10 +114,10 @@ class Login extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
-            const SizedBox(height: 14),
-            const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20)),
-            const SizedBox(height: 20),
+            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
+            const SizedBox(height: 12),
+            const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 18),
             ElevatedButton(
               onPressed: () async {
                 await [Permission.camera, Permission.microphone].request();
@@ -146,12 +146,12 @@ class IncomingCallScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
-            const SizedBox(height: 16),
+            const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 45)),
+            const SizedBox(height: 14),
             Text(host, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             const Text('Incoming Video Call... (1800/min)', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
-            const SizedBox(height: 40),
+            const SizedBox(height: 36),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -182,7 +182,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     setState(() => _chat.add('You: ${_msgCtrl.text}'));
     _msgCtrl.clear();
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => _chat.add('Host: Waiting in video call, tap call above! 😘'));
+      if (mounted) setState(() => _chat.add('Host: Waiting in video call, call me above! 😘'));
     });
   }
   @override
@@ -195,7 +195,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ),
       body: Column(
         children: [
-          Expanded(child: ListView(padding: const EdgeInsets.all(12), children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white, fontSize: 16))])),
+          Expanded(child: ListView(padding: const EdgeInsets.all(12), children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white, fontSize: 15))])),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
@@ -272,9 +272,9 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 55)),
+                  const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 50)),
                   const SizedBox(height: 10),
-                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   const Text('Live Stream • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
                 ],
@@ -284,8 +284,8 @@ class _CallScreenState extends State<CallScreen> {
           Positioned(
             top: 40,
             right: 16,
-            width: 90,
-            height: 125,
+            width: 85,
+            height: 120,
             child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
           ),
           SafeArea(
@@ -305,7 +305,7 @@ class _CallScreenState extends State<CallScreen> {
                     IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
               ],
             ),
           ),
@@ -445,7 +445,7 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 36)),
+            const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 34)),
             const SizedBox(height: 8),
             Text('${h['name']} • ${h['lvl']}', style: const TextStyle(color: Colors.white, fontSize: 18)),
             Text('${h['city']} • ${h['fans']} Fans', style: const TextStyle(color: Colors.white54, fontSize: 12)),
@@ -469,16 +469,22 @@ class _DashboardState extends State<Dashboard> {
     if (_tab == 0) {
       return Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (int i = 0; i < _cats.length; i++)
-                ActionChip(
-                  label: Text(_cats[i]),
-                  backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
-                  onPressed: () => setState(() => _cat = i),
-                ),
-            ],
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                for (int i = 0; i < _cats.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ActionChip(
+                      label: Text(_cats[i]),
+                      backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                      onPressed: () => setState(() => _cat = i),
+                    ),
+                  ),
+              ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8),
@@ -504,7 +510,7 @@ class _DashboardState extends State<Dashboard> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const CircleAvatar(radius: 26, child: Icon(Icons.person)),
+                          const CircleAvatar(radius: 24, child: Icon(Icons.person)),
                           Text(h['name']!, style: const TextStyle(color: Colors.white)),
                           ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                         ],
@@ -541,12 +547,4 @@ class _DashboardState extends State<Dashboard> {
               title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
               subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
-            ),
-        ],
-      );
-    } else {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 34, chil
+     
