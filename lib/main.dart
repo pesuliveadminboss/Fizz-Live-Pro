@@ -5,12 +5,7 @@ import 'package:zego_express_engine/zego_express_engine.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Splash(),
-    ),
-  );
+  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
 }
 
 class Splash extends StatefulWidget {
@@ -25,13 +20,9 @@ class _SplashState extends State<Splash> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const PinGate()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,35 +34,19 @@ class _SplashState extends State<Splash> {
             Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.network(
                   'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                  errorBuilder: (c, e, s) => const Icon(
-                    Icons.videocam,
-                    size: 70,
-                    color: Color(0xFFFF2E93),
-                  ),
+                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93)),
                 ),
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'FIZZ LIVE PRO',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFFFD700),
-              ),
-            ),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFFD700))),
             const SizedBox(height: 4),
-            const Text(
-              '18+ Private Live Video Chat',
-              style: TextStyle(fontSize: 12, color: Colors.white54),
-            ),
+            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
           ],
         ),
       ),
@@ -88,19 +63,14 @@ class PinGate extends StatefulWidget {
 class _PinGateState extends State<PinGate> {
   final _c = TextEditingController();
   String _msg = "";
-
   void _check() {
     if (_c.text.trim() == "7777") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Login()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
     } else {
       setState(() => _msg = "Invalid PIN!");
       _c.clear();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,16 +81,9 @@ class _PinGateState extends State<PinGate> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.admin_panel_settings,
-                size: 50,
-                color: Color(0xFFFFD700),
-              ),
+              const Icon(Icons.admin_panel_settings, size: 50, color: Color(0xFFFFD700)),
               const SizedBox(height: 10),
-              const Text(
-                'Admin PIN (7777)',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
+              const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 10),
               TextField(
                 controller: _c,
@@ -128,24 +91,12 @@ class _PinGateState extends State<PinGate> {
                 obscureText: true,
                 textAlign: TextAlign.center,
                 maxLength: 4,
-                style: const TextStyle(
-                  color: Color(0xFFFFD700),
-                  fontSize: 22,
-                ),
-                decoration: const InputDecoration(
-                  counterText: "",
-                  filled: true,
-                  fillColor: Color(0xFF14141E),
-                  hintText: "••••",
-                ),
+                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 22),
+                decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••"),
               ),
-              if (_msg.isNotEmpty)
-                Text(_msg, style: const TextStyle(color: Colors.redAccent)),
+              if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
               const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _check,
-                child: const Text('Unlock'),
-              ),
+              ElevatedButton(onPressed: _check, child: const Text('Unlock')),
             ],
           ),
         ),
@@ -156,7 +107,6 @@ class _PinGateState extends State<PinGate> {
 
 class Login extends StatelessWidget {
   const Login({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,28 +115,14 @@ class Login extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              radius: 36,
-              child: Icon(Icons.person, size: 36),
-            ),
+            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
             const SizedBox(height: 12),
-            const Text(
-              'Meet Real Friends Nearby',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
+            const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 18),
             ElevatedButton(
               onPressed: () async {
-                await [
-                  Permission.camera,
-                  Permission.microphone,
-                ].request();
-                if (context.mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const Dashboard()),
-                  );
-                }
+                await [Permission.camera, Permission.microphone].request();
+                if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
               },
               child: const Text('Fast Login & Allow Permissions'),
             ),
@@ -201,14 +137,7 @@ class IncomingCallScreen extends StatelessWidget {
   final String host;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
-
-  const IncomingCallScreen({
-    super.key,
-    required this.host,
-    required this.onAccept,
-    required this.onDecline,
-  });
-
+  const IncomingCallScreen({super.key, required this.host, required this.onAccept, required this.onDecline});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -217,36 +146,17 @@ class IncomingCallScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              radius: 45,
-              child: Icon(Icons.person, size: 45),
-            ),
+            const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 45)),
             const SizedBox(height: 14),
-            Text(
-              host,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text(host, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            const Text(
-              'Incoming Video Call... (1800/min)',
-              style: TextStyle(color: Colors.greenAccent, fontSize: 13),
-            ),
+            const Text('Incoming Video Call... (1800/min)', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
             const SizedBox(height: 36),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.call_end, color: Colors.red, size: 36),
-                  onPressed: onDecline,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.videocam, color: Colors.green, size: 36),
-                  onPressed: onAccept,
-                ),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: onDecline),
+                IconButton(icon: const Icon(Icons.videocam, color: Colors.green, size: 36), onPressed: onAccept),
               ],
             ),
           ],
@@ -259,13 +169,7 @@ class IncomingCallScreen extends StatelessWidget {
 class ChatDetailScreen extends StatefulWidget {
   final String host;
   final VoidCallback onCall;
-
-  const ChatDetailScreen({
-    super.key,
-    required this.host,
-    required this.onCall,
-  });
-
+  const ChatDetailScreen({super.key, required this.host, required this.onCall});
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
@@ -273,7 +177,6 @@ class ChatDetailScreen extends StatefulWidget {
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final _msgCtrl = TextEditingController();
   final List<String> _chat = ['Host: Hi dear! Call me live ❤️'];
-
   void _send() {
     if (_msgCtrl.text.isEmpty) return;
     setState(() => _chat.add('You: ${_msgCtrl.text}'));
@@ -283,51 +186,26 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       setState(() => _chat.add('Host: Waiting in call, tap call above! 😘'));
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
         title: Text(widget.host),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.pink),
-            onPressed: widget.onCall,
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.videocam, color: Colors.pink), onPressed: widget.onCall)],
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                for (var m in _chat)
-                  Text(
-                    m,
-                    style: const TextStyle(color: Colors.white, fontSize: 15),
-                  ),
-              ],
-            ),
-          ),
+          Expanded(child: ListView(padding: const EdgeInsets.all(12), children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white, fontSize: 15))])),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.amber),
-                  onPressed: _send,
-                ),
+                Expanded(child: TextField(controller: _msgCtrl, style: const TextStyle(color: Colors.white))),
+                IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: _send),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
@@ -339,15 +217,7 @@ class CallScreen extends StatefulWidget {
   final String room;
   final int userGems;
   final Function(int) onGems;
-
-  const CallScreen({
-    super.key,
-    required this.host,
-    required this.room,
-    required this.userGems,
-    required this.onGems,
-  });
-
+  const CallScreen({super.key, required this.host, required this.room, required this.userGems, required this.onGems});
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
@@ -357,40 +227,28 @@ class _CallScreenState extends State<CallScreen> {
   int? _vid;
   late int _gems;
   String _gift = "";
-
   @override
   void initState() {
     super.initState();
     _gems = widget.userGems;
     _startPreview();
   }
-
   Future<void> _startPreview() async {
     const appID = 710176630;
-    const appSign =
-        '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
-    await ZegoExpressEngine.createEngineWithProfile(
-      ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign),
-    );
+    const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
+    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
     await ZegoExpressEngine.instance.createCanvasView((id) {
       _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     }).then((w) => setState(() => _myCam = w));
   }
-
   void _sendGift(String name, int cost, String em) {
     if (_gems >= cost) {
-      setState(() {
-        _gems -= cost;
-        _gift = "Sent $em $name!";
-      });
+      setState(() { _gems -= cost; _gift = "Sent $em $name!"; });
       widget.onGems(_gems);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = "");
-      });
+      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
     }
   }
-
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -398,7 +256,6 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -411,24 +268,11 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircleAvatar(
-                    radius: 45,
-                    child: Icon(Icons.person, size: 50),
-                  ),
+                  const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 50)),
                   const SizedBox(height: 10),
-                  Text(
-                    '${widget.host} is speaking...',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Live Stream • 1800/min',
-                    style: TextStyle(color: Colors.greenAccent, fontSize: 12),
-                  ),
+                  const Text('Live Stream • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
                 ],
               ),
             ),
@@ -438,10 +282,7 @@ class _CallScreenState extends State<CallScreen> {
             right: 16,
             width: 85,
             height: 120,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: _myCam ?? const Center(child: CircularProgressIndicator()),
-            ),
+            child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
           ),
           SafeArea(
             child: Column(
@@ -449,41 +290,15 @@ class _CallScreenState extends State<CallScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(
-                    widget.host,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
-                if (_gift.isNotEmpty)
-                  Container(
-                    margin: const EdgeInsets.only(left: 16),
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.pink,
-                    child: Text(
-                      _gift,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
+                if (_gift.isNotEmpty) Container(margin: const EdgeInsets.only(left: 16), padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                 const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.call_end, color: Colors.red, size: 36),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.card_giftcard,
-                        color: Colors.amber,
-                        size: 36,
-                      ),
-                      onPressed: () => _sendGift('Car', 1000, '🏎️'),
-                    ),
+                    IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
+                    IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -510,12 +325,11 @@ class _DashboardState extends State<Dashboard> {
 
   final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
   final _hosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7', 'bio': 'Dancer ❤️', 'fans': '14.2k'},
-    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9', 'bio': 'Call me 😘', 'fans': '28.9k'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'bio': 'Tamil ponnu ✨', 'fans': '9.8k'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'bio': 'Party lover!', 'fans': '19.4k'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
+    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
   ];
-
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
@@ -528,10 +342,6 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    _scheduleFakeIncoming();
-  }
-
-  void _scheduleFakeIncoming() {
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted && !_incomingShown) {
         _incomingShown = true;
@@ -559,10 +369,7 @@ class _DashboardState extends State<Dashboard> {
       builder: (ctx) => ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            'My Gems: $_gems',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          Text('My Gems: $_gems', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           for (var p in _packs)
             ListTile(
               title: Text('${p['gems']} Gems'),
@@ -589,39 +396,16 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Cashout / Withdraw',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Cashout / Withdraw', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              'Balance: $_gems Gems',
-              style: const TextStyle(color: Color(0xFFFFD700)),
-            ),
+            Text('Balance: $_gems Gems', style: const TextStyle(color: Color(0xFFFFD700))),
             const SizedBox(height: 12),
-            TextField(
-              controller: upiCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: 'Enter UPI ID',
-                filled: true,
-                fillColor: Color(0xFF1E1E2C),
-              ),
-            ),
+            TextField(controller: upiCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter UPI ID', filled: true, fillColor: Color(0xFF1E1E2C))),
             const SizedBox(height: 14),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Withdrawal request submitted!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal request submitted!'), backgroundColor: Colors.green));
               },
               child: const Text('Submit'),
             ),
@@ -634,60 +418,131 @@ class _DashboardState extends State<Dashboard> {
   void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CallScreen(
-            host: name,
-            room: 'room_${name.toLowerCase()}',
-            userGems: _gems,
-            onGems: (g) => setState(() => _gems = g),
-          ),
-        ),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_${name.toLowerCase()}', userGems: _gems, onGems: (g) => setState(() => _gems = g))));
     } else {
       _recharge();
     }
   }
 
-  void _openProfile(Map<String, String> h) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF101018),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 34)),
-            const SizedBox(height: 8),
-            Text(
-              '${h['name']} • ${h['lvl']}',
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-            ),
-            Text(
-              '${h['city']} • ${h['fans']} Fans',
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              h['bio']!,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
-            ),
-            const SizedBox(height: 14),
-            Row(
+  Widget _body() {
+    if (_tab == 0) {
+      return Column(
+        children: [
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: const Text('Follow'),
+                for (int i = 0; i < _cats.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ActionChip(
+                      label: Text(_cats[i]),
+                      backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                      onPressed: () => setState(() => _cat = i),
+                    ),
                   ),
-                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]['name']!),
+                icon: const Icon(Icons.radar),
+                label: const Text('Random Match (1800 gems)'),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(8),
+              children: [
+                for (var h in _hosts)
+                  Card(
+                    color: const Color(0xFF14141E),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircleAvatar(radius: 24, child: Icon(Icons.person)),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                        Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else if (_tab == 1) {
+      return ListView(
+        children: [
+          for (var h in _hosts)
+            ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+            ),
+        ],
+      );
+    } else if (_tab == 2) {
+      return Center(
+        child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Play Spin & Win 150 Gems')),
+      );
+    } else if (_tab == 3) {
+      return ListView(
+        children: [
+          for (var h in _hosts)
+            ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
+            ),
+        ],
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 32)),
+            const SizedBox(height: 8),
+            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18)),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _dial(h['name']!);
-                    },
-                    child: const Text('Call (1800)'
+                OutlinedButton(onPressed: _showWithdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white))),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        title: const Text('Fizz Live Pro'),
+        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+      ),
+      body: _body(),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (i) => setState(() => _tab = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'For You'),
+          NavigationDestination(icon: Icon(Icons.favorite), label: 'Follow'),
+          NavigationDestination(icon: Icon(Icons.casino), label: 'Game'),
+          NavigationDestination(icon: Icon(Icons.chat), labe
