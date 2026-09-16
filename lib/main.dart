@@ -14,61 +14,39 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
-  late AnimationController _anim;
-  late Animation<double> _scale;
-
+class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    _anim = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
-    _scale = CurvedAnimation(parent: _anim, curve: Curves.easeOutBack);
-    _anim.forward();
-
-    Future.delayed(const Duration(milliseconds: 1800), () {
+    Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
-
-  @override
-  void dispose() {
-    _anim.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Center(
-        child: ScaleTransition(
-          scale: _scale,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 130,
-                height: 130,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(26),
-                  boxShadow: [
-                    BoxShadow(color: const Color(0xFFFF2E93).withOpacity(0.4), blurRadius: 26, spreadRadius: 3),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(26),
-                  child: Image.network(
-                    'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                    errorBuilder: (ctx, err, stack) => const Icon(Icons.videocam_rounded, size: 85, color: Color(0xFFFF2E93)),
-                  ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(22)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Image.network(
+                  'https://i.ibb.co/3k5fB0K/fizz-logo.png',
+                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 75, color: Color(0xFFFF2E93)),
                 ),
               ),
-              const SizedBox(height: 18),
-              const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
-              const SizedBox(height: 6),
-              const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54, letterSpacing: 1)),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: Color(0xFFFFD700))),
+            const SizedBox(height: 6),
+            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
+          ],
         ),
       ),
     );
@@ -232,12 +210,12 @@ class _CallScreenState extends State<CallScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                        child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 16)),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(6)),
                         child: const Text('1800/min', style: TextStyle(color: Colors.white, fontSize: 12)),
                       ),
@@ -251,63 +229,6 @@ class _CallScreenState extends State<CallScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class MatchScreen extends StatefulWidget {
-  final List<Map<String, String>> hosts;
-  final Function(String) onMatched;
-  const MatchScreen({super.key, required this.hosts, required this.onMatched});
-  @override
-  State<MatchScreen> createState() => _MatchScreenState();
-}
-
-class _MatchScreenState extends State<MatchScreen> {
-  String status = "Searching for nearby hosts...";
-  @override
-  void initState() {
-    super.initState();
-    _startMatching();
-  }
-
-  void _startMatching() {
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      if (mounted) {
-        final randHost = widget.hosts[Random().nextInt(widget.hosts.length)];
-        setState(() => status = "Matched with ${randHost['name']}!");
-        Future.delayed(const Duration(milliseconds: 800), () {
-          if (mounted) {
-            Navigator.pop(context);
-            widget.onMatched(randHost['name']!);
-          }
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0A0A12),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: 80,
-              height: 80,
-              child: CircularProgressIndicator(strokeWidth: 4, color: Color(0xFFFF2E93)),
-            ),
-            const SizedBox(height: 24),
-            Text(status, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Quick Random Video Match", style: TextStyle(color: Colors.grey, fontSize: 13)),
-            const SizedBox(height: 24),
-            ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ],
-        ),
       ),
     );
   }
@@ -328,10 +249,10 @@ class _DashboardState extends State<Dashboard> {
   final _hosts = const [
     {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7', 'status': 'Online', 'bio': 'Dancer & model. Love late night video chats! ❤️', 'followers': '14.2k'},
     {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9', 'status': 'Online', 'bio': 'College girl. Free now, call me darling 😘', 'followers': '28.9k'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'status': 'Online', 'bio': 'Tamil ponnu! Always happy to make new friends ✨', 'followers': '9.8k'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'status': 'Online', 'bio': 'Party lover & fashion vlogger. Call for fun!', 'followers': '19.4k'},
-    {'name': 'Rhea', 'city': 'Hyderabad', 'lvl': 'Lv.5', 'status': 'Online', 'bio': 'Sweet & naughty. 1-on-1 private talk only 💋', 'followers': '7.1k'},
-    {'name': 'Divya', 'city': 'Kolkata', 'lvl': 'Lv.7', 'status': 'Online', 'bio': 'Singer & artist. Chill vibes only 🎵', 'followers': '12.5k'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'status': 'Online', 'bio': 'Tamil ponnu! Happy to make friends ✨', 'followers': '9.8k'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'status': 'Online', 'bio': 'Fashion vlogger. Call for fun!', 'followers': '19.4k'},
+    {'name': 'Rhea', 'city': 'Hyderabad', 'lvl': 'Lv.5', 'status': 'Online', 'bio': 'Sweet & talkative. Private calls only 💋', 'followers': '7.1k'},
+    {'name': 'Divya', 'city': 'Kolkata', 'lvl': 'Lv.7', 'status': 'Online', 'bio': 'Music lover. Chill vibes only 🎵', 'followers': '12.5k'},
   ];
 
   final _packs = const [
@@ -360,7 +281,6 @@ class _DashboardState extends State<Dashboard> {
                   onPressed: () {
                     setState(() => _gems += (p['gems'] as int));
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
                   },
                   child: Text('₹${p['price']}'),
                 ),
@@ -380,86 +300,51 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  void _openHostProfile(Map<String, String> h) {
+  void _openProfile(Map<String, String> h) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: const Color(0xFF101018),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircleAvatar(
-                radius: 46,
-                backgroundColor: const Color(0xFFFF2E93),
-                child: const CircleAvatar(radius: 43, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 50, color: Colors.white)),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(h['name']!, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: const Color(0xFFFFD700), borderRadius: BorderRadius.circular(6)),
-                    child: Text(h['lvl']!, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text('${h['city']} • ${h['followers']} Followers', style: const TextStyle(color: Colors.white54, fontSize: 13)),
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: const Color(0xFF181824), borderRadius: BorderRadius.circular(12)),
-                child: Text(h['bio']!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 13)),
-              ),
-              const SizedBox(height: 18),
+              const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
+              const SizedBox(height: 10),
+              Text('${h['name']} • ${h['lvl']}', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('${h['city']} • ${h['followers']} Fans', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              const SizedBox(height: 10),
+              Text(h['bio']!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
+                    child: OutlinedButton(
                       onPressed: () {
                         Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Followed ${h['name']}!'), backgroundColor: Colors.pink));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Followed ${h['name']}!')));
                       },
-                      icon: const Icon(Icons.favorite, color: Color(0xFFFF2E93)),
-                      label: const Text('Follow', style: TextStyle(color: Colors.white)),
+                      child: const Text('Follow'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(ctx);
                         _dial(h['name']!);
                       },
-                      icon: const Icon(Icons.videocam, color: Colors.white),
-                      label: const Text('Call Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                      child: const Text('Call (1800)'),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
             ],
           ),
         );
       },
     );
-  }
-
-  void _startRandomMatch() {
-    if (_gems < 1800) {
-      _showRecharge();
-      return;
-    }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => MatchScreen(hosts: _hosts, onMatched: (name) => _dial(name))));
   }
 
   Widget _buildBody() {
@@ -478,14 +363,16 @@ class _DashboardState extends State<Dashboard> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.all(8),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _startRandomMatch,
-                icon: const Icon(Icons.radar, color: Colors.white),
-                label: const Text('Start Random Video Match (1800 gems)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                onPressed: () {
+                  final rand = _hosts[Random().nextInt(_hosts.length)];
+                  _dial(rand['name']!);
+                },
+                icon: const Icon(Icons.radar),
+                label: const Text('Random Match (1800 gems)'),
               ),
             ),
           ),
@@ -496,17 +383,15 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 for (var h in _hosts)
                   GestureDetector(
-                    onTap: () => _openHostProfile(h),
+                    onTap: () => _openProfile(h),
                     child: Card(
                       color: const Color(0xFF14141E),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const CircleAvatar(radius: 26, child: Icon(Icons.person)),
-                          const SizedBox(height: 4),
                           Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                          const SizedBox(height: 4),
                           ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                         ],
                       ),
@@ -522,5 +407,72 @@ class _DashboardState extends State<Dashboard> {
         children: [
           for (var h in _hosts)
             ListTile(
-              onTap: () => _openHostProfile(h),
-              leading: const CircleAvatar(child: Icon(Ic
+              onTap: () => _openProfile(h),
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              subtitle: Text('${h['city']} • ${h['status']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+            ),
+        ],
+      );
+    } else if (_tab == 2) {
+      return Center(
+        child: ElevatedButton(
+          onPressed: () => setState(() => _gems += 150),
+          child: const Text('Play Spin & Win 150 Gems'),
+        ),
+      );
+    } else if (_tab == 3) {
+      return const Center(child: Text('Welcome to Fizz Live Pro Messages!', style: TextStyle(color: Colors.white)));
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
+            const SizedBox(height: 8),
+            const Text('Pesulive User • VIP Lv.4', style: TextStyle(color: Colors.white)),
+            Text('Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 20)),
+            const SizedBox(height: 12),
+            ElevatedButton(onPressed: _showRecharge, child: const Text('Buy Gems')),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton.icon(
+            onPressed: _showRecharge,
+            icon: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
+            label: Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700))),
+          ),
+        ],
+      ),
+      body: _buildBody(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tab,
+        onTap: (i) => setState(() => _tab = i),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0E0E14),
+        selectedItemColor: const Color(0xFFFFD700),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
+        ],
+      ),
+    );
+  }
+}
+
