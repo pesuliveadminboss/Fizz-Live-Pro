@@ -34,20 +34,16 @@ jobs:
           echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
 
-      - name: Write 55-Point App Code
+      - name: Create Clean Main Dart
         run: |
-          rm -f lib/main.dart
-          cat << 'EOF' > lib/main.dart
-          import 'package:flutter/material.dart';
+          python3 - << 'PYEOF'
+          dart_code = """import 'package:flutter/material.dart';
           import 'package:permission_handler/permission_handler.dart';
           import 'package:zego_express_engine/zego_express_engine.dart';
 
           void main() {
             WidgetsFlutterBinding.ensureInitialized();
-            runApp(const MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: Splash(),
-            ));
+            runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
           }
 
           class Splash extends StatefulWidget {
@@ -61,12 +57,9 @@ jobs:
             void initState() {
               super.initState();
               Future.delayed(const Duration(milliseconds: 1200), () {
-                if (mounted) {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
-                }
+                if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
               });
             }
-
             @override
             Widget build(BuildContext context) {
               return const Scaffold(
@@ -93,17 +86,15 @@ jobs:
 
           class _PinGateState extends State<PinGate> {
             final _ctrl = TextEditingController();
-            String _err = "";
-
+            String _err = '';
             void _verify() {
-              if (_ctrl.text.trim() == "7777") {
+              if (_ctrl.text.trim() == '7777') {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
               } else {
-                setState(() => _err = "Invalid PIN!");
+                setState(() => _err = 'Invalid PIN!');
                 _ctrl.clear();
               }
             }
-
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -125,7 +116,7 @@ jobs:
                           textAlign: TextAlign.center,
                           maxLength: 4,
                           style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 8),
-                          decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
+                          decoration: const InputDecoration(counterText: '', filled: true, fillColor: Color(0xFF14141E), hintText: '••••', border: OutlineInputBorder()),
                         ),
                         if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
                         const SizedBox(height: 20),
@@ -148,7 +139,6 @@ jobs:
 
           class Login extends StatelessWidget {
             const Login({super.key});
-
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -186,14 +176,12 @@ jobs:
 
           class Perms extends StatelessWidget {
             const Perms({super.key});
-
             Future<void> _ask(BuildContext context) async {
               await [Permission.camera, Permission.microphone].request();
               if (context.mounted) {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
               }
             }
-
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -230,7 +218,6 @@ jobs:
             final String host;
             final String room;
             const CallScreen({super.key, required this.host, required this.room});
-
             @override
             State<CallScreen> createState() => _CallScreenState();
           }
@@ -238,13 +225,11 @@ jobs:
           class _CallScreenState extends State<CallScreen> {
             Widget? _v;
             int? _vid;
-
             @override
             void initState() {
               super.initState();
               _initZego();
             }
-
             Future<void> _initZego() async {
               const appID = 710176630;
               const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
@@ -253,11 +238,10 @@ jobs:
                 _vid = id;
                 ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
               }).then((w) => setState(() => _v = w));
-              final u = ZegoUser('u_\${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
+              final u = ZegoUser('u_' + str(DateTime.now().millisecondsSinceEpoch % 10000), 'Guest');
               await ZegoExpressEngine.instance.loginRoom(widget.room, u);
-              await ZegoExpressEngine.instance.startPublishingStream('s_\${u.userID}');
+              await ZegoExpressEngine.instance.startPublishingStream('s_' + u.userID);
             }
-
             @override
             void dispose() {
               if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -266,7 +250,6 @@ jobs:
               ZegoExpressEngine.destroyEngine();
               super.dispose();
             }
-
             @override
             Widget build(BuildContext context) {
               return Scaffold(
@@ -345,7 +328,7 @@ jobs:
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text('My Gems: \$_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+                            Text('My Gems: ' + _gems.toString(), style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -354,15 +337,15 @@ jobs:
                             color: const Color(0xFF1E1E2C),
                             child: ListTile(
                               leading: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
-                              title: Text('\${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              title: Text(p['gems'].toString() + ' Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                               trailing: ElevatedButton(
                                 onPressed: () {
                                   setState(() => _gems += (p['gems'] as int));
                                   Navigator.pop(ctx);
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added \${p['gems']} Gems!'), backgroundColor: Colors.green));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ' + p['gems'].toString() + ' Gems!'), backgroundColor: Colors.green));
                                 },
                                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                                child: Text('₹\${p['price']}', style: const TextStyle(color: Colors.white)),
+                                child: Text('₹' + p['price'].toString(), style: const TextStyle(color: Colors.white)),
                               ),
                             ),
                           ),
@@ -376,7 +359,7 @@ jobs:
             void _dial(String name) {
               if (_gems >= 1800) {
                 setState(() => _gems -= 1800);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_\${name.toLowerCase()}')));
+                Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_' + name.toLowerCase())));
               } else {
                 _showRecharge();
               }
@@ -423,9 +406,10 @@ jobs:
                                   const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
                                   const SizedBox(height: 6),
                                   Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                  Text('\${h['city']} • \${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                                  Text(h['city']! + ' • ' + h['lvl']!, style: const TextStyle(color: Colors.white54, fontSize: 11)),
                                   const SizedBox(height: 6),
                                   ElevatedButton.icon(
                                     onPressed: () => _dial(h['name']!),
                                     icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
-                                    label: const Text('
+                                    label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
+      
