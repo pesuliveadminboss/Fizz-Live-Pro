@@ -29,19 +29,36 @@ jobs:
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
 
-      - name: Hardcode MinSDK 22 and Permissions
+      - name: Fix Kotlin Duplicate Classes and Set SDK 22
         run: |
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
           
-          # Force minSdkVersion to 22 in all gradle/properties files
+          # Force minSdkVersion 22
           sed -i 's/flutter.minSdkVersion/22/g' android/app/build.gradle || true
           sed -i 's/minSdkVersion .*/minSdkVersion 22/g' android/app/build.gradle || true
           sed -i 's/minSdk = .*/minSdk = 22/g' android/app/build.gradle || true
-          sed -i 's/minSdkVersion=[0-9]*/minSdkVersion=22/g' android/local.properties || true
           echo "flutter.minSdkVersion=22" >> android/local.properties
 
           # Camera and Audio permissions
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
+          
+          # Fix Kotlin Duplicate Classes globally across all plugins
+          cat << 'EOF' >> android/build.gradle
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+                      def requested = details.requested
+                      if (requested.group == 'org.jetbrains.kotlin') {
+                          if (requested.name.startsWith('kotlin-stdlib-jdk')) {
+                              details.useTarget("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
+                          }
+                      }
+                  }
+              }
+          }
+          EOF
+
           echo "android.enableJetifier=true" >> android/gradle.properties
           echo "android.useAndroidX=true" >> android/gradle.properties
 
