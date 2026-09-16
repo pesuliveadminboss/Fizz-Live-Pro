@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -324,7 +324,6 @@ class MainDashboardScreen extends StatefulWidget {
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tab = 0;
   int _userGems = 1670;
-  int _selectedPackIndex = 0;
 
   final List<String> _names = const ['Pooja', 'Ananya', 'Sneha', 'Kavya'];
 
@@ -342,111 +341,52 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF14141E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Recharge Gems',
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 18),
-                          const SizedBox(width: 4),
-                          Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 15)),
-                        ],
-                      ),
-                    ],
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Buy Gems Pack',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              ..._rechargePacks.map((pack) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E2C),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(height: 6),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Instant recharge for 1-on-1 video calls', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  ),
-                  const SizedBox(height: 16),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1.0,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                  child: ListTile(
+                    leading: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
+                    title: Text(
+                      '${pack['gems']} Gems',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
-                    itemCount: _rechargePacks.length,
-                    itemBuilder: (context, i) {
-                      final pack = _rechargePacks[i];
-                      final isSelected = _selectedPackIndex == i;
-                      return GestureDetector(
-                        onTap: () => setSheetState(() => _selectedPackIndex = i),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF2A2035) : const Color(0xFF1E1E2C),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? const Color(0xFFFFD700) : Colors.white12,
-                              width: isSelected ? 2 : 1,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 26),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${pack['gems']}',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '₹${pack['price']}',
-                                style: const TextStyle(color: Color(0xFFFF2E93), fontWeight: FontWeight.bold, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
+                    trailing: ElevatedButton(
                       onPressed: () {
-                        final added = _rechargePacks[_selectedPackIndex]['gems'] as int;
-                        setState(() => _userGems += added);
+                        setState(() => _userGems += (pack['gems'] as int));
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
+                            content: Text('Added ${pack['gems']} Gems successfully!'),
                             backgroundColor: Colors.green,
-                            content: Text('Recharge Successful! Added $added Gems'),
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF2E93),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text(
-                        'Pay ₹${_rechargePacks[_selectedPackIndex]['price']} & Add Gems',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                      child: Text('₹${pack['price']}', style: const TextStyle(color: Colors.white)),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
+                );
+              }),
+            ],
+          ),
         );
       },
     );
@@ -504,8 +444,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       itemCount: _names.length,
       itemBuilder: (context, i) {
         final n = _names[i];
-        return Card(
-          color: const Color(0xFF14141E),
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(10)),
           child: ListTile(
             leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
             title: Text(n, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -544,7 +485,80 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          const ListTile(
-            leading: CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
-            title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            sub
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(10)),
+            child: const Row(
+              children: [
+                CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
+                SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('ID: 207183', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(10)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('My Gems Balance', style: TextStyle(color: Colors.white)),
+                Row(
+                  children: [
+                    const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 18),
+                    const SizedBox(width: 4),
+                    Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: ElevatedButton.icon(
+              onPressed: _showRechargeSheet,
+              icon: const Icon(Icons.diamond, color: Colors.black),
+              label: const Text('Recharge / Buy Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget pageBody;
+    if (_tab == 0) pageBody = _tabZero();
+    else if (_tab == 1) pageBody = _tabOne();
+    else if (_tab == 2) pageBody = _tabTwo();
+    else if (_tab == 3) pageBody = _tabThree();
+    else pageBody = _tabFour();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          GestureDetector(
+            onTap: _showRechargeSheet,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                children: [
+                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
+                  const SizedBox(width: 4),
+                  Text('$_userGems', style: const TextStyle(color: 
