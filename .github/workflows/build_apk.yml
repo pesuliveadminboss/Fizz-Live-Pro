@@ -29,12 +29,15 @@ jobs:
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
 
-      - name: Configure Android Permissions & MinSDK 22
+      - name: Configure Android Gradle & Kotlin
         run: |
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
           sed -i 's/minSdkVersion .*/minSdkVersion 22/' android/app/build.gradle || true
           sed -i 's/flutter.minSdkVersion/22/' android/app/build.gradle || true
+          sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = '\''1.9.10'\''/' android/build.gradle || true
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
+          echo "android.enableJetifier=true" >> android/gradle.properties
+          echo "configurations.all { resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10' }" >> android/app/build.gradle
 
       - name: Get Dependencies
         run: flutter pub get
