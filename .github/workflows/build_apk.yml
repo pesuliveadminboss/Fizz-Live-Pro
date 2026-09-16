@@ -25,34 +25,17 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Install Android 34 and 35 Platforms
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-34" "platforms;android-35" "build-tools;34.0.0"
-
       - name: Scaffold Android Files
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
 
-      - name: Configure Android Permissions and Gradle
+      - name: Configure Android Permissions
         run: |
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
-          
-          # Force minSdkVersion 22
-          sed -i 's/flutter.minSdkVersion/22/g' android/app/build.gradle || true
-          sed -i 's/minSdkVersion .*/minSdkVersion 22/g' android/app/build.gradle || true
-          sed -i 's/minSdk = .*/minSdk = 22/g' android/app/build.gradle || true
-          echo "flutter.minSdkVersion=22" >> android/local.properties
-
-          # Camera and Audio permissions
+          sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle || true
+          echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
-
-          # Update Kotlin version properly in root build.gradle
-          sed -i "s/ext.kotlin_version = .*/ext.kotlin_version = '1.9.10'/" android/build.gradle || true
-          sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/g' android/build.gradle || true
-
-          echo "android.enableJetifier=true" >> android/gradle.properties
-          echo "android.useAndroidX=true" >> android/gradle.properties
 
       - name: Get Dependencies
         run: flutter pub get
