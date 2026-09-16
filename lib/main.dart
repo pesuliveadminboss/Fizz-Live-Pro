@@ -441,7 +441,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                         child: Card(
                           color: Colors.grey,
                           child: Column(
-                            mainAxisAlignment: MethodAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
                               const SizedBox(height: 4),
@@ -475,4 +475,3 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 }
-
