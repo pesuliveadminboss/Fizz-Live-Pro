@@ -324,31 +324,129 @@ class MainDashboardScreen extends StatefulWidget {
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tab = 0;
   int _userGems = 1670;
+  int _selectedPackIndex = 0;
+
   final List<String> _names = const ['Pooja', 'Ananya', 'Sneha', 'Kavya'];
+
+  final List<Map<String, dynamic>> _rechargePacks = const [
+    {'gems': 4050, 'price': '100'},
+    {'gems': 8100, 'price': '200'},
+    {'gems': 16380, 'price': '400'},
+    {'gems': 32940, 'price': '800'},
+    {'gems': 66600, 'price': '1600'},
+    {'gems': 167400, 'price': '4000'},
+  ];
 
   void _showRechargeSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF14141E),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Add Gems for Calling', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() => _userGems += 4050);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA28A9)),
-                child: const Text('Get 4,050 Gems (₹100)', style: TextStyle(color: Colors.white)),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Recharge Gems',
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 18),
+                          const SizedBox(width: 4),
+                          Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 15)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Instant recharge for 1-on-1 video calls', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 1.0,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: _rechargePacks.length,
+                    itemBuilder: (context, i) {
+                      final pack = _rechargePacks[i];
+                      final isSelected = _selectedPackIndex == i;
+                      return GestureDetector(
+                        onTap: () => setSheetState(() => _selectedPackIndex = i),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF2A2035) : const Color(0xFF1E1E2C),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFFFFD700) : Colors.white12,
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 26),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${pack['gems']}',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '₹${pack['price']}',
+                                style: const TextStyle(color: Color(0xFFFF2E93), fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final added = _rechargePacks[_selectedPackIndex]['gems'] as int;
+                        setState(() => _userGems += added);
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.green,
+                            content: Text('Recharge Successful! Added $added Gems'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF2E93),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Pay ₹${_rechargePacks[_selectedPackIndex]['price']} & Add Gems',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -449,71 +547,4 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const ListTile(
             leading: CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
             title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            subtitle: Text('ID: 207183', style: TextStyle(color: Colors.grey)),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              title: const Text('My Gems', style: TextStyle(color: Colors.white)),
-              trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-              onTap: _showRechargeSheet,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget pageBody;
-    if (_tab == 0) pageBody = _tabZero();
-    else if (_tab == 1) pageBody = _tabOne();
-    else if (_tab == 2) pageBody = _tabTwo();
-    else if (_tab == 3) pageBody = _tabThree();
-    else pageBody = _tabFour();
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        actions: [
-          GestureDetector(
-            onTap: _showRechargeSheet,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
-                children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: pageBody,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
-
+            sub
