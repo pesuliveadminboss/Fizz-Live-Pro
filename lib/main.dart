@@ -289,8 +289,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   final _allHosts = const [
     {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Professional model & live streamer ❤️'},
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover & friendly host ✨'},
-    {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'bio': 'Music & Fun 🎵'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'bio': 'Chat with me 💬'},
   ];
 
   final _packs = const [
@@ -457,3 +455,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               for (var item in _history)
                 Card(color: const Color(0xFF14141E), child: ListTile(leading: const Icon(Icons.history, color: Colors.pink), title: Text(item, style: const TextStyle(color: Colors.white)))),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
