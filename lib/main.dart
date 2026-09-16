@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -167,7 +168,7 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
                     padding: const EdgeInsets.all(8),
                     child: Row(
                       children: [
-                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat or tap screen to like ❤️', filled: true, fillColor: Colors.black54))),
+                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat or tap to like ❤️', filled: true, fillColor: Colors.black54))),
                         IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _roomChat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
                         IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                         ElevatedButton(onPressed: widget.onCall, style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), child: const Text('Call')),
@@ -202,12 +203,22 @@ class _CallScreenState extends State<CallScreen> {
   bool _mic = true;
   bool _glow = false;
   bool _frontCam = true;
+  int _seconds = 0;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
     _initZego();
+    _startCallTimer();
+  }
+
+  void _startCallTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      setState(() => _seconds++);
+    });
   }
 
   Future<void> _initZego() async {
@@ -232,10 +243,17 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     if (_viewID != null) ZegoExpressEngine.instance.destroyCanvasView(_viewID!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
+  }
+
+  String _formatTime(int s) {
+    int min = s ~/ 60;
+    int sec = s % 60;
+    return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -254,7 +272,12 @@ class _CallScreenState extends State<CallScreen> {
                     CircleAvatar(radius: 45, backgroundImage: NetworkImage(widget.pic)),
                     const SizedBox(height: 10),
                     Text('${widget.host} is live', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    if (_glow) const Text('✨ Glow Filter ON', style: TextStyle(color: Colors.amber, fontSize: 11)),
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
+                      child: Text(_formatTime(_seconds), style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
                   ],
                 ),
               ),
@@ -410,7 +433,4 @@ class _DashboardState extends State<Dashboard> {
           for (int i = 0; i < icons.length; i++)
             IconButton(icon: Icon(icons[i], color: _tab == i ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = i)),
         ]),
-      ),
-    );
-  }
-}
+  
