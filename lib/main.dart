@@ -112,21 +112,11 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
   late int _g;
   String _gift = "";
   int _likes = 120;
-  final _chatCtrl = TextEditingController();
-  final List<String> _chat = ['Welcome to Live Room! ❤️'];
 
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
-  }
-
-  void _sendGift(String n, int c, String e) {
-    if (_g >= c) {
-      setState(() { _g -= c; _gift = "Sent $e $n!"; });
-      widget.onGems(_g);
-      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
-    }
   }
 
   @override
@@ -156,17 +146,11 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
                   ),
                   if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                   const Spacer(),
-                  Container(
-                    height: 60, padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: ListView(children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white70, fontSize: 12))]),
-                  ),
                   Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
-                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat or tap ❤️', filled: true, fillColor: Colors.black54))),
-                        IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _chat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
-                        IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
+                        const Expanded(child: Text('Tap screen to like ❤️', style: TextStyle(color: Colors.white70))),
                         ElevatedButton(onPressed: widget.onCall, child: const Text('Call')),
                       ],
                     ),
@@ -224,7 +208,7 @@ class _CallScreenState extends State<CallScreen> {
 
   void _closeCall() {
     _timer?.cancel();
-    final dur = _formatTime(_sec);
+    final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}';
     Navigator.pop(context);
     widget.onCallEnd(dur, _sec);
   }
@@ -241,12 +225,6 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _camView = w);
   }
 
-  void _flipCam() async {
-    _frontCam = !_frontCam;
-    await ZegoExpressEngine.instance.useFrontCamera(_frontCam);
-    setState(() {});
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
@@ -254,11 +232,6 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
-  }
-
-  String _formatTime(int s) {
-    int m = s ~/ 60, sc = s % 60;
-    return '${m.toString().padLeft(2, '0')}:${sc.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -277,8 +250,7 @@ class _CallScreenState extends State<CallScreen> {
                     CircleAvatar(radius: 40, backgroundImage: NetworkImage(widget.pic)),
                     const SizedBox(height: 8),
                     Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text(_formatTime(_sec), style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
-                    if (_g < 1800) const Text('⚠️ Low Gems!', style: TextStyle(color: Colors.orangeAccent, fontSize: 12)),
+                    Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14)),
                   ],
                 ),
               ),
@@ -291,17 +263,15 @@ class _CallScreenState extends State<CallScreen> {
               child: ClipRRect(borderRadius: BorderRadius.circular(6), child: _camView ?? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Colors.pink))),
             ),
           ),
-          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () { setState(() => _mic = !_mic); ZegoExpressEngine.instance.muteMicrophone(!_mic); }),
-                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
+                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
+                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () => ZegoExpressEngine.instance.useFrontCamera(_frontCam = !_frontCam)),
                 IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 34), onPressed: _closeCall),
-                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
               ],
             ),
           ),
@@ -319,34 +289,20 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
-  int _cat = 0;
   int _gems = 1670;
 
-  final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _hosts = const [
     {'name': 'Pooja', 'views': '3.2k', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'},
     {'name': 'Ananya', 'views': '5.1k', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
-    {'name': 'Sneha', 'views': '2.4k', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
-    {'name': 'Kavya', 'views': '4.3k', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
-  ];
-
-  final _packs = const [
-    {'gems': 4050, 'price': 100},
-    {'gems': 8100, 'price': 200},
-    {'gems': 16380, 'price': 400},
-    {'gems': 32940, 'price': 800},
-    {'gems': 66600, 'price': 1600},
-    {'gems': 167400, 'price': 4000},
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 5, vsync: this);
+    _tabCtrl = TabController(length: 3, vsync: this);
   }
 
-  void _showSummary(String host, String dur, int sec) {
-    int spent = 1800 + (sec ~/ 60) * 1800;
+  void _showSummary(String host, String dur) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -357,13 +313,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Duration: $dur', style: const TextStyle(color: Colors.greenAccent)),
-            const SizedBox(height: 4),
-            Text('Gems Spent: $spent 💎', style: const TextStyle(color: Colors.amber)),
-            const SizedBox(height: 4),
-            Text('Balance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
-            const SizedBox(height: 10),
-            const Text('Rate Host:', style: TextStyle(color: Colors.white70)),
-            const Row(children: [Text('⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 18))]),
+            const SizedBox(height: 6),
+            const Text('Rating: ⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 16)),
           ],
         ),
         actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
@@ -371,37 +322,13 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  void _recharge() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF14141E),
-      builder: (ctx) => ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('My Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          for (var p in _packs)
-            ListTile(
-              leading: const Icon(Icons.diamond, color: Colors.amber),
-              title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(onPressed: () { setState(() => _gems += (p['gems'] as int)); Navigator.pop(ctx); }, child: Text('₹${p['price']}')),
-            ),
-        ],
-      ),
-    );
-  }
-
   void _dial(String name, String pic) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g), onCallEnd: (d, s) => _showSummary(name, d, s))));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g), onCallEnd: (d, s) => _showSummary(name, d))));
     } else {
-      _recharge();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not enough gems!')));
     }
-  }
-
-  void _watch(Map<String, String> h) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamRoom(host: h, gems: _gems, onGems: (g) => setState(() => _gems = g), onCall: () { Navigator.pop(context); _dial(h['name']!, h['pic']!); })));
   }
 
   @override
@@ -410,67 +337,52 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
         title: const Text('Fizz Live Pro'),
-        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+        actions: [TextButton(onPressed: () => setState(() => _gems += 4050), child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
         bottom: TabBar(
           controller: _tabCtrl,
           indicatorColor: Colors.pink,
           labelColor: Colors.pink,
           unselectedLabelColor: Colors.grey,
-          tabs: const [Tab(icon: Icon(Icons.home)), Tab(icon: Icon(Icons.favorite)), Tab(icon: Icon(Icons.casino)), Tab(icon: Icon(Icons.chat)), Tab(icon: Icon(Icons.person))],
+          tabs: const [Tab(icon: Icon(Icons.home)), Tab(icon: Icon(Icons.chat)), Tab(icon: Icon(Icons.person))],
         ),
       ),
       body: TabBarView(
         controller: _tabCtrl,
         children: [
-          Column(
+          GridView.count(
+            crossAxisCount: 2,
+            padding: const EdgeInsets.all(6),
             children: [
-              SizedBox(
-                height: 38,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [for (int i = 0; i < _cats.length; i++) Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: ActionChip(label: Text(_cats[i]), backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E), onPressed: () => setState(() => _cat = i)))],
+              for (var h in _hosts)
+                Card(
+                  color: const Color(0xFF14141E),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(radius: 24, backgroundImage: NetworkImage(h['pic']!)),
+                      Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  padding: const EdgeInsets.all(6),
-                  children: [
-                    for (var h in _hosts)
-                      GestureDetector(
-                        onTap: () => _watch(h),
-                        child: Card(
-                          color: const Color(0xFF14141E),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(radius: 24, backgroundImage: NetworkImage(h['pic']!)),
-                              Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              Text('🔴 ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  OutlinedButton(onPressed: () => _watch(h), child: const Text('Watch')),
-                                  const SizedBox(width: 4),
-                                  ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
             ],
           ),
-          ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
-          Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win'))),
-          ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
+          ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), onTap: () => _dial(h['name']!, h['pic']!))]),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircleAvatar(radius: 34, child: Icon(Icons.person)),
                 const SizedBox(height: 6),
-                const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: Fon
+                const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                const SizedBox(height: 6),
+                Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
