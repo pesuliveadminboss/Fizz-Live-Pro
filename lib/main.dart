@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
@@ -29,7 +30,7 @@ class _SplashState extends State<Splash> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.videocam, size: 75, color: Color(0xFFFF2E93)),
+            Icon(Icons.videocam_rounded, size: 75, color: Color(0xFFFF2E93)),
             SizedBox(height: 16),
             Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
           ],
@@ -192,15 +193,90 @@ class _CallScreenState extends State<CallScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                        child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(6)),
+                        child: const Text('1800/min', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      ),
+                    ],
+                  ),
                 ),
                 const Spacer(),
-                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 40), onPressed: () => Navigator.pop(context)),
                 const SizedBox(height: 24),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class MatchScreen extends StatefulWidget {
+  final List<Map<String, String>> hosts;
+  final Function(String) onMatched;
+  const MatchScreen({super.key, required this.hosts, required this.onMatched});
+  @override
+  State<MatchScreen> createState() => _MatchScreenState();
+}
+
+class _MatchScreenState extends State<MatchScreen> {
+  String status = "Searching for nearby hosts...";
+  @override
+  void initState() {
+    super.initState();
+    _startMatching();
+  }
+
+  void _startMatching() {
+    Future.delayed(const Duration(milliseconds: 2200), () {
+      if (mounted) {
+        final randHost = widget.hosts[Random().nextInt(widget.hosts.length)];
+        setState(() => status = "Matched with ${randHost['name']}!");
+        Future.delayed(const Duration(milliseconds: 800), () {
+          if (mounted) {
+            Navigator.pop(context);
+            widget.onMatched(randHost['name']!);
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A12),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 90,
+              height: 90,
+              child: CircularProgressIndicator(strokeWidth: 4, color: Color(0xFFFF2E93)),
+            ),
+            const SizedBox(height: 28),
+            Text(status, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text("Quick Random Video Match", style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white12),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -219,10 +295,12 @@ class _DashboardState extends State<Dashboard> {
 
   final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
   final _hosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
-    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7', 'status': 'Online'},
+    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9', 'status': 'Online'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'status': 'Online'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'status': 'Online'},
+    {'name': 'Rhea', 'city': 'Hyderabad', 'lvl': 'Lv.5', 'status': 'Online'},
+    {'name': 'Divya', 'city': 'Kolkata', 'lvl': 'Lv.7', 'status': 'Online'},
   ];
 
   final _packs = const [
@@ -242,7 +320,7 @@ class _DashboardState extends State<Dashboard> {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18)),
+            Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             for (var p in _packs)
               ListTile(
@@ -251,6 +329,7 @@ class _DashboardState extends State<Dashboard> {
                   onPressed: () {
                     setState(() => _gems += (p['gems'] as int));
                     Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
                   },
                   child: Text('₹${p['price']}'),
                 ),
@@ -270,6 +349,14 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  void _startRandomMatch() {
+    if (_gems < 1800) {
+      _showRecharge();
+      return;
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (_) => MatchScreen(hosts: _hosts, onMatched: (name) => _dial(name))));
+  }
+
   Widget _buildBody() {
     if (_tab == 0) {
       return Column(
@@ -285,6 +372,18 @@ class _DashboardState extends State<Dashboard> {
                 ),
             ],
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _startRandomMatch,
+                icon: const Icon(Icons.radar, color: Colors.white),
+                label: const Text('Start Random Video Match (1800 gems)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+              ),
+            ),
+          ),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -296,9 +395,11 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const CircleAvatar(radius: 28, child: Icon(Icons.person)),
-                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                        const CircleAvatar(radius: 26, child: Icon(Icons.person)),
+                        const SizedBox(height: 4),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        const SizedBox(height: 4),
                         ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                       ],
                     ),
@@ -315,6 +416,7 @@ class _DashboardState extends State<Dashboard> {
             ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person)),
               title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              subtitle: Text('${h['city']} • ${h['status']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
               trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
             ),
         ],
@@ -322,7 +424,10 @@ class _DashboardState extends State<Dashboard> {
     } else if (_tab == 2) {
       return Center(
         child: ElevatedButton(
-          onPressed: () => setState(() => _gems += 150),
+          onPressed: () {
+            setState(() => _gems += 150);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
+          },
           child: const Text('Play Spin & Win 150 Gems'),
         ),
       );
@@ -379,3 +484,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
