@@ -25,7 +25,7 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Setup Android Project
+      - name: Setup Android Project & App Icon
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
@@ -33,6 +33,16 @@ jobs:
           sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle || true
           echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
+          
+          # Setup Assets and Launcher Icon
+          mkdir -p assets
+          curl -sL "https://i.ibb.co/3k5fB0K/fizz-logo.png" -o assets/logo.png || true
+          mkdir -p android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
+          cp assets/logo.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png || true
+          cp assets/logo.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png || true
+          cp assets/logo.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png || true
+          cp assets/logo.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png || true
+          cp assets/logo.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png || true
 
       - name: Get Dependencies
         run: flutter pub get
