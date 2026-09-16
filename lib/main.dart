@@ -431,6 +431,28 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     }
   }
 
+  Widget _buildFavoritesTab() {
+    if (_favorites.isEmpty) {
+      return const Center(
+        child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)),
+      );
+    }
+    return ListView(
+      children: [
+        for (var h in _favorites)
+          ListTile(
+            leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)),
+            title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)),
+            trailing: ElevatedButton(
+              onPressed: () => _dial(h['name']!, h['pic']!),
+              child: const Text('Call'),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
@@ -441,7 +463,19 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       appBar: AppBar(
         title: const Text('Fizz Live Pro'),
         actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-        bottom: TabBar(controller: _tabCtrl, indicatorColor: Colors.pink, labelColor: Colors.pink, unselectedLabelColor: Colors.grey, tabs: const [Tab(icon: Icon(Icons.home)), Tab(icon: Icon(Icons.favorite)), Tab(icon: Icon(Icons.casino)), Tab(icon: Icon(Icons.chat)), Tab(icon: Icon(Icons.person))]),
+        bottom: TabBar(
+          controller: _tabCtrl,
+          indicatorColor: Colors.pink,
+          labelColor: Colors.pink,
+          unselectedLabelColor: Colors.grey,
+          tabs: const [
+            Tab(icon: Icon(Icons.home)),
+            Tab(icon: Icon(Icons.favorite)),
+            Tab(icon: Icon(Icons.casino)),
+            Tab(icon: Icon(Icons.chat)),
+            Tab(icon: Icon(Icons.person)),
+          ],
+        ),
       ),
       body: TabBarView(
         controller: _tabCtrl,
@@ -452,7 +486,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 height: 38,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: [for (int i = 0; i < _cats.length; i++) Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: ActionChip(label: Text(_cats[i]), backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E), onPressed: () => setState(() => _cat = i)))],
+                  children: [
+                    for (int i = 0; i < _cats.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: ActionChip(
+                          label: Text(_cats[i]),
+                          backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E),
+                          onPressed: () => setState(() => _cat = i),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               Padding(
@@ -474,23 +518,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                       GestureDetector(
                         onTap: () => _showHostProfile(h),
                         child: Card(
-                          color: const Color(0xFF14141E),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic']!)),
-                              const SizedBox(height: 4),
-                              Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              Text('🔴 LIVE • ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                              const SizedBox(height: 6),
-                              ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          _favorites.isEmpty ? const Center(child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)
+                          color: const Color(0xFF141
