@@ -19,8 +19,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
+      if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
   @override
@@ -182,8 +181,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     setState(() => _chat.add('You: ${_msgCtrl.text}'));
     _msgCtrl.clear();
     Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      setState(() => _chat.add('Host: Waiting in call, tap call above! 😘'));
+      if (mounted) setState(() => _chat.add('Host: Waiting in call, tap call above! 😘'));
     });
   }
   @override
@@ -538,11 +536,11 @@ class _DashboardState extends State<Dashboard> {
         actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
       ),
       body: _body(),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'For You'),
-          NavigationDestination(icon: Icon(Icons.favorite), label: 'Follow'),
-          NavigationDestination(icon: Icon(Icons.casino), label: 'Game'),
-          NavigationDestination(icon: Icon(Icons.chat), labe
+      bottomNavigationBar: Container(
+        color: const Color(0xFF0E0E14),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(icon: Icon(Icons.home, color: _tab == 0 ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = 0)),
+            IconButton(icon: Icon(Icons.favorite, color: _tab == 1 ? Colors.pink : Colors.grey), onPressed:
