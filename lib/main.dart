@@ -10,7 +10,7 @@ void main() {
   ));
 }
 
-// ---------------- SPLASH SCREEN ----------------
+// 1. SPLASH SCREEN
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   @override
@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1400), () {
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -41,15 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Icon(Icons.videocam_rounded, size: 75, color: Color(0xFFFF2E93)),
             SizedBox(height: 16),
-            Text(
-              'FIZZ LIVE PRO',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 4,
-                color: Color(0xFFFFD700),
-              ),
-            ),
+            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
           ],
         ),
       ),
@@ -57,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// ---------------- ADMIN GATEWAY (PIN: 7777) ----------------
+// 2. ADMIN GATEWAY (PIN: 7777)
 class AdminGatewayScreen extends StatefulWidget {
   const AdminGatewayScreen({super.key});
   @override
@@ -100,30 +92,23 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                 obscureText: true,
                 textAlign: TextAlign.center,
                 maxLength: 4,
-                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 26, letterSpacing: 12),
-                decoration: InputDecoration(
+                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 10),
+                decoration: const InputDecoration(
                   counterText: "",
                   filled: true,
-                  fillColor: const Color(0xFF14141E),
+                  fillColor: Color(0xFF14141E),
                   hintText: "••••",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(),
                 ),
               ),
-              if (_err.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(_err, style: const TextStyle(color: Colors.redAccent)),
-                ),
+              if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
                   onPressed: _checkPin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
-                    foregroundColor: Colors.black,
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
                   child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
@@ -135,7 +120,7 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
   }
 }
 
-// ---------------- LOGIN SCREEN ----------------
+// 3. FAST LOGIN SCREEN
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -149,21 +134,11 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(),
-              const CircleAvatar(
-                radius: 45,
-                backgroundColor: Color(0xFF1E1E2C),
-                child: Icon(Icons.person, size: 45, color: Colors.white),
-              ),
+              const CircleAvatar(radius: 45, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 45, color: Colors.white)),
               const SizedBox(height: 16),
-              const Text(
-                'Meet Real Friends Nearby',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text(
-                'Live video calls with beautiful hosts 24/7',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
+              const Text('Live video calls with beauties 24/7', style: TextStyle(color: Colors.grey, fontSize: 13)),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -175,15 +150,12 @@ class LoginScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const AuthorizationScreen()),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF2E93),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 14),
-              const Text('By continuing, you agree to our Terms & Privacy Policy', style: TextStyle(color: Colors.white38, fontSize: 11)),
+              const SizedBox(height: 12),
+              const Text('By continuing, you agree to Terms & Privacy Policy', style: TextStyle(color: Colors.white38, fontSize: 11)),
               const SizedBox(height: 10),
             ],
           ),
@@ -193,7 +165,7 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// ---------------- PERMISSIONS SCREEN ----------------
+// 4. PERMISSIONS SCREEN
 class AuthorizationScreen extends StatelessWidget {
   const AuthorizationScreen({super.key});
 
@@ -225,12 +197,12 @@ class AuthorizationScreen extends StatelessWidget {
               const ListTile(
                 leading: Icon(Icons.videocam, color: Color(0xFFFFD700), size: 28),
                 title: Text('Camera', style: TextStyle(color: Colors.white)),
-                subtitle: Text('For video calls and streaming', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                subtitle: Text('For live streaming and video chat', style: TextStyle(color: Colors.grey, fontSize: 12)),
               ),
               const ListTile(
                 leading: Icon(Icons.mic, color: Color(0xFFFFD700), size: 28),
                 title: Text('Microphone', style: TextStyle(color: Colors.white)),
-                subtitle: Text('For real-time voice talk', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                subtitle: Text('For high-definition voice talk', style: TextStyle(color: Colors.grey, fontSize: 12)),
               ),
               const Spacer(),
               SizedBox(
@@ -238,11 +210,7 @@ class AuthorizationScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () => _requestAndContinue(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00E5FF),
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
                   child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
               ),
@@ -254,7 +222,7 @@ class AuthorizationScreen extends StatelessWidget {
   }
 }
 
-// ---------------- ZEGO RTC LIVE CALL SCREEN ----------------
+// 5. ZEGO RTC LIVE VIDEO CALL SCREEN
 class LiveCallScreen extends StatefulWidget {
   final String hostName;
   final String roomID;
@@ -289,9 +257,9 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
       setState(() => _localView = widgetView);
     });
 
-    final user = ZegoUser('user_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
+    final user = ZegoUser('u_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
     await ZegoExpressEngine.instance.loginRoom(widget.roomID, user);
-    await ZegoExpressEngine.instance.startPublishingStream('stream_${user.userID}');
+    await ZegoExpressEngine.instance.startPublishingStream('s_${user.userID}');
   }
 
   @override
@@ -356,7 +324,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
   }
 }
 
-// ---------------- MAIN DASHBOARD SCREEN ----------------
+// 6. MAIN DASHBOARD (5 Bottom Tabs, Top Categories, Wallet & 6 Recharge Packs)
 class MainDashboardScreen extends StatefulWidget {
   const MainDashboardScreen({super.key});
   @override
@@ -506,13 +474,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     }
   }
 
-  // TAB 0: FOR YOU (Category row + 2-Column Host Grid)
+  // TAB 0: FOR YOU
   Widget _buildForYouTab() {
     return Column(
       children: [
-        // Top Category Selector Row
         Container(
-          height: 44,
+          height: 42,
           margin: const EdgeInsets.symmetric(vertical: 6),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -524,5 +491,30 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 onTap: () => setState(() => _categoryIndex = i),
                 child: Container(
                   margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-               
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSel ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _categories[i],
+                      style: TextStyle(
+                        color: isSel ? Colors.white : Colors.grey,
+                        fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.78,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10
