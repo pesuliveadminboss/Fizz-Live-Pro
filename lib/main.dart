@@ -161,7 +161,9 @@ class Perms extends StatelessWidget {
 class CallScreen extends StatefulWidget {
   final String host;
   final String room;
-  const CallScreen({super.key, required this.host, required this.room});
+  final int userGems;
+  final Function(int) onGemsUpdated;
+  const CallScreen({super.key, required this.host, required this.room, required this.userGems, required this.onGemsUpdated});
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
@@ -169,11 +171,16 @@ class CallScreen extends StatefulWidget {
 class _CallScreenState extends State<CallScreen> {
   Widget? _v;
   int? _vid;
+  late int _gems;
+  String _giftBanner = "";
+
   @override
   void initState() {
     super.initState();
+    _gems = widget.userGems;
     _start();
   }
+
   Future<void> _start() async {
     const appID = 710176630;
     const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
@@ -186,6 +193,74 @@ class _CallScreenState extends State<CallScreen> {
     await ZegoExpressEngine.instance.loginRoom(widget.room, u);
     await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
   }
+
+  void _sendGift(String name, int cost, String icon) {
+    if (_gems >= cost) {
+      setState(() {
+        _gems -= cost;
+        _giftBanner = "Sent $icon $name to ${widget.host}!";
+      });
+      widget.onGemsUpdated(_gems);
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _giftBanner = "");
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not enough gems for this gift!'), backgroundColor: Colors.red));
+    }
+  }
+
+  void _openGiftSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Send Virtual Gifts', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text('Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _giftBtn('Rose', 50, '🌹', () { Navigator.pop(ctx); _sendGift('Rose', 50, '🌹'); }),
+                  _giftBtn('Ring', 200, '💎', () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }),
+                  _giftBtn('Car', 1000, '🏎️', () { Navigator.pop(ctx); _sendGift('Supercar', 1000, '🏎️'); }),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _giftBtn(String name, int cost, String em, VoidCallback tap) {
+    return InkWell(
+      onTap: tap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          children: [
+            Text(em, style: const TextStyle(fontSize: 28)),
+            const SizedBox(height: 4),
+            Text(name, style: const TextStyle(color: Colors.white, fontSize: 12)),
+            Text('$cost gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 10)),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -194,6 +269,7 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -222,9 +298,24 @@ class _CallScreenState extends State<CallScreen> {
                     ],
                   ),
                 ),
+                if (_giftBanner.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(color: const Color(0xFFFF2E93).withOpacity(0.85), borderRadius: BorderRadius.circular(20)),
+                    child: Text(_giftBanner, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
                 const Spacer(),
-                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 40), onPressed: () => Navigator.pop(context)),
-                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 40), onPressed: () => Navigator.pop(context)),
+                      IconButton(icon: const Icon(Icons.card_giftcard, color: Color(0xFFFFD700), size: 38), onPressed: _openGiftSheet),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -294,7 +385,17 @@ class _DashboardState extends State<Dashboard> {
   void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_${name.toLowerCase()}')));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CallScreen(
+            host: name,
+            room: 'room_${name.toLowerCase()}',
+            userGems: _gems,
+            onGemsUpdated: (g) => setState(() => _gems = g),
+          ),
+        ),
+      );
     } else {
       _showRecharge();
     }
@@ -432,47 +533,4 @@ class _DashboardState extends State<Dashboard> {
             const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
             const SizedBox(height: 8),
             const Text('Pesulive User • VIP Lv.4', style: TextStyle(color: Colors.white)),
-            Text('Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 20)),
-            const SizedBox(height: 12),
-            ElevatedButton(onPressed: _showRecharge, child: const Text('Buy Gems')),
-          ],
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton.icon(
-            onPressed: _showRecharge,
-            icon: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
-            label: Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700))),
-          ),
-        ],
-      ),
-      body: _buildBody(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
-
+            Text('Gems: $_gems', style: const TextStyle(color: Color(0
