@@ -68,7 +68,7 @@ class _PinGateState extends State<PinGate> {
             children: [
               const Icon(Icons.admin_panel_settings, size: 60, color: Color(0xFFFFD700)),
               const SizedBox(height: 16),
-              const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 16),
               TextField(
                 controller: _c,
@@ -79,16 +79,9 @@ class _PinGateState extends State<PinGate> {
                 style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 8),
                 decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
               ),
-              if (_msg.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_msg, style: const TextStyle(color: Colors.redAccent))),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _check,
-                  child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
+              if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
+              const SizedBox(height: 16),
+              ElevatedButton(onPressed: _check, child: const Text('Unlock App')),
             ],
           ),
         ),
@@ -111,20 +104,16 @@ class Login extends StatelessWidget {
               const Spacer(),
               const CircleAvatar(radius: 45, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 45, color: Colors.white)),
               const SizedBox(height: 16),
-              const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              const Text('Live video calls with beauties 24/7', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20)),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Perms())),
-                  child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text('Fast Login'),
                 ),
               ),
-              const SizedBox(height: 12),
-              const Text('Agree to Terms & Privacy Policy', style: TextStyle(color: Colors.white38, fontSize: 11)),
             ],
           ),
         ),
@@ -145,27 +134,10 @@ class Perms extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              const Text('Authorization', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 8),
-              const Text('Allow Camera & Mic for 1-on-1 calls.', style: TextStyle(color: Colors.grey)),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () => _ask(context),
-                  child: const Text('Allow permissions', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => _ask(context),
+          child: const Text('Allow Camera & Mic Permissions'),
         ),
       ),
     );
@@ -214,25 +186,17 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: _v ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93)))),
+          Positioned.fill(child: _v ?? const Center(child: CircularProgressIndicator())),
           SafeArea(
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(widget.host, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                      const Chip(label: Text('LIVE', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
-                    ],
-                  ),
+                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18)),
                 ),
                 const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: CircleAvatar(radius: 30, backgroundColor: Colors.red, child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white), onPressed: () => Navigator.pop(context))),
-                ),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -273,41 +237,25 @@ class _DashboardState extends State<Dashboard> {
   void _showRecharge() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: const Color(0xFF14141E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
-        return Padding(
+        return ListView(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              for (var p in _packs)
-                Card(
-                  color: const Color(0xFF1E1E2C),
-                  child: ListTile(
-                    leading: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
-                    title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _gems += (p['gems'] as int));
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
-                      },
-                      child: Text('₹${p['price']}'),
-                    ),
-                  ),
+          children: [
+            Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18)),
+            const SizedBox(height: 12),
+            for (var p in _packs)
+              ListTile(
+                title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    setState(() => _gems += (p['gems'] as int));
+                    Navigator.pop(ctx);
+                  },
+                  child: Text('₹${p['price']}'),
                 ),
-            ],
-          ),
+              ),
+          ],
         );
       },
     );
@@ -326,50 +274,32 @@ class _DashboardState extends State<Dashboard> {
     if (_tab == 0) {
       return Column(
         children: [
-          SizedBox(
-            height: 44,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _cats.length,
-              itemBuilder: (ctx, i) {
-                final sel = _cat == i;
-                return GestureDetector(
-                  onTap: () => setState(() => _cat = i),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
-                    alignment: Alignment.center,
-                    child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
-                  ),
-                );
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              for (int i = 0; i < _cats.length; i++)
+                ActionChip(
+                  label: Text(_cats[i]),
+                  backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                  onPressed: () => setState(() => _cat = i),
+                ),
+            ],
           ),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              childAspectRatio: 0.82,
-              padding: const EdgeInsets.all(10),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+              padding: const EdgeInsets.all(8),
               children: [
                 for (var h in _hosts)
-                  Container(
-                    decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+                  Card(
+                    color: const Color(0xFF14141E),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
-                        const SizedBox(height: 6),
-                        Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                        const SizedBox(height: 6),
-                        ElevatedButton.icon(
-                          onPressed: () => _dial(h['name']!),
-                          icon: const Icon(Icons.video_call, size: 16),
-                          label: const Text('Call', style: TextStyle(fontSize: 12)),
-                        ),
+                        const CircleAvatar(radius: 28, child: Icon(Icons.person)),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                        Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                       ],
                     ),
                   ),
@@ -380,106 +310,35 @@ class _DashboardState extends State<Dashboard> {
       );
     } else if (_tab == 1) {
       return ListView(
-        padding: const EdgeInsets.all(12),
         children: [
           for (var h in _hosts)
-            Card(
-              color: const Color(0xFF14141E),
-              child: ListTile(
-                leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
-                title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
-                trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-              ),
+            ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
             ),
         ],
       );
     } else if (_tab == 2) {
       return Center(
-        child: Card(
-          color: const Color(0xFF14141E),
-          margin: const EdgeInsets.all(20),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.casino, size: 60, color: Color(0xFFFFD700)),
-                const SizedBox(height: 12),
-                const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                const Text('Spin and win bonus gems', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() => _gems += 150);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
-                  },
-                  child: const Text('Play Spin', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ),
+        child: ElevatedButton(
+          onPressed: () => setState(() => _gems += 150),
+          child: const Text('Play Spin & Win 150 Gems'),
         ),
       );
     } else if (_tab == 3) {
-      return ListView(
-        padding: const EdgeInsets.all(12),
-        children: const [
-          Card(
-            color: Color(0xFF14141E),
-            child: ListTile(
-              leading: CircleAvatar(backgroundColor: Color(0xFFFF2E93), child: Icon(Icons.notifications, color: Colors.white)),
-              title: Text('System Message', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: Text('Welcome to Fizz Live Pro! Start live calling now.', style: TextStyle(color: Colors.grey)),
-            ),
-          ),
-        ],
-      );
+      return const Center(child: Text('System: Welcome to Fizz Live Pro!', style: TextStyle(color: Colors.white)));
     } else {
-      return Padding(
-        padding: const EdgeInsets.all(16),
+      return Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
-              child: const Row(
-                children: [
-                  CircleAvatar(radius: 28, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 32, color: Colors.white)),
-                  SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text('ID: 207183 • Lv.4 VIP', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
+            const SizedBox(height: 8),
+            const Text('Pesulive User • VIP Lv.4', style: TextStyle(color: Colors.white)),
+            Text('Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 20)),
             const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('My Gems Balance', style: TextStyle(color: Colors.white, fontSize: 15)),
-                  Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: _showRecharge,
-                icon: const Icon(Icons.diamond),
-                label: const Text('Recharge / Buy Gems', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              ),
-            ),
+            ElevatedButton(onPressed: _showRecharge, child: const Text('Buy Gems')),
           ],
         ),
       );
@@ -492,16 +351,31 @@ class _DashboardState extends State<Dashboard> {
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white)),
         actions: [
-          GestureDetector(
-            onTap: _showRecharge,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
-              child: Row(
-                children: [
-                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
-                  const SizedBox(width: 4),
-                  Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), font
+          TextButton.icon(
+            onPressed: _showRecharge,
+            icon: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
+            label: Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700))),
+          ),
+        ],
+      ),
+      body: _buildBody(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tab,
+        onTap: (i) => setState(() => _tab = i),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0E0E14),
+        selectedItemColor: const Color(0xFFFFD700),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
+        ],
+      ),
+    );
+  }
+}
