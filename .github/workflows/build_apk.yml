@@ -25,7 +25,7 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Setup Android Project
+      - name: Scaffold Android Files
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
@@ -33,22 +33,6 @@ jobs:
           sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle || true
           echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
-
-      - name: Fetch Clean Code
-        run: |
-          curl -f -s -S -L https://raw.githubusercontent.com/flutter/samples/main/simplest_app/lib/main.dart -o lib/main.dart || true
-          cat << 'EOF' > generate.py
-import urllib.request
-
-url = "https://dpaste.org/9tKxX/raw"
-try:
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req) as resp, open('lib/main.dart', 'wb') as f:
-        f.write(resp.read())
-except Exception as e:
-    print("Fetch error:", e)
-EOF
-          python3 generate.py
 
       - name: Get Dependencies
         run: flutter pub get
