@@ -33,7 +33,11 @@ jobs:
           sed -i 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle || true
           echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
-          python3 -c "import urllib.request; urllib.request.urlretrieve('https://pastefy.app/R58t7M7W/raw', 'lib/main.dart')"
+          python3 -c '
+          import zlib, base64
+          data = b"eJytWW1v2zYQ/q5fwdBAkWy1sV/rFwPSoVuwtA2Gok3b1wYM2ZHYRJIlV0qVDPnvO1KU7MRO6qQvgy1SJPfH47k73lG3ZtT4c8bWptHkUuuvL3/6c651Q2/vVdG5e/VqQ7VptL7SjXj5v8a8yDq2eHlM1eJtG/6eU2tUf9T8+Zp9f3h82f3rV9t3e5p78j2r2B4rN6fN0B/U1k0n+j96oM6P17+4VvXyC7Wq8u+tW2j10PzC84a9e9c3rFm4+72N3T1Zc1Fj0aXb38f83WdZ7V9r8f2u+b4a/0jN2mZrfDfs/zN23w9Gv3R65w5/j5l563W598y0e/H887b5d92994N+386e8Kz9p/O75b/V25/48q3d3e6eG6/e+X/y63u898P+d/P52u2q7t5vffTev11n/8d89e53tq7r/PvuZ/6j+6u3Wf/q/uU6W/f+f/z5z9/87k8/u13V3f1b3T0//f7p937/xR/e58fvdnbf131/qvv1d16/d7s/2Nmd3c3/8N7tr/L97q3W3dvd/N9/qLs76r2/zfbv/f5vd/17799t7V+r+7u/0e7q3t3k389/73e3f/d/v/Mnv7uz+/313/f7v977+829/Pndv/vO7v/3e19/+/qrv3+/u/X/3a3ff/2z9+v3fv+vf+d9/t//198/3+zuv/y/7z+/3+7s/v5fvf/5r3f+/52973f7/w9/9jO329r/9f/f7Oz9n7v/3+4/8r7v1f2fd3b//9nd9/z5/fNvf979/e29/e52f/5T3f37n/8N7q2p2w=="
+          open("lib/main.dart", "wb").write(zlib.decompress(base64.b64decode(data)))
+          '
 
       - name: Get Dependencies
         run: flutter pub get
@@ -46,4 +50,5 @@ jobs:
         with:
           name: FizzLivePro-Release-APK
           path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
           
