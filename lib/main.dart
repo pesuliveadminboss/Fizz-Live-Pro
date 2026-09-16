@@ -4,10 +4,7 @@ import 'package:zego_express_engine/zego_express_engine.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: Splash(),
-  ));
+  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
 }
 
 class Splash extends StatefulWidget {
@@ -21,12 +18,9 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1200), () {
-      if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
-      }
+      if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
@@ -54,7 +48,6 @@ class PinGate extends StatefulWidget {
 class _PinGateState extends State<PinGate> {
   final _ctrl = TextEditingController();
   String _err = "";
-
   void _verify() {
     if (_ctrl.text.trim() == "7777") {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
@@ -63,7 +56,6 @@ class _PinGateState extends State<PinGate> {
       _ctrl.clear();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +100,6 @@ class _PinGateState extends State<PinGate> {
 
 class Login extends StatelessWidget {
   const Login({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,14 +137,12 @@ class Login extends StatelessWidget {
 
 class Perms extends StatelessWidget {
   const Perms({super.key});
-
   Future<void> _ask(BuildContext context) async {
     await [Permission.camera, Permission.microphone].request();
     if (context.mounted) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,7 +179,6 @@ class CallScreen extends StatefulWidget {
   final String host;
   final String room;
   const CallScreen({super.key, required this.host, required this.room});
-
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
@@ -198,13 +186,11 @@ class CallScreen extends StatefulWidget {
 class _CallScreenState extends State<CallScreen> {
   Widget? _v;
   int? _vid;
-
   @override
   void initState() {
     super.initState();
     _initZego();
   }
-
   Future<void> _initZego() async {
     const appID = 710176630;
     const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
@@ -217,7 +203,6 @@ class _CallScreenState extends State<CallScreen> {
     await ZegoExpressEngine.instance.loginRoom(widget.room, u);
     await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
   }
-
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -226,7 +211,6 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,181 +326,162 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Widget _buildForYou() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 44,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _cats.length,
-            itemBuilder: (ctx, i) {
-              final sel = _cat == i;
-              return GestureDetector(
-                onTap: () => setState(() => _cat = i),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
-                  alignment: Alignment.center,
-                  child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
-                ),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 2,
-            childAspectRatio: 0.82,
-            padding: const EdgeInsets.all(10),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            children: [
-              for (var h in _hosts)
-                Container(
-                  decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
-                      const SizedBox(height: 6),
-                      Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                      const SizedBox(height: 6),
-                      ElevatedButton.icon(
-                        onPressed: () => _dial(h['name']!),
-                        icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
-                        label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFollow() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        for (var h in _hosts)
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
-              title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
-              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildGame() {
-    return Center(
-      child: Card(
-        color: const Color(0xFF14141E),
-        margin: const EdgeInsets.all(20),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.casino, size: 60, color: Color(0xFFFFD700)),
-              const SizedBox(height: 12),
-              const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              const Text('Spin and win bonus gems', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() => _gems += 150);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                child: const Text('Play Spin', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessages() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: const [
-        Card(
-          color: Color(0xFF14141E),
-          child: ListTile(
-            leading: CircleAvatar(backgroundColor: Color(0xFFFF2E93), child: Icon(Icons.notifications, color: Colors.white)),
-            title: Text('System Message', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            subtitle: Text('Welcome to Fizz Live Pro! Start live calling now.', style: TextStyle(color: Colors.grey)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMe() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
+  Widget _buildBody() {
+    if (_tab == 0) {
+      return Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
-            child: const Row(
-              children: [
-                CircleAvatar(radius: 28, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 32, color: Colors.white)),
-                SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('ID: 207183 • Lv.4 VIP', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('My Gems Balance', style: TextStyle(color: Colors.white, fontSize: 15)),
-                Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
           SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
-              onPressed: _showRecharge,
-              icon: const Icon(Icons.diamond, color: Colors.black),
-              label: const Text('Recharge / Buy Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            height: 44,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _cats.length,
+              itemBuilder: (ctx, i) {
+                final sel = _cat == i;
+                return GestureDetector(
+                  onTap: () => setState(() => _cat = i),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
+                    alignment: Alignment.center,
+                    child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
+                  ),
+                );
+              },
+            ),
+          ),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 0.82,
+              padding: const EdgeInsets.all(10),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              children: [
+                for (var h in _hosts)
+                  Container(
+                    decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
+                        const SizedBox(height: 6),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                        const SizedBox(height: 6),
+                        ElevatedButton.icon(
+                          onPressed: () => _dial(h['name']!),
+                          icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
+                          label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget page;
-    if (_tab == 0) page = _buildForYou();
-    else if (_tab == 1) page = _buildFoll
+      );
+    } else if (_tab == 1) {
+      return ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          for (var h in _hosts)
+            Card(
+              color: const Color(0xFF14141E),
+              child: ListTile(
+                leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
+                title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+                trailing: ElevatedButton(onPressed: () => _dial(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
+              ),
+            ),
+        ],
+      );
+    } else if (_tab == 2) {
+      return Center(
+        child: Card(
+          color: const Color(0xFF14141E),
+          margin: const EdgeInsets.all(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.casino, size: 60, color: Color(0xFFFFD700)),
+                const SizedBox(height: 12),
+                const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                const Text('Spin and win bonus gems', style: TextStyle(color: Colors.grey)),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() => _gems += 150);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                  child: const Text('Play Spin', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (_tab == 3) {
+      return ListView(
+        padding: const EdgeInsets.all(12),
+        children: const [
+          Card(
+            color: Color(0xFF14141E),
+            child: ListTile(
+              leading: CircleAvatar(backgroundColor: Color(0xFFFF2E93), child: Icon(Icons.notifications, color: Colors.white)),
+              title: Text('System Message', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text('Welcome to Fizz Live Pro! Start live calling now.', style: TextStyle(color: Colors.grey)),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+              child: const Row(
+                children: [
+                  CircleAvatar(radius: 28, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 32, color: Colors.white)),
+                  SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text('ID: 207183 • Lv.4 VIP', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('My Gems Balance', style: TextStyle(color: Colors.white, fontSize: 15)),
+                  Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _showRecharge,
+                icon: const Icon(Icons.diamond, color: Colors.black),
+                label: const Text('Recharge / Buy Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+                style: ElevatedButton.styl
