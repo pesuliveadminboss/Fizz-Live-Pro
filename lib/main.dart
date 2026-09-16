@@ -98,6 +98,45 @@ class Login extends StatelessWidget {
   }
 }
 
+class RandomMatchScreen extends StatefulWidget {
+  final Function(String, String) onMatched;
+  const RandomMatchScreen({super.key, required this.onMatched});
+  @override
+  State<RandomMatchScreen> createState() => _RandomMatchScreenState();
+}
+
+class _RandomMatchScreenState extends State<RandomMatchScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      widget.onMatched('Pooja', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(color: Colors.pink),
+            const SizedBox(height: 20),
+            const Text('Finding random online host...', style: TextStyle(color: Colors.white, fontSize: 16)),
+            const SizedBox(height: 8),
+            const Text('1800 Gems / min', style: TextStyle(color: Colors.amber, fontSize: 12)),
+            const SizedBox(height: 30),
+            ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class LiveStreamRoom extends StatefulWidget {
   final Map<String, String> host;
   final int gems;
@@ -112,11 +151,21 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
   late int _g;
   String _gift = "";
   int _likes = 120;
+  final _chatCtrl = TextEditingController();
+  final List<String> _chat = ['Welcome to Live Room! ❤️'];
 
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
+  }
+
+  void _sendGift(String n, int c, String e) {
+    if (_g >= c) {
+      setState(() { _g -= c; _gift = "Sent $e $n!"; });
+      widget.onGems(_g);
+      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
+    }
   }
 
   @override
@@ -146,11 +195,17 @@ class _LiveStreamRoomState extends State<LiveStreamRoom> {
                   ),
                   if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                   const Spacer(),
+                  Container(
+                    height: 60, padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: ListView(children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white70, fontSize: 12))]),
+                  ),
                   Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
                     child: Row(
                       children: [
-                        const Expanded(child: Text('Tap screen to like ❤️', style: TextStyle(color: Colors.white70))),
+                        Expanded(child: TextField(controller: _chatCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Chat or tap ❤️', filled: true, fillColor: Colors.black54))),
+                        IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: () { if (_chatCtrl.text.isNotEmpty) { setState(() => _chat.add('You: ${_chatCtrl.text}')); _chatCtrl.clear(); } }),
+                        IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pink), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                         ElevatedButton(onPressed: widget.onCall, child: const Text('Call')),
                       ],
                     ),
@@ -370,6 +425,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     }
   }
 
+  void _startRandomMatch() {
+    if (_gems >= 1800) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => RandomMatchScreen(onMatched: (name, pic) {
+        Navigator.pop(context);
+        _dial(name, pic);
+      })));
+    } else {
+      _recharge();
+    }
+  }
+
   void _watch(Map<String, String> h) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamRoom(host: h, gems: _gems, onGems: (g) => setState(() => _gems = g), onCall: () { Navigator.pop(context); _dial(h['name']!, h['pic']!); })));
   }
@@ -404,6 +470,18 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   children: [for (int i = 0; i < _cats.length; i++) Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: ActionChip(label: Text(_cats[i]), backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E), onPressed: () => setState(() => _cat = i)))],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _startRandomMatch,
+                    icon: const Icon(Icons.radar),
+                    label: const Text('Random Match (1800 gems)'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  ),
+                ),
+              ),
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -422,41 +500,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                             Text('🔴 LIVE • ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
                             const SizedBox(height: 6),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                OutlinedButton(onPressed: () => _watch(h), child: const Text('Watch', style: TextStyle(fontSize: 10))),
-                                const SizedBox(width: 4),
-                                ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
-          Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: const TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircleAvatar(radius: 34, child: Icon(Icons.person)),
-                const SizedBox(height: 6),
-                const Text('User7789', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                const Text('👑 VIP Lv.5', style: const TextStyle(color: Colors.amber)),
-                const SizedBox(height: 6),
-                Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                              mainAxisAlignment: MainA
