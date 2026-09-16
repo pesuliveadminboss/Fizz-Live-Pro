@@ -253,8 +253,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _allHosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'},
-    {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Professional model & live streamer ❤️'},
+    {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover & friendly host ✨'},
   ];
 
   final _packs = const [
@@ -266,6 +266,35 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: 5, vsync: this);
+  }
+
+  void _showHostProfile(Map<String, String> h) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(radius: 35, backgroundImage: NetworkImage(h['pic']!)),
+            const SizedBox(height: 8),
+            Text(h['name']!, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('${h['city']} • 🔴 LIVE', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+            const SizedBox(height: 8),
+            Text(h['bio']!, style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                OutlinedButton.icon(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Following Host!'))); }, icon: const Icon(Icons.favorite, color: Colors.pink), label: const Text('Follow', style: TextStyle(color: Colors.white))),
+                ElevatedButton.icon(onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); }, icon: const Icon(Icons.videocam), label: const Text('Direct Call (1800)'), style: ElevatedButton.styleFrom(backgroundColor: Colors.pink)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _recharge() {
@@ -346,18 +375,21 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   childAspectRatio: 0.8,
                   children: [
                     for (var h in (list.isEmpty ? _allHosts : list))
-                      Card(
-                        color: const Color(0xFF14141E),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic']!)),
-                            const SizedBox(height: 4),
-                            Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            Text('🔴 LIVE • ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-                            const SizedBox(height: 6),
-                            ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                          ],
+                      GestureDetector(
+                        onTap: () => _showHostProfile(h),
+                        child: Card(
+                          color: const Color(0xFF14141E),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic']!)),
+                              const SizedBox(height: 4),
+                              Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              Text('🔴 LIVE • ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                              const SizedBox(height: 6),
+                              ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call', style: TextStyle(fontSize: 10))),
+                            ],
+                          ),
                         ),
                       ),
                   ],
@@ -391,3 +423,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 }
+
