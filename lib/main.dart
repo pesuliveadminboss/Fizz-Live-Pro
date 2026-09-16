@@ -18,35 +18,15 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1400), () {
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFFD700))),
-          ],
-        ),
-      ),
+    return const Scaffold(
+      backgroundColor: Color(0xFF07070A),
+      body: Center(child: Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93))),
     );
   }
 }
@@ -78,8 +58,6 @@ class _PinGateState extends State<PinGate> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.admin_panel_settings, size: 55, color: Color(0xFFFFD700)),
-              const SizedBox(height: 12),
               const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 12),
               TextField(
@@ -109,21 +87,12 @@ class Login extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
-            const SizedBox(height: 14),
-            const Text('Meet Real Friends', style: TextStyle(color: Colors.white, fontSize: 20)),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                await [Permission.camera, Permission.microphone].request();
-                if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-              },
-              child: const Text('Fast Login & Allow Permissions'),
-            ),
-          ],
+        child: ElevatedButton(
+          onPressed: () async {
+            await [Permission.camera, Permission.microphone].request();
+            if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+          },
+          child: const Text('Fast Login & Allow Permissions'),
         ),
       ),
     );
@@ -140,80 +109,35 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final _msgCtrl = TextEditingController();
-  final List<Map<String, String>> _messages = [
-    {'from': 'host', 'text': 'Hey dear! I am online now ❤️'}
-  ];
-
+  final List<String> _chat = ['Host: Hi dear! Call me live ❤️'];
   void _send() {
-    final txt = _msgCtrl.text.trim();
-    if (txt.isEmpty) return;
-    setState(() {
-      _messages.add({'from': 'me', 'text': txt});
-    });
+    if (_msgCtrl.text.isEmpty) return;
+    setState(() => _chat.add('You: ${_msgCtrl.text}'));
     _msgCtrl.clear();
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        final replies = [
-          "You look sweet! Let's talk face-to-face in video call 😘",
-          "I'm alone in my room, call me now baby! 💋",
-          "Waiting for your private live call, tap the video button above! ❤️"
-        ];
-        setState(() {
-          _messages.add({'from': 'host', 'text': replies[Random().nextInt(replies.length)]});
-        });
-      }
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) setState(() => _chat.add('Host: I am waiting in video call, tap call above! 😘'));
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF14141E),
-        title: Text(widget.host, style: const TextStyle(color: Colors.white)),
-        actions: [
-          IconButton(icon: const Icon(Icons.videocam, color: Color(0xFFFF2E93)), onPressed: widget.onCall),
-        ],
+        title: Text(widget.host),
+        actions: [IconButton(icon: const Icon(Icons.videocam, color: Colors.pink), onPressed: widget.onCall)],
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: _messages.length,
-              itemBuilder: (ctx, i) {
-                final isMe = _messages[i]['from'] == 'me';
-                return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isMe ? const Color(0xFFFF2E93) : const Color(0xFF1E1E2C),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(_messages[i]['text']!, style: const TextStyle(color: Colors.white, fontSize: 14)),
-                  ),
-                );
-              },
-            ),
-          ),
+          Expanded(child: ListView(padding: const EdgeInsets.all(12), children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white, fontSize: 16))])),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(hintText: 'Type a message...', hintStyle: TextStyle(color: Colors.grey), filled: true, fillColor: Color(0xFF14141E)),
-                  ),
-                ),
-                IconButton(icon: const Icon(Icons.send, color: Color(0xFFFFD700)), onPressed: _send),
+                Expanded(child: TextField(controller: _msgCtrl, style: const TextStyle(color: Colors.white))),
+                IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: _send),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
@@ -235,14 +159,12 @@ class _CallScreenState extends State<CallScreen> {
   int? _vid;
   late int _gems;
   String _gift = "";
-
   @override
   void initState() {
     super.initState();
     _gems = widget.userGems;
     _start();
   }
-
   Future<void> _start() async {
     const appID = 710176630;
     const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
@@ -255,40 +177,13 @@ class _CallScreenState extends State<CallScreen> {
     await ZegoExpressEngine.instance.loginRoom(widget.room, u);
     await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
   }
-
-  void _giveGift(String name, int cost, String em) {
+  void _sendGift(String name, int cost, String em) {
     if (_gems >= cost) {
-      setState(() {
-        _gems -= cost;
-        _gift = "Sent $em $name!";
-      });
+      setState(() { _gems -= cost; _gift = "Sent $em $name!"; });
       widget.onGems(_gems);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = "");
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not enough gems!')));
+      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
     }
   }
-
-  void _showGifts() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF14141E),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _giveGift('Rose', 50, '🌹'); }, child: const Text('🌹 50')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _giveGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _giveGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -297,7 +192,6 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -310,23 +204,17 @@ class _CallScreenState extends State<CallScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18)),
+                  child: Text('${widget.host} (1800/min)', style: const TextStyle(color: Colors.white, fontSize: 18)),
                 ),
-                if (_gift.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(color: const Color(0xFFFF2E93), borderRadius: BorderRadius.circular(16)),
-                    child: Text(_gift, style: const TextStyle(color: Colors.white)),
-                  ),
+                if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                 const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
-                    IconButton(icon: const Icon(Icons.card_giftcard, color: Color(0xFFFFD700), size: 36), onPressed: _showGifts),
+                    IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                   ],
                 ),
-                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -345,14 +233,12 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _tab = 0;
   int _gems = 1670;
-
   final _hosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7', 'bio': 'Dancer & model ❤️', 'fans': '14.2k'},
-    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9', 'bio': 'Free now, call me 😘', 'fans': '28.9k'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'bio': 'Tamil ponnu ✨', 'fans': '9.8k'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'bio': 'Party lover!', 'fans': '19.4k'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
+    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
   ];
-
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
@@ -362,18 +248,16 @@ class _DashboardState extends State<Dashboard> {
     {'gems': 167400, 'price': 4000},
   ];
 
-  void _showRecharge() {
+  void _recharge() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF14141E),
       builder: (ctx) => ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('My Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18)),
-          const SizedBox(height: 10),
+          Text('My Gems: $_gems', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           for (var p in _packs)
             ListTile(
-              title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
+              title: Text('${p['gems']} Gems'),
               trailing: ElevatedButton(
                 onPressed: () {
                   setState(() => _gems += (p['gems'] as int));
@@ -390,52 +274,13 @@ class _DashboardState extends State<Dashboard> {
   void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CallScreen(
-            host: name,
-            room: 'room_${name.toLowerCase()}',
-            userGems: _gems,
-            onGems: (g) => setState(() => _gems = g),
-          ),
-        ),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_${name.toLowerCase()}', userGems: _gems, onGems: (g) => setState(() => _gems = g))));
     } else {
-      _showRecharge();
+      _recharge();
     }
   }
 
-  void _openProfile(Map<String, String> h) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF101018),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 36)),
-            const SizedBox(height: 8),
-            Text('${h['name']} • ${h['lvl']}', style: const TextStyle(color: Colors.white, fontSize: 18)),
-            Text('${h['city']} • ${h['fans']} Fans', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-            const SizedBox(height: 8),
-            Text(h['bio']!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Follow'))),
-                const SizedBox(width: 10),
-                Expanded(child: ElevatedButton(onPressed: () { Navigator.pop(ctx); _dial(h['name']!); }, child: const Text('Call (1800)'))),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
+  Widget _body() {
     if (_tab == 0) {
       return Column(
         children: [
@@ -444,12 +289,9 @@ class _DashboardState extends State<Dashboard> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  final rand = _hosts[Random().nextInt(_hosts.length)];
-                  _dial(rand['name']!);
-                },
+                onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]['name']!),
                 icon: const Icon(Icons.radar),
-                label: const Text('Random Video Match (1800 gems)'),
+                label: const Text('Random Match (1800 gems)'),
               ),
             ),
           ),
@@ -459,19 +301,15 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.all(8),
               children: [
                 for (var h in _hosts)
-                  GestureDetector(
-                    onTap: () => _openProfile(h),
-                    child: Card(
-                      color: const Color(0xFF14141E),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircleAvatar(radius: 26, child: Icon(Icons.person)),
-                          Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                          ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-                        ],
-                      ),
+                  Card(
+                    color: const Color(0xFF14141E),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircleAvatar(radius: 26, child: Icon(Icons.person)),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                        ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+                      ],
                     ),
                   ),
               ],
@@ -484,7 +322,6 @@ class _DashboardState extends State<Dashboard> {
         children: [
           for (var h in _hosts)
             ListTile(
-              onTap: () => _openProfile(h),
               leading: const CircleAvatar(child: Icon(Icons.person)),
               title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
               trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
@@ -493,10 +330,7 @@ class _DashboardState extends State<Dashboard> {
       );
     } else if (_tab == 2) {
       return Center(
-        child: ElevatedButton(
-          onPressed: () => setState(() => _gems += 150),
-          child: const Text('Play Spin & Win 150 Gems'),
-        ),
+        child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Play Spin & Win 150 Gems')),
       );
     } else if (_tab == 3) {
       return ListView(
@@ -505,12 +339,8 @@ class _DashboardState extends State<Dashboard> {
             ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person)),
               title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
-              trailing: const Icon(Icons.chat_bubble_outline, color: Color(0xFFFFD700)),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!))),
-              ),
+              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
             ),
         ],
       );
@@ -521,10 +351,9 @@ class _DashboardState extends State<Dashboard> {
           children: [
             const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 34)),
             const SizedBox(height: 8),
-            const Text('Pesulive User', style: TextStyle(color: Colors.white)),
-            Text('Gems: $_gems', style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18)),
+            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 20)),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: _showRecharge, child: const Text('Buy Gems')),
+            ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
           ],
         ),
       );
@@ -536,25 +365,21 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF101016),
-        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton.icon(
-            onPressed: _showRecharge,
-            icon: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
-            label: Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700))),
-          ),
+        title: const Text('Fizz Live Pro'),
+        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+      ),
+      body: _body(),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (i) => setState(() => _tab = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'For You'),
+          NavigationDestination(icon: Icon(Icons.favorite), label: 'Follow'),
+          NavigationDestination(icon: Icon(Icons.casino), label: 'Game'),
+          NavigationDestination(icon: Icon(Icons.chat), label: 'Messages'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Me'),
         ],
       ),
-      body: _buildBody(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0E0E14),
-        selectedItemColor: const Color(0xFFFFD700),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          Botto
+    );
+  }
+}
