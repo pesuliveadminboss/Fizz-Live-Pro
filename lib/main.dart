@@ -31,8 +31,7 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100,
-              height: 100,
+              width: 100, height: 100,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
@@ -276,10 +275,7 @@ class _CallScreenState extends State<CallScreen> {
             ),
           ),
           Positioned(
-            top: 40,
-            right: 16,
-            width: 85,
-            height: 120,
+            top: 40, right: 16, width: 85, height: 120,
             child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
           ),
           SafeArea(
@@ -349,10 +345,7 @@ class _DashboardState extends State<Dashboard> {
           MaterialPageRoute(
             builder: (_) => IncomingCallScreen(
               host: h,
-              onAccept: () {
-                Navigator.pop(context);
-                _dial(h);
-              },
+              onAccept: () { Navigator.pop(context); _dial(h); },
               onDecline: () => Navigator.pop(context),
             ),
           ),
@@ -529,6 +522,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    const navIcons = [Icons.home, Icons.favorite, Icons.casino, Icons.chat, Icons.person];
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(
@@ -538,9 +532,18 @@ class _DashboardState extends State<Dashboard> {
       body: _body(),
       bottomNavigationBar: Container(
         color: const Color(0xFF0E0E14),
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        height: 56,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(icon: Icon(Icons.home, color: _tab == 0 ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = 0)),
-            IconButton(icon: Icon(Icons.favorite, color: _tab == 1 ? Colors.pink : Colors.grey), onPressed:
+            for (int i = 0; i < navIcons.length; i++)
+              IconButton(
+                icon: Icon(navIcons[i], color: _tab == i ? Colors.pink : Colors.grey),
+                onPressed: () => setState(() => _tab = i),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+  
