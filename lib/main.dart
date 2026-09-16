@@ -262,6 +262,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   late TabController _tabCtrl;
   int _cat = 0;
   int _gems = 1670;
+  String _userName = 'User7789';
+  String _userBio = 'VIP Member & Live Chat Lover';
+  
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
   final List<Host> _favorites = [];
 
@@ -306,6 +309,37 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         _favorites.add(h);
       }
     });
+  }
+
+  void _editProfile() {
+    final nameCtrl = TextEditingController(text: _userName);
+    final bioCtrl = TextEditingController(text: _userBio);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.grey))),
+            TextField(controller: bioCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Bio', labelStyle: TextStyle(color: Colors.grey))),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _userName = nameCtrl.text;
+                _userBio = bioCtrl.text;
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showHostProfile(Host h) {
@@ -462,16 +496,21 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber))])),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(onPressed: () => setState(() => _gems += 500), icon: const Icon(Icons.card_giftcard), label: const Text('Claim VIP Bonus (+500 Gems)'), style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black)),
-              const SizedBox(height: 20),
-              const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-              for (var item in _history) Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white)))),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+              Center(
+                child: Column(
+                  children: [
+                    const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                    const SizedBox(height: 6),
+                    Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                    Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    const SizedBox(height: 6),
+                    const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: _editProfile,
+                icon: const Icon(Icons.edit),
+                label: const Text('Edit Profile'),
+                styl
