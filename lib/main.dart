@@ -18,15 +18,37 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF07070A),
-      body: Center(child: Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93))),
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.network(
+                  'https://i.ibb.co/3k5fB0K/fizz-logo.png',
+                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 80, color: Color(0xFFFF2E93)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: Color(0xFFFFD700))),
+            const SizedBox(height: 6),
+            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -58,7 +80,9 @@ class _PinGateState extends State<PinGate> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
+              const Icon(Icons.admin_panel_settings, size: 55, color: Color(0xFFFFD700)),
+              const SizedBox(height: 12),
+              const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 12),
               TextField(
                 controller: _c,
@@ -71,7 +95,7 @@ class _PinGateState extends State<PinGate> {
               ),
               if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
               const SizedBox(height: 14),
-              ElevatedButton(onPressed: _check, child: const Text('Unlock')),
+              ElevatedButton(onPressed: _check, child: const Text('Unlock App')),
             ],
           ),
         ),
@@ -87,12 +111,21 @@ class Login extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            await [Permission.camera, Permission.microphone].request();
-            if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-          },
-          child: const Text('Fast Login & Allow Permissions'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
+            const SizedBox(height: 14),
+            const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 20)),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                await [Permission.camera, Permission.microphone].request();
+                if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+              },
+              child: const Text('Fast Login & Allow Permissions'),
+            ),
+          ],
         ),
       ),
     );
@@ -123,16 +156,8 @@ class IncomingCallScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.red,
-                  child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 32), onPressed: onDecline),
-                ),
-                CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.green,
-                  child: IconButton(icon: const Icon(Icons.videocam, color: Colors.white, size: 32), onPressed: onAccept),
-                ),
+                CircleAvatar(radius: 35, backgroundColor: Colors.red, child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 30), onPressed: onDecline)),
+                CircleAvatar(radius: 35, backgroundColor: Colors.green, child: IconButton(icon: const Icon(Icons.videocam, color: Colors.white, size: 30), onPressed: onAccept)),
               ],
             ),
           ],
@@ -302,14 +327,16 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _tab = 0;
+  int _cat = 0;
   int _gems = 1670;
   bool _incomingShown = false;
 
+  final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
   final _hosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
-    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7', 'bio': 'Dancer & model ❤️', 'fans': '14.2k'},
+    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9', 'bio': 'Free now, call me 😘', 'fans': '28.9k'},
+    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6', 'bio': 'Tamil ponnu ✨', 'fans': '9.8k'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8', 'bio': 'Party lover!', 'fans': '19.4k'},
   ];
   final _packs = const [
     {'gems': 4050, 'price': 100},
@@ -327,7 +354,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _scheduleFakeIncoming() {
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (mounted && !_incomingShown) {
         _incomingShown = true;
         final h = _hosts[Random().nextInt(_hosts.length)]['name']!;
@@ -413,10 +440,63 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  void _openProfile(Map<String, String> h) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF101018),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 36)),
+            const SizedBox(height: 8),
+            Text('${h['name']} • ${h['lvl']}', style: const TextStyle(color: Colors.white, fontSize: 18)),
+            Text('${h['city']} • ${h['fans']} Fans', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            const SizedBox(height: 8),
+            Text(h['bio']!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Follow'))),
+                const SizedBox(width: 10),
+                Expanded(child: ElevatedButton(onPressed: () { Navigator.pop(ctx); _dial(h['name']!); }, child: const Text('Call (1800)'))),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _body() {
     if (_tab == 0) {
       return Column(
         children: [
+          // Top Category Tabs
+          SizedBox(
+            height: 48,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _cats.length,
+              itemBuilder: (ctx, i) {
+                final sel = _cat == i;
+                return GestureDetector(
+                  onTap: () => setState(() => _cat = i),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
+                  ),
+                );
+              },
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8),
             child: SizedBox(
@@ -434,15 +514,19 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.all(8),
               children: [
                 for (var h in _hosts)
-                  Card(
-                    color: const Color(0xFF14141E),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircleAvatar(radius: 26, child: Icon(Icons.person)),
-                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
-                        ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-                      ],
+                  GestureDetector(
+                    onTap: () => _openProfile(h),
+                    child: Card(
+                      color: const Color(0xFF14141E),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircleAvatar(radius: 26, child: Icon(Icons.person)),
+                          Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                          Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                          ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+                        ],
+                      ),
                     ),
                   ),
               ],
@@ -454,72 +538,4 @@ class _DashboardState extends State<Dashboard> {
       return ListView(
         children: [
           for (var h in _hosts)
-            ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-            ),
-        ],
-      );
-    } else if (_tab == 2) {
-      return Center(
-        child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Play Spin & Win 150 Gems')),
-      );
-    } else if (_tab == 3) {
-      return ListView(
-        children: [
-          for (var h in _hosts)
-            ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
-            ),
-        ],
-      );
-    } else {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 34)),
-            const SizedBox(height: 8),
-            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 20)),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-                const SizedBox(width: 12),
-                OutlinedButton(onPressed: _showWithdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white))),
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        title: const Text('Fizz Live Pro'),
-        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-      ),
-      body: _body(),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'For You'),
-          NavigationDestination(icon: Icon(Icons.favorite), label: 'Follow'),
-          NavigationDestination(icon: Icon(Icons.casino), label: 'Game'),
-          NavigationDestination(icon: Icon(Icons.chat), label: 'Messages'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
+          
