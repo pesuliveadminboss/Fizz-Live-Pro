@@ -286,19 +286,24 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
+class Host {
+  final String name, city, views, cat, pic, bio;
+  const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
+}
+
 class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
   int _cat = 0;
   int _gems = 1670;
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
-  final List<Map<String, String>> _favorites = [];
+  final List<Host> _favorites = [];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
-  final _allHosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Model & live streamer ❤️'},
-    {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover ✨'},
-    {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'bio': 'Music & Fun 🎵'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'bio': 'Chat with me 💬'},
+  final List<Host> _allHosts = const [
+    Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
+    Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
+    Host(name: 'Sneha', city: 'Chennai', views: '2.4k', cat: 'Party Match', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', bio: 'Music & Fun 🎵'),
+    Host(name: 'Kavya', city: 'Bangalore', views: '4.3k', cat: 'Nearby', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'Chat with me 💬'),
   ];
 
   final _packs = const [
@@ -342,7 +347,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  void _toggleFavorite(Map<String, String> h) {
+  void _toggleFavorite(Host h) {
     setState(() {
       if (_favorites.contains(h)) {
         _favorites.remove(h);
@@ -354,7 +359,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     });
   }
 
-  void _showHostProfile(Map<String, String> h) {
+  void _showHostProfile(Host h) {
     final isFav = _favorites.contains(h);
     showModalBottomSheet(
       context: context,
@@ -364,12 +369,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(radius: 35, backgroundImage: NetworkImage(h['pic']!)),
+            CircleAvatar(radius: 35, backgroundImage: NetworkImage(h.pic)),
             const SizedBox(height: 8),
-            Text(h['name']!, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('${h['city']} • 🔴 LIVE', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
+            Text(h.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('${h.city} • 🔴 LIVE', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
             const SizedBox(height: 8),
-            Text(h['bio']!, style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
+            Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -380,7 +385,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   label: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); },
+                  onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
                   icon: const Icon(Icons.videocam),
                   label: const Text('Direct Call'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
@@ -439,10 +444,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       children: [
         for (var h in _favorites)
           ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)),
-            title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)),
-            trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
+            leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+            title: Text(h.name, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(h.city, style: const TextStyle(color: Colors.grey)),
+            trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')),
           ),
       ],
     );
@@ -451,7 +456,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
-    final list = _allHosts.where((h) => _cat == 0 || h['cat'] == curCat).toList();
+    final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -517,4 +522,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic
+    
