@@ -189,6 +189,37 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _cam = w);
   }
 
+  void _sendGift(String name, int cost, String em) {
+    if (_g >= cost) {
+      setState(() {
+        _g -= cost;
+        _gift = "Sent $em $name!";
+      });
+      widget.onGems(_g);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _gift = "");
+      });
+    }
+  }
+
+  void _showGiftBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Rose', 50, '🌹'); }, child: const Text('🌹 50')),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _t?.cancel();
@@ -215,12 +246,14 @@ class _CallScreenState extends State<CallScreen> {
                     const SizedBox(height: 8),
                     Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    if (_g < 1800) const Text('⚠️ Low Gems!', style: TextStyle(color: Colors.orangeAccent, fontSize: 12)),
                   ],
                 ),
               ),
             ),
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
+          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
@@ -229,6 +262,7 @@ class _CallScreenState extends State<CallScreen> {
                 IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
                 IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () => ZegoExpressEngine.instance.useFrontCamera(_frontCam = !_frontCam)),
                 IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
+                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: _showGiftBottomSheet),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
               ],
             ),
@@ -255,11 +289,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   final _allHosts = const [
     {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Professional model & live streamer ❤️'},
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover & friendly host ✨'},
+    {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'bio': 'Music & Fun 🎵'},
+    {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'bio': 'Chat with me 💬'},
   ];
 
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
+    {'gems': 16380, 'price': 400},
+    {'gems': 32940, 'price': 800},
+    {'gems': 66600, 'price': 1600},
+    {'gems': 167400, 'price': 4000},
   ];
 
   @override
@@ -417,10 +457,3 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               for (var item in _history)
                 Card(color: const Color(0xFF14141E), child: ListTile(leading: const Icon(Icons.history, color: Colors.pink), title: Text(item, style: const TextStyle(color: Colors.white)))),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
