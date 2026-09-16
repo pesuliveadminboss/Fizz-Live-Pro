@@ -99,6 +99,49 @@ class Login extends StatelessWidget {
   }
 }
 
+class IncomingCallScreen extends StatelessWidget {
+  final String host;
+  final VoidCallback onAccept;
+  final VoidCallback onDecline;
+  const IncomingCallScreen({super.key, required this.host, required this.onAccept, required this.onDecline});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D0D15),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 55, backgroundColor: Color(0xFFFF2E93), child: CircleAvatar(radius: 50, child: Icon(Icons.person, size: 55))),
+            const SizedBox(height: 20),
+            Text(host, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text('Incoming Private Video Call...', style: TextStyle(color: Colors.greenAccent, fontSize: 14)),
+            const Text('1800 gems/min', style: TextStyle(color: Color(0xFFFFD700), fontSize: 12)),
+            const SizedBox(height: 50),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CircleAvatar(
+                  radius: 35,
+                  backgroundColor: Colors.red,
+                  child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white, size: 32), onPressed: onDecline),
+                ),
+                CircleAvatar(
+                  radius: 35,
+                  backgroundColor: Colors.green,
+                  child: IconButton(icon: const Icon(Icons.videocam, color: Colors.white, size: 32), onPressed: onAccept),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ChatDetailScreen extends StatefulWidget {
   final String host;
   final VoidCallback onCall;
@@ -159,10 +202,6 @@ class _CallScreenState extends State<CallScreen> {
   int? _vid;
   late int _gems;
   String _gift = "";
-  final List<String> _simVideos = const [
-    'https://assets.mixkit.co/videos/preview/mixkit-young-woman-talking-on-a-video-call-with-her-phone-41478-large.mp4',
-    'https://assets.mixkit.co/videos/preview/mixkit-girl-talking-on-video-call-online-42614-large.mp4'
-  ];
 
   @override
   void initState() {
@@ -203,7 +242,6 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Simulated Live Host Visual
           Positioned.fill(
             child: Container(
               color: const Color(0xFF101018),
@@ -219,7 +257,6 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
           ),
-          // User Camera Picture-in-Picture (PIP)
           Positioned(
             top: 40,
             right: 16,
@@ -266,6 +303,8 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _tab = 0;
   int _gems = 1670;
+  bool _incomingShown = false;
+
   final _hosts = const [
     {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
     {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
@@ -280,6 +319,34 @@ class _DashboardState extends State<Dashboard> {
     {'gems': 66600, 'price': 1600},
     {'gems': 167400, 'price': 4000},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleFakeIncoming();
+  }
+
+  void _scheduleFakeIncoming() {
+    Future.delayed(const Duration(seconds: 8), () {
+      if (mounted && !_incomingShown) {
+        _incomingShown = true;
+        final h = _hosts[Random().nextInt(_hosts.length)]['name']!;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => IncomingCallScreen(
+              host: h,
+              onAccept: () {
+                Navigator.pop(context);
+                _dial(h);
+              },
+              onDecline: () => Navigator.pop(context),
+            ),
+          ),
+        );
+      }
+    });
+  }
 
   void _recharge() {
     showModalBottomSheet(
@@ -416,4 +483,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-
