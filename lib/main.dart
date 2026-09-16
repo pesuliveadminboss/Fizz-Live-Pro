@@ -215,8 +215,8 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
-  Widget? _cam;
-  int? _vid;
+  Widget? _camView;
+  int? _viewID;
   late int _g;
   String _gift = "";
   bool _mic = true;
@@ -227,25 +227,37 @@ class _CallScreenState extends State<CallScreen> {
   void initState() {
     super.initState();
     _g = widget.gems;
-    _start();
+    _initZegoAndCamera();
   }
 
-  Future<void> _start() async {
-    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(710176630, ZegoScenario.StandardVideoCall, appSign: '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a'));
-    await ZegoExpressEngine.instance.createCanvasView((id) {
-      _vid = id;
-      ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
-    }).then((w) => setState(() => _cam = w));
+  Future<void> _initZegoAndCamera() async {
+    await [Permission.camera, Permission.microphone].request();
+    const appID = 710176630;
+    const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
+    await ZegoExpressEngine.createEngineWithProfile(
+      ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign),
+    );
+    await ZegoExpressEngine.instance.enableCamera(true);
+    await ZegoExpressEngine.instance.useFrontCamera(true);
+    
+    final createdWidget = await ZegoExpressEngine.instance.createCanvasView((viewID) {
+      _viewID = viewID;
+      ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(viewID));
+    });
+    if (mounted) setState(() => _camView = createdWidget);
   }
 
-  void _flipCam() {
-    setState(() => _frontCam = !_frontCam);
-    ZegoExpressEngine.instance.useFrontCamera(_frontCam);
+  void _flipCam() async {
+    _frontCam = !_frontCam;
+    await ZegoExpressEngine.instance.useFrontCamera(_frontCam);
+    setState(() {});
   }
 
   @override
   void dispose() {
-    if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
+    if (_viewID != null) {
+      ZegoExpressEngine.instance.destroyCanvasView(_viewID!);
+    }
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
@@ -279,14 +291,29 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
           ),
-          Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _cam ?? const CircularProgressIndicator())),
+          Positioned(
+            top: 40,
+            right: 16,
+            width: 90,
+            height: 125,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.pink, width: 2), borderRadius: BorderRadius.circular(10)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: _camView ?? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Colors.pink)),
+              ),
+            ),
+          ),
           if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
+                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () {
+                  setState(() => _mic = !_mic);
+                  ZegoExpressEngine.instance.muteMicrophone(!_mic);
+                }),
                 IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
                 IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
@@ -417,8 +444,4 @@ class _DashboardState extends State<Dashboard> {
       backgroundColor: const Color(0xFF07070A),
       appBar: AppBar(title: const Text('Fizz Live Pro'), actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))]),
       body: _buildBody(),
-      bottomNavigationBar: Container(height: 50, color: const Color(0xFF0E0E14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [for (int i = 0; i < icons.length; i++) IconButton(icon: Icon(icons[i], color: _tab == i ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = i))])),
-    );
-  }
-}
-
+      bottomNavigationBar: Container(height: 50, color: const Color(0xFF0E0E14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [for (int i = 0; i < icons.length; i++) IconButton(icon: Icon(icons[i], col
