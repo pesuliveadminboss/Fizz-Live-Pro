@@ -31,19 +31,15 @@ class _SplashState extends State<Splash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100, height: 100,
+              width: 90, height: 90,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  'https://i.ibb.co/3k5fB0K/fizz-logo.png',
-                  errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 70, color: Color(0xFFFF2E93)),
-                ),
+                child: Image.network('https://i.ibb.co/3k5fB0K/fizz-logo.png', errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 60, color: Colors.pink)),
               ),
             ),
-            const SizedBox(height: 12),
-            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFFD700))),
-            const SizedBox(height: 4),
+            const SizedBox(height: 10),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber)),
             const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54)),
           ],
         ),
@@ -60,41 +56,21 @@ class PinGate extends StatefulWidget {
 
 class _PinGateState extends State<PinGate> {
   final _c = TextEditingController();
-  String _msg = "";
-  void _check() {
-    if (_c.text.trim() == "7777") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
-    } else {
-      setState(() => _msg = "Invalid PIN!");
-      _c.clear();
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.admin_panel_settings, size: 50, color: Color(0xFFFFD700)),
-              const SizedBox(height: 10),
               const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 10),
-              TextField(
-                controller: _c,
-                keyboardType: TextInputType.number,
-                obscureText: true,
-                textAlign: TextAlign.center,
-                maxLength: 4,
-                style: const TextStyle(color: Color(0xFFFFD700), fontSize: 22),
-                decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••"),
-              ),
-              if (_msg.isNotEmpty) Text(_msg, style: const TextStyle(color: Colors.redAccent)),
-              const SizedBox(height: 12),
-              ElevatedButton(onPressed: _check, child: const Text('Unlock')),
+              TextField(controller: _c, keyboardType: TextInputType.number, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber, fontSize: 22), decoration: const InputDecoration(filled: true, fillColor: Color(0xFF14141E), hintText: "••••")),
+              const SizedBox(height: 10),
+              ElevatedButton(onPressed: () { if (_c.text.trim() == "7777") Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login())); }, child: const Text('Unlock')),
             ],
           ),
         ),
@@ -110,100 +86,13 @@ class Login extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 36)),
-            const SizedBox(height: 12),
-            const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 18)),
-            const SizedBox(height: 18),
-            ElevatedButton(
-              onPressed: () async {
-                await [Permission.camera, Permission.microphone].request();
-                if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-              },
-              child: const Text('Fast Login & Allow Permissions'),
-            ),
-          ],
+        child: ElevatedButton(
+          onPressed: () async {
+            await [Permission.camera, Permission.microphone].request();
+            if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+          },
+          child: const Text('Fast Login & Allow Permissions'),
         ),
-      ),
-    );
-  }
-}
-
-class IncomingCallScreen extends StatelessWidget {
-  final String host;
-  final VoidCallback onAccept;
-  final VoidCallback onDecline;
-  const IncomingCallScreen({super.key, required this.host, required this.onAccept, required this.onDecline});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D15),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 45)),
-            const SizedBox(height: 14),
-            Text(host, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text('Incoming Video Call... (1800/min)', style: TextStyle(color: Colors.greenAccent, fontSize: 13)),
-            const SizedBox(height: 36),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: onDecline),
-                IconButton(icon: const Icon(Icons.videocam, color: Colors.green, size: 36), onPressed: onAccept),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ChatDetailScreen extends StatefulWidget {
-  final String host;
-  final VoidCallback onCall;
-  const ChatDetailScreen({super.key, required this.host, required this.onCall});
-  @override
-  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
-}
-
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
-  final _msgCtrl = TextEditingController();
-  final List<String> _chat = ['Host: Hi dear! Call me live ❤️'];
-  void _send() {
-    if (_msgCtrl.text.isEmpty) return;
-    setState(() => _chat.add('You: ${_msgCtrl.text}'));
-    _msgCtrl.clear();
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => _chat.add('Host: Waiting in call, tap call above! 😘'));
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        title: Text(widget.host),
-        actions: [IconButton(icon: const Icon(Icons.videocam, color: Colors.pink), onPressed: widget.onCall)],
-      ),
-      body: Column(
-        children: [
-          Expanded(child: ListView(padding: const EdgeInsets.all(12), children: [for (var m in _chat) Text(m, style: const TextStyle(color: Colors.white, fontSize: 15))])),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Expanded(child: TextField(controller: _msgCtrl, style: const TextStyle(color: Colors.white))),
-                IconButton(icon: const Icon(Icons.send, color: Colors.amber), onPressed: _send),
-              ],
-            ),
-          )
-        ],
       ),
     );
   }
@@ -211,40 +100,30 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
 class CallScreen extends StatefulWidget {
   final String host;
-  final String room;
-  final int userGems;
+  final int gems;
   final Function(int) onGems;
-  const CallScreen({super.key, required this.host, required this.room, required this.userGems, required this.onGems});
+  const CallScreen({super.key, required this.host, required this.gems, required this.onGems});
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
 
 class _CallScreenState extends State<CallScreen> {
-  Widget? _myCam;
+  Widget? _cam;
   int? _vid;
-  late int _gems;
+  late int _g;
   String _gift = "";
   @override
   void initState() {
     super.initState();
-    _gems = widget.userGems;
-    _startPreview();
+    _g = widget.gems;
+    _start();
   }
-  Future<void> _startPreview() async {
-    const appID = 710176630;
-    const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
-    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
+  Future<void> _start() async {
+    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(710176630, ZegoScenario.StandardVideoCall, appSign: '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a'));
     await ZegoExpressEngine.instance.createCanvasView((id) {
       _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
-    }).then((w) => setState(() => _myCam = w));
-  }
-  void _sendGift(String name, int cost, String em) {
-    if (_gems >= cost) {
-      setState(() { _gems -= cost; _gift = "Sent $em $name!"; });
-      widget.onGems(_gems);
-      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
-    }
+    }).then((w) => setState(() => _cam = w));
   }
   @override
   void dispose() {
@@ -259,46 +138,13 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Container(
-              color: const Color(0xFF101018),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(radius: 45, child: Icon(Icons.person, size: 50)),
-                  const SizedBox(height: 10),
-                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  const Text('Live Stream • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 40, right: 16, width: 85, height: 120,
-            child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
-          ),
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                if (_gift.isNotEmpty) Container(margin: const EdgeInsets.only(left: 16), padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
-                    IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () => _sendGift('Car', 1000, '🏎️')),
-                  ],
-                ),
-                const SizedBox(height: 14),
-              ],
-            ),
-          ),
+          Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 45)), const SizedBox(height: 8), Text('${widget.host} is live (1800/min)', style: const TextStyle(color: Colors.white, fontSize: 16))])),
+          Positioned(top: 40, right: 16, width: 80, height: 110, child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _cam ?? const CircularProgressIndicator())),
+          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
+          Positioned(bottom: 20, left: 0, right: 0, child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
+            IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
+          ])),
         ],
       ),
     );
@@ -315,101 +161,51 @@ class _DashboardState extends State<Dashboard> {
   int _tab = 0;
   int _cat = 0;
   int _gems = 1670;
-  bool _incomingShown = false;
-
+  bool _inc = false;
   final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
-  final _hosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'lvl': 'Lv.7'},
-    {'name': 'Ananya', 'city': 'Delhi', 'lvl': 'Lv.9'},
-    {'name': 'Sneha', 'city': 'Chennai', 'lvl': 'Lv.6'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'lvl': 'Lv.8'},
-  ];
-  final _packs = const [
-    {'gems': 4050, 'price': 100},
-    {'gems': 8100, 'price': 200},
-    {'gems': 16380, 'price': 400},
-    {'gems': 32940, 'price': 800},
-    {'gems': 66600, 'price': 1600},
-    {'gems': 167400, 'price': 4000},
-  ];
+  final _hosts = const ['Pooja', 'Ananya', 'Sneha', 'Kavya'];
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 10), () {
-      if (mounted && !_incomingShown) {
-        _incomingShown = true;
-        final h = _hosts[Random().nextInt(_hosts.length)]['name']!;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => IncomingCallScreen(
-              host: h,
-              onAccept: () { Navigator.pop(context); _dial(h); },
-              onDecline: () => Navigator.pop(context),
-            ),
-          ),
-        );
+      if (mounted && !_inc) {
+        _inc = true;
+        showDialog(context: context, builder: (ctx) => AlertDialog(
+          backgroundColor: const Color(0xFF14141E),
+          title: const Text('Incoming Call...', style: TextStyle(color: Colors.white)),
+          content: const Text('Pooja calling live (1800/min)', style: TextStyle(color: Colors.greenAccent)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Decline', style: TextStyle(color: Colors.red))),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _dial('Pooja'); }, child: const Text('Accept')),
+          ],
+        ));
       }
     });
   }
 
   void _recharge() {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('My Gems: $_gems', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          for (var p in _packs)
-            ListTile(
-              title: Text('${p['gems']} Gems'),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  setState(() => _gems += (p['gems'] as int));
-                  Navigator.pop(ctx);
-                },
-                child: Text('₹${p['price']}'),
-              ),
-            ),
-        ],
-      ),
-    );
+    showModalBottomSheet(context: context, builder: (ctx) => ListView(padding: const EdgeInsets.all(16), children: [
+      Text('My Gems: $_gems', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ListTile(title: const Text('4050 Gems'), trailing: ElevatedButton(onPressed: () { setState(() => _gems += 4050); Navigator.pop(ctx); }, child: const Text('₹100'))),
+      ListTile(title: const Text('8100 Gems'), trailing: ElevatedButton(onPressed: () { setState(() => _gems += 8100); Navigator.pop(ctx); }, child: const Text('₹200'))),
+    ]));
   }
 
-  void _showWithdraw() {
-    final upiCtrl = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF14141E),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Cashout / Withdraw', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('Balance: $_gems Gems', style: const TextStyle(color: Color(0xFFFFD700))),
-            const SizedBox(height: 12),
-            TextField(controller: upiCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter UPI ID', filled: true, fillColor: Color(0xFF1E1E2C))),
-            const SizedBox(height: 14),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal request submitted!'), backgroundColor: Colors.green));
-              },
-              child: const Text('Submit'),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _withdraw() {
+    showModalBottomSheet(context: context, builder: (ctx) => Padding(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Text('Balance: $_gems Gems', style: const TextStyle(fontSize: 18)),
+      const SizedBox(height: 10),
+      const TextField(decoration: InputDecoration(hintText: 'Enter UPI ID', border: OutlineInputBorder())),
+      const SizedBox(height: 10),
+      ElevatedButton(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal submitted!'))); }, child: const Text('Withdraw')),
+    ])));
   }
 
   void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: 'room_${name.toLowerCase()}', userGems: _gems, onGems: (g) => setState(() => _gems = g))));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, gems: _gems, onGems: (g) => setState(() => _gems = g))));
     } else {
       _recharge();
     }
@@ -417,133 +213,30 @@ class _DashboardState extends State<Dashboard> {
 
   Widget _body() {
     if (_tab == 0) {
-      return Column(
-        children: [
-          SizedBox(
-            height: 44,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                for (int i = 0; i < _cats.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: ActionChip(
-                      label: Text(_cats[i]),
-                      backgroundColor: _cat == i ? const Color(0xFFFF2E93) : const Color(0xFF14141E),
-                      onPressed: () => setState(() => _cat = i),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]['name']!),
-                icon: const Icon(Icons.radar),
-                label: const Text('Random Match (1800 gems)'),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              padding: const EdgeInsets.all(8),
-              children: [
-                for (var h in _hosts)
-                  Card(
-                    color: const Color(0xFF14141E),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircleAvatar(radius: 24, child: Icon(Icons.person)),
-                        Text(h['name']!, style: const TextStyle(color: Colors.white)),
-                        Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                        ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      );
+      return Column(children: [
+        SizedBox(height: 40, child: ListView(scrollDirection: Axis.horizontal, children: [for (int i = 0; i < _cats.length; i++) Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: ActionChip(label: Text(_cats[i]), backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E), onPressed: () => setState(() => _cat = i)))])),
+        Padding(padding: const EdgeInsets.all(8), child: SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]), icon: const Icon(Icons.radar), label: const Text('Random Match (1800 gems)')))),
+        Expanded(child: GridView.count(crossAxisCount: 2, padding: const EdgeInsets.all(8), children: [for (var h in _hosts) Card(color: const Color(0xFF14141E), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 24, child: Icon(Icons.person)), Text(h, style: const TextStyle(color: Colors.white)), ElevatedButton(onPressed: () => _dial(h), child: const Text('Call'))]))])),
+      ]);
     } else if (_tab == 1) {
-      return ListView(
-        children: [
-          for (var h in _hosts)
-            ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
-            ),
-        ],
-      );
+      return ListView(children: [for (var h in _hosts) ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: Text(h, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h), child: const Text('Call')))]);
     } else if (_tab == 2) {
-      return Center(
-        child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Play Spin & Win 150 Gems')),
-      );
+      return Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems')));
     } else if (_tab == 3) {
-      return ListView(
-        children: [
-          for (var h in _hosts)
-            ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
-              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!)))),
-            ),
-        ],
-      );
+      return ListView(children: [for (var h in _hosts) ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: Text(h, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h))]);
     } else {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 32)),
-            const SizedBox(height: 8),
-            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18)),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-                const SizedBox(width: 10),
-                OutlinedButton(onPressed: _showWithdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white))),
-              ],
-            ),
-          ],
-        ),
-      );
+      return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 30, child: Icon(Icons.person)), const SizedBox(height: 8), Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18)), const SizedBox(height: 10), Row(mainAxisAlignment: MainAxisAlignment.center, children: [ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')), const SizedBox(width: 10), OutlinedButton(onPressed: _withdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white)))])]));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const navIcons = [Icons.home, Icons.favorite, Icons.casino, Icons.chat, Icons.person];
+    const icons = [Icons.home, Icons.favorite, Icons.casino, Icons.chat, Icons.person];
     return Scaffold(
       backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(
-        title: const Text('Fizz Live Pro'),
-        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-      ),
+      appBar: AppBar(title: const Text('Fizz Live Pro'), actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))]),
       body: _body(),
-      bottomNavigationBar: Container(
-        color: const Color(0xFF0E0E14),
-        height: 56,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            for (int i = 0; i < navIcons.length; i++)
-              IconButton(
-                icon: Icon(navIcons[i], color: _tab == i ? Colors.pink : Colors.grey),
-                onPressed: () => setState(() => _tab = i),
-              ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: Container(height: 50, color: const Color(0xFF0E0E14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [for (int i = 0; i < icons.length; i++) IconButton(icon: Icon(icons[i], color: _tab == i ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = i))])),
     );
   }
-  
+}
