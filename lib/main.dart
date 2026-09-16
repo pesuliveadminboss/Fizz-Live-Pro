@@ -22,7 +22,10 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const AdminGatewayScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminGatewayScreen()),
+        );
       }
     });
   }
@@ -37,7 +40,15 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Icon(Icons.videocam_rounded, size: 70, color: Color(0xFFFF2E93)),
             SizedBox(height: 16),
-            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4, color: Color(0xFFFFD700))),
+            Text(
+              'FIZZ LIVE PRO',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 4,
+                color: Color(0xFFFFD700),
+              ),
+            ),
           ],
         ),
       ),
@@ -57,7 +68,10 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
 
   void _checkPin() {
     if (_pin.text.trim() == "7777") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const LoginScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
     } else {
       setState(() => _err = "Invalid PIN! Access Denied.");
       _pin.clear();
@@ -93,7 +107,11 @@ class _AdminGatewayScreenState extends State<AdminGatewayScreen> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-              if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
+              if (_err.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(_err, style: const TextStyle(color: Colors.redAccent)),
+                ),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -123,7 +141,6 @@ class LoginScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               const Spacer(),
               const CircleAvatar(radius: 40, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 40, color: Colors.white)),
@@ -135,14 +152,15 @@ class LoginScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const AuthorizationScreen()));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AuthorizationScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text('Agree to Terms & Privacy Policy', style: TextStyle(color: Colors.grey, fontSize: 11)),
             ],
           ),
         ),
@@ -157,7 +175,10 @@ class AuthorizationScreen extends StatelessWidget {
   Future<void> _requestAndContinue(BuildContext context) async {
     await [Permission.camera, Permission.microphone].request();
     if (context.mounted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => const MainDashboardScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainDashboardScreen()),
+      );
     }
   }
 
@@ -172,12 +193,9 @@ class AuthorizationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text('Authorization Settings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text('Permissions Required', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),
-              const Text('Allow permissions for 1-on-1 private video calls.', style: TextStyle(color: Colors.grey, fontSize: 13)),
-              const SizedBox(height: 24),
-              const ListTile(leading: Icon(Icons.videocam, color: Color(0xFFFFD700)), title: Text('Camera', style: TextStyle(color: Colors.white)), subtitle: Text('For video calls and streaming', style: TextStyle(color: Colors.grey))),
-              const ListTile(leading: Icon(Icons.mic, color: Color(0xFFFFD700)), title: Text('Microphone', style: TextStyle(color: Colors.white)), subtitle: Text('For voice talk', style: TextStyle(color: Colors.grey))),
+              const Text('Allow Camera & Mic for 1-on-1 calls.', style: TextStyle(color: Colors.grey)),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -185,7 +203,7 @@ class AuthorizationScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => _requestAndContinue(context),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
-                  child: const Text('Allow all permissions', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text('Allow permissions', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -212,29 +230,25 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
   @override
   void initState() {
     super.initState();
-    _startZegoCall();
+    _startZego();
   }
 
-  Future<void> _startZegoCall() async {
+  Future<void> _startZego() async {
     const int appID = 710176630;
     const String appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
 
-    await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(
-      appID,
-      ZegoScenario.StandardVideoCall,
-      appSign: appSign,
-    ));
+    await ZegoExpressEngine.createEngineWithProfile(
+      ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign),
+    );
 
     await ZegoExpressEngine.instance.createCanvasView((viewID) {
       _localViewID = viewID;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(viewID));
     }).then((widgetView) {
-      setState(() {
-        _localView = widgetView;
-      });
+      setState(() => _localView = widgetView);
     });
 
-    final user = ZegoUser('user_${DateTime.now().millisecondsSinceEpoch % 10000}', 'GuestUser');
+    final user = ZegoUser('user_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
     await ZegoExpressEngine.instance.loginRoom(widget.roomID, user);
     await ZegoExpressEngine.instance.startPublishingStream('stream_${user.userID}');
   }
@@ -270,15 +284,12 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)),
-                        child: Text(
-                          widget.hostName,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
+                        child: Text(widget.hostName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)),
-                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -290,7 +301,7 @@ class _LiveCallScreenState extends State<LiveCallScreen> {
                     radius: 32,
                     backgroundColor: Colors.red,
                     child: IconButton(
-                      icon: const Icon(Icons.call_end, color: Colors.white, size: 30),
+                      icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -313,89 +324,31 @@ class MainDashboardScreen extends StatefulWidget {
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _tab = 0;
   int _userGems = 1670;
-  int _selectedPack = 0;
-
   final List<String> _names = const ['Pooja', 'Ananya', 'Sneha', 'Kavya'];
-
-  final List<Map<String, dynamic>> _rechargePacks = const [
-    {'gems': 4050, 'price': '100.00'},
-    {'gems': 8100, 'price': '200.00'},
-    {'gems': 16380, 'price': '400.00'},
-    {'gems': 32940, 'price': '800.00'},
-    {'gems': 66600, 'price': '1600.00'},
-    {'gems': 167400, 'price': '4000.00'},
-  ];
 
   void _showRechargeSheet() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Make video calls with Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
-                  const Text('Call beauties with Gems', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  const SizedBox(height: 16),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1.0,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: _rechargePacks.length,
-                    itemBuilder: (context, i) {
-                      final pack = _rechargePacks[i];
-                      final isSelected = _selectedPack == i;
-                      return GestureDetector(
-                        onTap: () => setSheetState(() => _selectedPack = i),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFFFFF2DC) : const Color(0xFFF7F7F9),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isSelected ? const Color(0xFFFFA500) : Colors.transparent, width: 1.5),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.diamond, color: Color(0xFFFFA500), size: 24),
-                              Text('${pack['gems']}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                              Text('₹${pack['price']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  Text('My Gems: $_userGems', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 46,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final int added = _rechargePacks[_selectedPack]['gems'] as int;
-                        setState(() => _userGems += added);
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA28A9)),
-                      child: const Text('Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Add Gems for Calling', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => _userGems += 4050);
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA28A9)),
+                child: const Text('Get 4,050 Gems (₹100)', style: TextStyle(color: Colors.white)),
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );
@@ -407,10 +360,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (c) => LiveCallScreen(
-            hostName: name,
-            roomID: 'room_${name.toLowerCase()}',
-          ),
+          builder: (_) => LiveCallScreen(hostName: name, roomID: 'room_${name.toLowerCase()}'),
         ),
       );
     } else {
@@ -420,12 +370,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   Widget _tabZero() {
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
       ),
       itemCount: _names.length,
       itemBuilder: (context, i) {
@@ -435,13 +385,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(radius: 35, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 40, color: Colors.white54)),
+              const CircleAvatar(radius: 30, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
               const SizedBox(height: 8),
               Text(n, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              const Text('Online • LV7', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
               IconButton(
-                icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 28),
+                icon: const Icon(Icons.video_call_rounded, color: Color(0xFFFF2E93), size: 30),
                 onPressed: () => _callHost(n),
               ),
             ],
@@ -460,13 +409,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         return Card(
           color: const Color(0xFF14141E),
           child: ListTile(
-            leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white54)),
+            leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
             title: Text(n, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            subtitle: const Text('Following • Active now', style: TextStyle(color: Colors.grey)),
             trailing: ElevatedButton(
               onPressed: () => _callHost(n),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-              child: const Text('Call', style: TextStyle(fontSize: 12)),
+              child: const Text('Call', style: TextStyle(color: Colors.white)),
             ),
           ),
         );
@@ -475,48 +423,21 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Widget _tabTwo() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Card(
-            color: const Color(0xFF14141E),
-            child: ListTile(
-              leading: const Icon(Icons.casino_rounded, color: Color(0xFFFFD700), size: 36),
-              title: const Text('Lucky Wheel Spin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: const Text('Play with 100 gems & win gems', style: TextStyle(color: Colors.grey)),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  if (_userGems >= 100) {
-                    setState(() => _userGems += 200);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 300 Gems!')));
-                  } else {
-                    _showRechargeSheet();
-                  }
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                child: const Text('Play'),
-              ),
-            ),
-          ),
-        ],
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() => _userGems += 100);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Free 100 Gems Claimed!')));
+        },
+        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+        child: const Text('Spin & Win Gems'),
       ),
     );
   }
 
   Widget _tabThree() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: const [
-        Card(
-          color: Color(0xFF14141E),
-          child: ListTile(
-            leading: Icon(Icons.notifications, color: Color(0xFFFFD700)),
-            title: Text('System Announcement', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            subtitle: Text('Welcome to Fizz Live Pro!', style: TextStyle(color: Colors.grey)),
-          ),
-        ),
-      ],
+    return const Center(
+      child: Text('Welcome to Fizz Live Messages', style: TextStyle(color: Colors.white)),
     );
   }
 
@@ -526,4 +447,73 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         children: [
           const ListTile(
-            leading: CircleAvatar(bac
+            leading: CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
+            title: Text('Pesulive User', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            subtitle: Text('ID: 207183', style: TextStyle(color: Colors.grey)),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            color: const Color(0xFF14141E),
+            child: ListTile(
+              title: const Text('My Gems', style: TextStyle(color: Colors.white)),
+              trailing: Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 16)),
+              onTap: _showRechargeSheet,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget pageBody;
+    if (_tab == 0) pageBody = _tabZero();
+    else if (_tab == 1) pageBody = _tabOne();
+    else if (_tab == 2) pageBody = _tabTwo();
+    else if (_tab == 3) pageBody = _tabThree();
+    else pageBody = _tabFour();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          GestureDetector(
+            onTap: _showRechargeSheet,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                children: [
+                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
+                  const SizedBox(width: 4),
+                  Text('$_userGems', style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: pageBody,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _tab,
+        onTap: (i) => setState(() => _tab = i),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF0E0E14),
+        selectedItemColor: const Color(0xFFFFD700),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
+        ],
+      ),
+    );
+  }
+}
+
