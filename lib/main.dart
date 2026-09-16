@@ -189,25 +189,6 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _cam = w);
   }
 
-  void _flipCam() async {
-    _frontCam = !_frontCam;
-    await ZegoExpressEngine.instance.useFrontCamera(_frontCam);
-    setState(() {});
-  }
-
-  void _sendGift(String n, int cost, String em) {
-    if (_g >= cost) {
-      setState(() {
-        _g -= cost;
-        _gift = "Sent $em $n!";
-      });
-      widget.onGems(_g);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = "");
-      });
-    }
-  }
-
   @override
   void dispose() {
     _t?.cancel();
@@ -234,24 +215,21 @@ class _CallScreenState extends State<CallScreen> {
                     const SizedBox(height: 8),
                     Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
-                    if (_g < 1800) const Text('⚠️ Low Gems!', style: TextStyle(color: Colors.orangeAccent, fontSize: 12)),
                   ],
                 ),
               ),
             ),
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
-          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () { setState(() => _mic = !_mic); ZegoExpressEngine.instance.muteMicrophone(!_mic); }),
-                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
+                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
+                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () => ZegoExpressEngine.instance.useFrontCamera(_frontCam = !_frontCam)),
                 IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
-                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: () => _sendGift('Car', 1000, '🏎️')),
               ],
             ),
           ),
@@ -271,54 +249,23 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   late TabController _tabCtrl;
   int _cat = 0;
   int _gems = 1670;
+  final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _allHosts = const [
     {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'},
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
-    {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
-    {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
   ];
 
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
-    {'gems': 16380, 'price': 400},
-    {'gems': 32940, 'price': 800},
-    {'gems': 66600, 'price': 1600},
-    {'gems': 167400, 'price': 4000},
   ];
 
   @override
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: 5, vsync: this);
-  }
-
-  void _showSummary(String host, String dur, int sec) {
-    int spent = 1800 + (sec ~/ 60) * 1800;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF14141E),
-        title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Duration: $dur', style: const TextStyle(color: Colors.greenAccent)),
-            const SizedBox(height: 4),
-            Text('Gems Spent: $spent 💎', style: const TextStyle(color: Colors.amber)),
-            const SizedBox(height: 4),
-            Text('Balance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
-            const SizedBox(height: 10),
-            const Text('Rate Host:', style: TextStyle(color: Colors.white70)),
-            const Row(children: [Text('⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 18))]),
-          ],
-        ),
-        actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-      ),
-    );
   }
 
   void _recharge() {
@@ -334,7 +281,13 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             ListTile(
               leading: const Icon(Icons.diamond, color: Colors.amber),
               title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(onPressed: () { setState(() => _gems += (p['gems'] as int)); Navigator.pop(ctx); }, child: Text('₹${p['price']}')),
+              trailing: ElevatedButton(onPressed: () {
+                setState(() {
+                  _gems += (p['gems'] as int);
+                  _history.insert(0, 'Recharge: +${p['gems']} Gems');
+                });
+                Navigator.pop(ctx);
+              }, child: Text('₹${p['price']}')),
             ),
         ],
       ),
@@ -343,8 +296,11 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   void _dial(String n, String p) {
     if (_gems >= 1800) {
-      setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) => _showSummary(n, d, s))));
+      setState(() {
+        _gems -= 1800;
+        _history.insert(0, 'Video Call with $n: -1800 Gems');
+      });
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) {})));
     } else {
       _recharge();
     }
@@ -409,23 +365,22 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ),
             ],
           ),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
+          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
           Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
           ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
-          const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(radius: 34, child: Icon(Icons.person)),
-                SizedBox(height: 6),
-                Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
-              ],
-            ),
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber))])),
+              const SizedBox(height: 20),
+              const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 10),
+              for (var item in _history)
+                Card(color: const Color(0xFF14141E), child: ListTile(leading: const Icon(Icons.history, color: Colors.pink), title: Text(item, style: const TextStyle(color: Colors.white)))),
+            ],
           ),
         ],
       ),
     );
   }
 }
-
