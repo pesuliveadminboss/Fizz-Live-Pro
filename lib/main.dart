@@ -100,9 +100,10 @@ class Login extends StatelessWidget {
 
 class CallScreen extends StatefulWidget {
   final String host;
+  final String pic;
   final int gems;
   final Function(int) onGems;
-  const CallScreen({super.key, required this.host, required this.gems, required this.onGems});
+  const CallScreen({super.key, required this.host, required this.pic, required this.gems, required this.onGems});
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
@@ -112,12 +113,15 @@ class _CallScreenState extends State<CallScreen> {
   int? _vid;
   late int _g;
   String _gift = "";
+  bool _micOn = true;
+
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
     _start();
   }
+
   Future<void> _start() async {
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(710176630, ZegoScenario.StandardVideoCall, appSign: '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a'));
     await ZegoExpressEngine.instance.createCanvasView((id) {
@@ -125,6 +129,7 @@ class _CallScreenState extends State<CallScreen> {
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     }).then((w) => setState(() => _cam = w));
   }
+
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -132,19 +137,45 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 40, child: Icon(Icons.person, size: 45)), const SizedBox(height: 8), Text('${widget.host} is live (1800/min)', style: const TextStyle(color: Colors.white, fontSize: 16))])),
-          Positioned(top: 40, right: 16, width: 80, height: 110, child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _cam ?? const CircularProgressIndicator())),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken)),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(radius: 50, backgroundImage: NetworkImage(widget.pic)),
+                    const SizedBox(height: 12),
+                    Text('${widget.host} is live now', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    const Text('🟢 Connected • 1800 gems/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _cam ?? const CircularProgressIndicator())),
           if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
-          Positioned(bottom: 20, left: 0, right: 0, child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
-            IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
-          ])),
+          Positioned(
+            bottom: 20, left: 0, right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(icon: Icon(_micOn ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _micOn = !_micOn)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 38), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -169,6 +200,14 @@ class _DashboardState extends State<Dashboard> {
     {'name': 'Sneha', 'city': 'Chennai', 'views': '1.9k', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '3.5k', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
   ];
+  final _packs = const [
+    {'gems': 4050, 'price': 100},
+    {'gems': 8100, 'price': 200},
+    {'gems': 16380, 'price': 400},
+    {'gems': 32940, 'price': 800},
+    {'gems': 66600, 'price': 1600},
+    {'gems': 167400, 'price': 4000},
+  ];
 
   @override
   void initState() {
@@ -176,13 +215,14 @@ class _DashboardState extends State<Dashboard> {
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted && !_inc) {
         _inc = true;
+        final h = _hosts[0];
         showDialog(context: context, builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF14141E),
           title: const Text('Incoming Call...', style: TextStyle(color: Colors.white)),
-          content: const Text('Pooja calling live (1800/min)', style: TextStyle(color: Colors.greenAccent)),
+          content: Text('${h['name']} calling live (1800/min)', style: const TextStyle(color: Colors.greenAccent)),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Decline', style: TextStyle(color: Colors.red))),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _dial('Pooja'); }, child: const Text('Accept')),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); }, child: const Text('Accept')),
           ],
         ));
       }
@@ -207,10 +247,10 @@ class _DashboardState extends State<Dashboard> {
     ])));
   }
 
-  void _dial(String name) {
+  void _dial(String name, String pic) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, gems: _gems, onGems: (g) => setState(() => _gems = g))));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g))));
     } else {
       _recharge();
     }
@@ -220,23 +260,23 @@ class _DashboardState extends State<Dashboard> {
     if (_tab == 0) {
       return Column(children: [
         SizedBox(height: 40, child: ListView(scrollDirection: Axis.horizontal, children: [for (int i = 0; i < _cats.length; i++) Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: ActionChip(label: Text(_cats[i]), backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E), onPressed: () => setState(() => _cat = i)))])),
-        Padding(padding: const EdgeInsets.all(8), child: SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]['name']!), icon: const Icon(Icons.radar), label: const Text('Random Match (1800 gems)')))),
+        Padding(padding: const EdgeInsets.all(8), child: SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => _dial(_hosts[Random().nextInt(_hosts.length)]['name']!, _hosts[0]['pic']!), icon: const Icon(Icons.radar), label: const Text('Random Match (1800 gems)')))),
         Expanded(child: GridView.count(crossAxisCount: 2, padding: const EdgeInsets.all(8), children: [
           for (var h in _hosts) Card(color: const Color(0xFF14141E), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             CircleAvatar(radius: 26, backgroundImage: NetworkImage(h['pic']!)),
             const SizedBox(height: 4),
             Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             Text('🟢 Live • ${h['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
-            ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
+            ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
           ]))
         ])),
       ]);
     } else if (_tab == 1) {
-      return ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')))]);
+      return ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]);
     } else if (_tab == 2) {
       return Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems')));
     } else if (_tab == 3) {
-      return ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!))]);
+      return ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]);
     } else {
       return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 30, child: Icon(Icons.person)), const SizedBox(height: 8), Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18)), const SizedBox(height: 10), Row(mainAxisAlignment: MainAxisAlignment.center, children: [ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')), const SizedBox(width: 10), OutlinedButton(onPressed: _withdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white)))])]));
     }
