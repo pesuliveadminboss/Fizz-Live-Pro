@@ -274,6 +274,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
+    {'gems': 16380, 'price': 400},
+    {'gems': 32940, 'price': 800},
+    {'gems': 66600, 'price': 1600},
+    {'gems': 167400, 'price': 4000},
   ];
 
   @override
@@ -437,7 +441,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                         child: Card(
                           color: Colors.grey,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MethodAlignment.center,
                             children: [
                               CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
                               const SizedBox(height: 4),
@@ -471,3 +475,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 }
+
