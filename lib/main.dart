@@ -98,39 +98,6 @@ class Login extends StatelessWidget {
   }
 }
 
-class RandomMatchScreen extends StatefulWidget {
-  final Function(String, String) onMatched;
-  const RandomMatchScreen({super.key, required this.onMatched});
-  @override
-  State<RandomMatchScreen> createState() => _RandomMatchScreenState();
-}
-
-class _RandomMatchScreenState extends State<RandomMatchScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) widget.onMatched('Pooja', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200');
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Colors.pink),
-            SizedBox(height: 20),
-            Text('Finding random host...', style: TextStyle(color: Colors.white, fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -302,17 +269,11 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   final List<Host> _allHosts = const [
     Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
     Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
-    Host(name: 'Sneha', city: 'Chennai', views: '2.4k', cat: 'Party Match', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', bio: 'Music & Fun 🎵'),
-    Host(name: 'Kavya', city: 'Bangalore', views: '4.3k', cat: 'Nearby', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'Chat with me 💬'),
   ];
 
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
-    {'gems': 16380, 'price': 400},
-    {'gems': 32940, 'price': 800},
-    {'gems': 66600, 'price': 1600},
-    {'gems': 167400, 'price': 4000},
   ];
 
   @override
@@ -322,26 +283,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   }
 
   void _showSummary(String host, String dur, int sec) {
-    int spent = 1800 + (sec ~/ 60) * 1800;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.grey,
         title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Duration: $dur', style: const TextStyle(color: Colors.greenAccent)),
-            const SizedBox(height: 4),
-            Text('Gems Spent: $spent 💎', style: const TextStyle(color: Colors.amber)),
-            const SizedBox(height: 4),
-            Text('Balance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
-            const SizedBox(height: 10),
-            const Text('Rate Host:', style: TextStyle(color: Colors.white70)),
-            const Row(children: [Text('⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 18))]),
-          ],
-        ),
+        content: Text('Duration: $dur\nBalance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
         actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
       ),
     );
@@ -351,10 +298,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     setState(() {
       if (_favorites.contains(h)) {
         _favorites.remove(h);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Removed')));
       } else {
         _favorites.add(h);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added')));
       }
     });
   }
@@ -372,9 +317,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             CircleAvatar(radius: 35, backgroundImage: NetworkImage(h.pic)),
             const SizedBox(height: 8),
             Text(h.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('${h.city} • 🔴 LIVE', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
-            const SizedBox(height: 8),
-            Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.center),
+            Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -387,7 +330,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 ElevatedButton.icon(
                   onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
                   icon: const Icon(Icons.videocam),
-                  label: const Text('Direct Call'),
+                  label: const Text('Call'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
                 ),
               ],
@@ -436,23 +379,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     }
   }
 
-  Widget _buildFavoritesTab() {
-    if (_favorites.isEmpty) {
-      return const Center(child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)));
-    }
-    return ListView(
-      children: [
-        for (var h in _favorites)
-          ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-            title: Text(h.name, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(h.city, style: const TextStyle(color: Colors.grey)),
-            trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')),
-          ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
@@ -499,15 +425,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RandomMatchScreen(onMatched: (n, p) { Navigator.pop(context); _dial(n, p); }))),
-                  icon: const Icon(Icons.radar),
-                  label: const Text('Random Match (1800 gems)'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                ),
-              ),
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -522,4 +439,35 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-    
+                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
+                              const SizedBox(height: 4),
+                              Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: [for (var h in _favorites) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))]),
+          Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
+          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), onTap: () => _dial(h.name, h.pic))]),
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber))])),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(onPressed: () => setState(() => _gems += 500), icon: const Icon(Icons.card_giftcard), label: const Text('Claim VIP Bonus (+500 Gems)'), style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black)),
+              const SizedBox(height: 20),
+              const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+              for (var item in _history) Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white)))),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
