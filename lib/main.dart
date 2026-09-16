@@ -130,6 +130,96 @@ class Login extends StatelessWidget {
   }
 }
 
+class ChatDetailScreen extends StatefulWidget {
+  final String host;
+  final VoidCallback onCall;
+  const ChatDetailScreen({super.key, required this.host, required this.onCall});
+  @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+}
+
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
+  final _msgCtrl = TextEditingController();
+  final List<Map<String, String>> _messages = [
+    {'from': 'host', 'text': 'Hey dear! I am online now ❤️'}
+  ];
+
+  void _send() {
+    final txt = _msgCtrl.text.trim();
+    if (txt.isEmpty) return;
+    setState(() {
+      _messages.add({'from': 'me', 'text': txt});
+    });
+    _msgCtrl.clear();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        final replies = [
+          "You look sweet! Let's talk face-to-face in video call 😘",
+          "I'm alone in my room, call me now baby! 💋",
+          "Waiting for your private live call, tap the video button above! ❤️"
+        ];
+        setState(() {
+          _messages.add({'from': 'host', 'text': replies[Random().nextInt(replies.length)]});
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF14141E),
+        title: Text(widget.host, style: const TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(icon: const Icon(Icons.videocam, color: Color(0xFFFF2E93)), onPressed: widget.onCall),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: _messages.length,
+              itemBuilder: (ctx, i) {
+                final isMe = _messages[i]['from'] == 'me';
+                return Align(
+                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isMe ? const Color(0xFFFF2E93) : const Color(0xFF1E1E2C),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(_messages[i]['text']!, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _msgCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(hintText: 'Type a message...', hintStyle: TextStyle(color: Colors.grey), filled: true, fillColor: Color(0xFF14141E)),
+                  ),
+                ),
+                IconButton(icon: const Icon(Icons.send, color: Color(0xFFFFD700)), onPressed: _send),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class CallScreen extends StatefulWidget {
   final String host;
   final String room;
@@ -377,7 +467,7 @@ class _DashboardState extends State<Dashboard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const CircleAvatar(radius: 26, child: Icon(Icons.person)),
-                          Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                          Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           Text('${h['city']} • ${h['lvl']}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
                           ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
                         ],
@@ -409,7 +499,21 @@ class _DashboardState extends State<Dashboard> {
         ),
       );
     } else if (_tab == 3) {
-      return const Center(child: Text('Messages', style: TextStyle(color: Colors.white)));
+      return ListView(
+        children: [
+          for (var h in _hosts)
+            ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+              subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
+              trailing: const Icon(Icons.chat_bubble_outline, color: Color(0xFFFFD700)),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ChatDetailScreen(host: h['name']!, onCall: () => _dial(h['name']!))),
+              ),
+            ),
+        ],
+      );
     } else {
       return Center(
         child: Column(
@@ -453,11 +557,4 @@ class _DashboardState extends State<Dashboard> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.local_fire_department), label: 'For You'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
-        ],
-      ),
-    );
-  }
-}
+          Botto
