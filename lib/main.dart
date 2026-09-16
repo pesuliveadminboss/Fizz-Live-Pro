@@ -212,7 +212,17 @@ class _CallScreenState extends State<CallScreen> {
     _g = widget.gems;
     _initZego();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (mounted) setState(() => _seconds++);
+      if (!mounted) return;
+      setState(() => _seconds++);
+      if (_seconds > 0 && _seconds % 60 == 0) {
+        if (_g >= 1800) {
+          setState(() => _g -= 1800);
+          widget.onGems(_g);
+        } else {
+          _timer?.cancel();
+          Navigator.pop(context);
+        }
+      }
     });
   }
 
@@ -270,6 +280,7 @@ class _CallScreenState extends State<CallScreen> {
                       decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
                       child: Text(_formatTime(_seconds), style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
+                    if (_g < 1800) const Padding(padding: EdgeInsets.only(top: 6), child: Text('⚠️ Low Gems! Ending soon...', style: TextStyle(color: Colors.orangeAccent, fontSize: 12))),
                   ],
                 ),
               ),
@@ -425,15 +436,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
             const SizedBox(height: 8),
             const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(12)), child: const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12))),
-            const SizedBox(height: 10),
-            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 14),
-            ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-          ])),
-        ],
-      ),
-    );
-  }
-}
-
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(12)), child: const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold,
