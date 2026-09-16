@@ -219,12 +219,17 @@ class _CallScreenState extends State<CallScreen> {
   int? _vid;
   late int _g;
   String _gift = "";
+  bool _mic = true;
+  bool _glow = false;
+  bool _frontCam = true;
+
   @override
   void initState() {
     super.initState();
     _g = widget.gems;
     _start();
   }
+
   Future<void> _start() async {
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(710176630, ZegoScenario.StandardVideoCall, appSign: '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a'));
     await ZegoExpressEngine.instance.createCanvasView((id) {
@@ -232,6 +237,12 @@ class _CallScreenState extends State<CallScreen> {
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     }).then((w) => setState(() => _cam = w));
   }
+
+  void _flipCam() {
+    setState(() => _frontCam = !_frontCam);
+    ZegoExpressEngine.instance.useFrontCamera(_frontCam);
+  }
+
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
@@ -239,19 +250,50 @@ class _CallScreenState extends State<CallScreen> {
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: Container(decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken))), child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircleAvatar(radius: 45, backgroundImage: NetworkImage(widget.pic)), const SizedBox(height: 10), Text('${widget.host} is live', style: const TextStyle(color: Colors.white, fontSize: 18))])))),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(widget.pic),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(_glow ? 0.3 : 0.5), BlendMode.darken),
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(radius: 45, backgroundImage: NetworkImage(widget.pic)),
+                    const SizedBox(height: 10),
+                    Text('${widget.host} is live', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    if (_glow) const Text('✨ Glow Filter ON', style: TextStyle(color: Colors.amber, fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _cam ?? const CircularProgressIndicator())),
           if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
-          Positioned(bottom: 20, left: 0, right: 0, child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
-            IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
-          ])),
+          Positioned(
+            bottom: 20, left: 0, right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
+                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
+                IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 34), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
+              ],
+            ),
+          ),
         ],
       ),
     );
