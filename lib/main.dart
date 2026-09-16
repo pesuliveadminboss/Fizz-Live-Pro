@@ -365,13 +365,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ),
             ],
           ),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
+          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
           Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
           ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
           ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber))])),
+              const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('👑 VIP Lv.5 (Special Badge Active)', style: TextStyle(color: Colors.amber, fontSize: 12))])),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () => setState(() => _gems += 500),
+                icon: const Icon(Icons.card_giftcard),
+                label: const Text('Claim Daily VIP Bonus (+500 Gems)'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black),
+              ),
               const SizedBox(height: 20),
               const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 10),
