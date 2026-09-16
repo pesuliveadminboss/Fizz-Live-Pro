@@ -235,7 +235,16 @@ class _CallScreenState extends State<CallScreen> {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(_glow ? 0.3 : 0.5), BlendMode.darken))),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(widget.pic),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(_glow ? 0.3 : 0.5),
+                    BlendMode.darken,
+                  ),
+                ),
+              ),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -290,8 +299,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover & friendly host ✨'},
     {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'bio': 'Music & Fun 🎵'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'bio': 'Chat with me 💬'},
-    {'name': 'Divya', 'city': 'Hyderabad', 'views': '6.8k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200', 'bio': 'Smile always 😊'},
-    {'name': 'Riya', 'city': 'Kolkata', 'views': '4.5k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', 'bio': 'Fashion & lifestyle 👑'},
   ];
 
   final _packs = const [
@@ -481,4 +488,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                           ),
                         ),
                       ),
- 
+                  ],
+                ),
+              ),
+            ],
+          ),
+          _favorites.isEmpty ? const Center(child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)
