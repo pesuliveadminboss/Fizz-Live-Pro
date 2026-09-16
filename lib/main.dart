@@ -98,39 +98,6 @@ class Login extends StatelessWidget {
   }
 }
 
-class RandomMatchScreen extends StatefulWidget {
-  final Function(String, String) onMatched;
-  const RandomMatchScreen({super.key, required this.onMatched});
-  @override
-  State<RandomMatchScreen> createState() => _RandomMatchScreenState();
-}
-
-class _RandomMatchScreenState extends State<RandomMatchScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) widget.onMatched('Pooja', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200');
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Colors.pink),
-            SizedBox(height: 20),
-            Text('Finding random host...', style: TextStyle(color: Colors.white, fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -145,8 +112,7 @@ class _CallScreenState extends State<CallScreen> {
   Widget? _cam;
   int? _vid;
   late int _g;
-  String _gift = "";
-  bool _mic = true, _glow = false, _frontCam = true;
+  bool _mic = true, _frontCam = true;
   int _sec = 0;
   Timer? _t;
 
@@ -187,37 +153,6 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _cam = w);
   }
 
-  void _sendGift(String name, int cost, String em) {
-    if (_g >= cost) {
-      setState(() {
-        _g -= cost;
-        _gift = "Sent $em $name!";
-      });
-      widget.onGems(_g);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = "");
-      });
-    }
-  }
-
-  void _showGiftBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Rose', 50, '🌹'); }, child: const Text('🌹 50')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _t?.cancel();
@@ -235,16 +170,7 @@ class _CallScreenState extends State<CallScreen> {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(widget.pic),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(_glow ? 0.3 : 0.5),
-                    BlendMode.darken,
-                  ),
-                ),
-              ),
+              decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover)),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -253,14 +179,12 @@ class _CallScreenState extends State<CallScreen> {
                     const SizedBox(height: 8),
                     Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
-                    if (_g < 1800) const Text('⚠️ Low Gems!', style: TextStyle(color: Colors.orangeAccent, fontSize: 12)),
                   ],
                 ),
               ),
             ),
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
-          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
@@ -268,8 +192,6 @@ class _CallScreenState extends State<CallScreen> {
               children: [
                 IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
                 IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () => ZegoExpressEngine.instance.useFrontCamera(_frontCam = !_frontCam)),
-                IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
-                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: _showGiftBottomSheet),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
               ],
             ),
@@ -280,31 +202,20 @@ class _CallScreenState extends State<CallScreen> {
   }
 }
 
-class Host {
-  final String name, city, views, cat, pic, bio;
-  const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
-}
-
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin {
-  late TabController _tabCtrl;
-  int _cat = 0;
+class _DashboardState extends State<Dashboard> {
   int _gems = 1670;
   String _userName = 'User7789';
-  String _userBio = 'VIP Member & Live Chat Lover';
+  String _userBio = 'VIP Member';
 
-  final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
-  final List<Host> _favorites = [];
-
-  final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
-  final List<Host> _allHosts = const [
-    Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
-    Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
+  final _hosts = const [
+    {'name': 'Pooja', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'},
+    {'name': 'Ananya', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
   ];
 
   final _packs = const [
@@ -315,34 +226,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     {'gems': 66600, 'price': 1600},
     {'gems': 167400, 'price': 4000},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabCtrl = TabController(length: 5, vsync: this);
-  }
-
-  void _showSummary(String host, String dur, int sec) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.grey,
-        title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
-        content: Text('Duration: $dur\nBalance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-      ),
-    );
-  }
-
-  void _toggleFavorite(Host h) {
-    setState(() {
-      if (_favorites.contains(h)) {
-        _favorites.remove(h);
-      } else {
-        _favorites.add(h);
-      }
-    });
-  }
 
   void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
@@ -375,40 +258,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  void _showHostProfile(Host h) {
-    final isFav = _favorites.contains(h);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(radius: 35, backgroundImage: NetworkImage(h.pic)),
-            const SizedBox(height: 8),
-            Text(h.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13)),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton(
-                  onPressed: () { Navigator.pop(ctx); _toggleFavorite(h); },
-                  child: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
-                  child: const Text('Call'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _recharge() {
     showModalBottomSheet(
       context: context,
@@ -424,10 +273,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
               trailing: ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _gems += (p['gems'] as int);
-                    _history.insert(0, 'Recharge: +${p['gems']} Gems');
-                  });
+                  setState(() => _gems += (p['gems'] as int));
                   Navigator.pop(ctx);
                 },
                 child: Text('₹${p['price']}'),
@@ -438,13 +284,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  void _dial(String n, String p) {
+  void _dial(String name, String pic) {
     if (_gems >= 1800) {
-      setState(() {
-        _gems -= 1800;
-        _history.insert(0, 'Video Call with $n: -1800 Gems');
-      });
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) => _showSummary(n, d, s))));
+      setState(() => _gems -= 1800);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) {})));
     } else {
       _recharge();
     }
@@ -452,85 +295,71 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    final curCat = _cats[_cat];
-    final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text('Fizz Live Pro'),
-        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-        bottom: TabBar(
-          controller: _tabCtrl,
-          indicatorColor: Colors.pink,
-          labelColor: Colors.pink,
-          unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(icon: Icon(Icons.home)),
-            Tab(icon: Icon(Icons.favorite)),
-            Tab(icon: Icon(Icons.casino)),
-            Tab(icon: Icon(Icons.chat)),
-            Tab(icon: Icon(Icons.person)),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text('Fizz Live Pro'),
+          actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.home)),
+              Tab(icon: Icon(Icons.favorite)),
+              Tab(icon: Icon(Icons.person)),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(10),
+              children: [
+                for (var h in _hosts)
+                  Card(
+                    color: Colors.grey[900],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic']!)),
+                        const SizedBox(height: 6),
+                        Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 6),
+                        ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))),
+            ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                      const SizedBox(height: 6),
+                      Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                      Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _editProfile,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  child: const Text('Edit Profile'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabCtrl,
-        children: [
-          Column(
-            children: [
-              SizedBox(
-                height: 38,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (int i = 0; i < _cats.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: ActionChip(
-                          label: Text(_cats[i]),
-                          backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                          onPressed: () => setState(() => _cat = i),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RandomMatchScreen(onMatched: (n, p) { Navigator.pop(context); _dial(n, p); }))),
-                  icon: const Icon(Icons.radar),
-                  label: const Text('Random Match (1800 gems)'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                ),
-              ),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  padding: const EdgeInsets.all(6),
-                  childAspectRatio: 0.8,
-                  children: [
-                    for (var h in (list.isEmpty ? _allHosts : list))
-                      GestureDetector(
-                        onTap: () => _showHostProfile(h),
-                        child: Card(
-                          color: Colors.grey,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
-                              const SizedBox(height: 4),
-                              Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: [for (var h in _favorites) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))]),
-          Cent
+    );
+  }
+}
+
