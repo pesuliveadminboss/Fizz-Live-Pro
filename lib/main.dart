@@ -14,26 +14,61 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> {
+class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
+  late AnimationController _anim;
+  late Animation<double> _scale;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    _anim = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+    _scale = CurvedAnimation(parent: _anim, curve: Curves.easeOutBack);
+    _anim.forward();
+
+    Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
     });
   }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF07070A),
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.videocam_rounded, size: 75, color: Color(0xFFFF2E93)),
-            SizedBox(height: 16),
-            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
-          ],
+        child: ScaleTransition(
+          scale: _scale,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(color: const Color(0xFFFF2E93).withOpacity(0.4), blurRadius: 30, spreadRadius: 4),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: Image.network(
+                    'https://i.ibb.co/3k5fB0K/fizz-logo.png',
+                    errorBuilder: (ctx, err, stack) => const Icon(Icons.videocam_rounded, size: 90, color: Color(0xFFFF2E93)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
+              const SizedBox(height: 6),
+              const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 12, color: Colors.white54, letterSpacing: 1)),
+            ],
+          ),
         ),
       ),
     );
@@ -272,8 +307,7 @@ class _MatchScreenState extends State<MatchScreen> {
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white12),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+              child: const Text('Cancel'),
             )
           ],
         ),
@@ -484,4 +518,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-
