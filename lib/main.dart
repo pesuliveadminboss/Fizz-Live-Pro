@@ -525,4 +525,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ),
           _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: [for (var h in _favorites) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))]),
           Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(ba
+          ListView(
+            children: [
+              for (var h in _allHosts)
+     
