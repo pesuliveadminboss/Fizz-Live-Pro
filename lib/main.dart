@@ -296,7 +296,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         backgroundColor: Colors.grey,
         title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
         content: Text('Duration: $dur\nBalance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
-        actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
       ),
     );
   }
@@ -327,7 +327,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ],
         ),
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               setState(() {
                 _userName = nameCtrl.text;
@@ -360,16 +360,13 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                OutlinedButton.icon(
+                OutlinedButton(
                   onPressed: () { Navigator.pop(ctx); _toggleFavorite(h); },
-                  icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: Colors.pink),
-                  label: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
+                  child: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
                 ),
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
-                  icon: const Icon(Icons.videocam),
-                  label: const Text('Call'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  child: const Text('Call'),
                 ),
               ],
             ),
@@ -509,8 +506,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: _editProfile,
-                icon: const Icon(Icons.edit),
-                label: const Text('Edit Profile'),
-                styl
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                child: const Text('Edit Profile'),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
+              const SizedBox(height: 20),
+             
