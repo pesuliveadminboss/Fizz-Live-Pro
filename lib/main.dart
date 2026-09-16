@@ -186,7 +186,8 @@ class CallScreen extends StatefulWidget {
   final String pic;
   final int gems;
   final Function(int) onGems;
-  const CallScreen({super.key, required this.host, required this.pic, required this.gems, required this.onGems});
+  final Function(String, int) onCallEnd;
+  const CallScreen({super.key, required this.host, required this.pic, required this.gems, required this.onGems, required this.onCallEnd});
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
@@ -215,11 +216,17 @@ class _CallScreenState extends State<CallScreen> {
           setState(() => _g -= 1800);
           widget.onGems(_g);
         } else {
-          _timer?.cancel();
-          Navigator.pop(context);
+          _closeCall();
         }
       }
     });
+  }
+
+  void _closeCall() {
+    _timer?.cancel();
+    final dur = _formatTime(_sec);
+    Navigator.pop(context);
+    widget.onCallEnd(dur, _sec);
   }
 
   Future<void> _initZego() async {
@@ -293,7 +300,7 @@ class _CallScreenState extends State<CallScreen> {
                 IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () { setState(() => _mic = !_mic); ZegoExpressEngine.instance.muteMicrophone(!_mic); }),
                 IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
                 IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
-                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 34), onPressed: () => Navigator.pop(context)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 34), onPressed: _closeCall),
                 IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: () { if (_g >= 1000) { setState(() { _g -= 1000; _gift = "Sent 🏎️ Car!"; }); widget.onGems(_g); } }),
               ],
             ),
@@ -338,6 +345,32 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     _tabCtrl = TabController(length: 5, vsync: this);
   }
 
+  void _showSummary(String host, String dur, int sec) {
+    int spent = 1800 + (sec ~/ 60) * 1800;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14141E),
+        title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Duration: $dur', style: const TextStyle(color: Colors.greenAccent)),
+            const SizedBox(height: 4),
+            Text('Gems Spent: $spent 💎', style: const TextStyle(color: Colors.amber)),
+            const SizedBox(height: 4),
+            Text('Balance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 10),
+            const Text('Rate Host:', style: TextStyle(color: Colors.white70)),
+            const Row(children: [Text('⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 18))]),
+          ],
+        ),
+        actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+      ),
+    );
+  }
+
   void _recharge() {
     showModalBottomSheet(
       context: context,
@@ -361,7 +394,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void _dial(String name, String pic) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g))));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, pic: pic, gems: _gems, onGems: (g) => setState(() => _gems = g), onCallEnd: (d, s) => _showSummary(name, d, s))));
     } else {
       _recharge();
     }
@@ -440,17 +473,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               children: [
                 const CircleAvatar(radius: 34, child: Icon(Icons.person)),
                 const SizedBox(height: 6),
-                const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
-                const SizedBox(height: 6),
-                Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: Fon
