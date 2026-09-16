@@ -115,7 +115,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     setState(() => _chat.add('You: ${_msgCtrl.text}'));
     _msgCtrl.clear();
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => _chat.add('Host: I am waiting in video call, tap call above! 😘'));
+      if (mounted) setState(() => _chat.add('Host: Waiting in video call, call me above! 😘'));
     });
   }
   @override
@@ -155,28 +155,32 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
-  Widget? _v;
+  Widget? _myCam;
   int? _vid;
   late int _gems;
   String _gift = "";
+  final List<String> _simVideos = const [
+    'https://assets.mixkit.co/videos/preview/mixkit-young-woman-talking-on-a-video-call-with-her-phone-41478-large.mp4',
+    'https://assets.mixkit.co/videos/preview/mixkit-girl-talking-on-video-call-online-42614-large.mp4'
+  ];
+
   @override
   void initState() {
     super.initState();
     _gems = widget.userGems;
-    _start();
+    _startPreview();
   }
-  Future<void> _start() async {
+
+  Future<void> _startPreview() async {
     const appID = 710176630;
     const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
     await ZegoExpressEngine.instance.createCanvasView((id) {
       _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
-    }).then((w) => setState(() => _v = w));
-    final u = ZegoUser('u_${DateTime.now().millisecondsSinceEpoch % 10000}', 'Guest');
-    await ZegoExpressEngine.instance.loginRoom(widget.room, u);
-    await ZegoExpressEngine.instance.startPublishingStream('s_${u.userID}');
+    }).then((w) => setState(() => _myCam = w));
   }
+
   void _sendGift(String name, int cost, String em) {
     if (_gems >= cost) {
       setState(() { _gems -= cost; _gift = "Sent $em $name!"; });
@@ -184,29 +188,57 @@ class _CallScreenState extends State<CallScreen> {
       Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
     }
   }
+
   @override
   void dispose() {
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
-    ZegoExpressEngine.instance.logoutRoom();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: _v ?? const Center(child: CircularProgressIndicator())),
+          // Simulated Live Host Visual
+          Positioned.fill(
+            child: Container(
+              color: const Color(0xFF101018),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(radius: 60, child: Icon(Icons.person, size: 70)),
+                  const SizedBox(height: 12),
+                  Text('${widget.host} is speaking...', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  const Text('Live Stream Connected • 1800/min', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
+                ],
+              ),
+            ),
+          ),
+          // User Camera Picture-in-Picture (PIP)
+          Positioned(
+            top: 40,
+            right: 16,
+            width: 100,
+            height: 140,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.pink, width: 2), borderRadius: BorderRadius.circular(12)),
+              child: ClipRRect(borderRadius: BorderRadius.circular(10), child: _myCam ?? const Center(child: CircularProgressIndicator())),
+            ),
+          ),
           SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('${widget.host} (1800/min)', style: const TextStyle(color: Colors.white, fontSize: 18)),
+                  child: Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
-                if (_gift.isNotEmpty) Container(padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
+                if (_gift.isNotEmpty) Container(margin: const EdgeInsets.only(left: 16), padding: const EdgeInsets.all(8), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))),
                 const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -215,6 +247,7 @@ class _CallScreenState extends State<CallScreen> {
                     IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 36), onPressed: () => _sendGift('Car', 1000, '🏎️')),
                   ],
                 ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -383,3 +416,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
