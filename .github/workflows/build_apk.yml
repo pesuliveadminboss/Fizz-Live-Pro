@@ -25,11 +25,16 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
+      - name: Install Android 34 and 35 Platforms
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-34" "platforms;android-35" "build-tools;34.0.0"
+
       - name: Scaffold Android Files
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
 
-      - name: Fix Kotlin Duplicate Classes and Set SDK 22
+      - name: Configure Android Permissions and Gradle
         run: |
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
           
@@ -41,23 +46,10 @@ jobs:
 
           # Camera and Audio permissions
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
-          
-          # Fix Kotlin Duplicate Classes globally across all plugins
-          cat << 'EOF' >> android/build.gradle
 
-          allprojects {
-              configurations.all {
-                  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-                      def requested = details.requested
-                      if (requested.group == 'org.jetbrains.kotlin') {
-                          if (requested.name.startsWith('kotlin-stdlib-jdk')) {
-                              details.useTarget("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
-                          }
-                      }
-                  }
-              }
-          }
-          EOF
+          # Update Kotlin version properly in root build.gradle
+          sed -i "s/ext.kotlin_version = .*/ext.kotlin_version = '1.9.10'/" android/build.gradle || true
+          sed -i 's/kotlin-gradle-plugin:1\.[0-9]\+\.[0-9]\+/kotlin-gradle-plugin:1.9.10/g' android/build.gradle || true
 
           echo "android.enableJetifier=true" >> android/gradle.properties
           echo "android.useAndroidX=true" >> android/gradle.properties
