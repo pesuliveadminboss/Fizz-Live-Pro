@@ -371,6 +371,39 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  void _showWithdraw() {
+    final upiCtrl = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Cashout / Withdraw', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Available Balance: $_gems Gems', style: const TextStyle(color: Color(0xFFFFD700))),
+            const SizedBox(height: 12),
+            TextField(
+              controller: upiCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(hintText: 'Enter UPI ID (e.g. name@upi)', hintStyle: TextStyle(color: Colors.grey), filled: true, fillColor: Color(0xFF1E1E2C)),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal request submitted! Processing in 24 hrs.'), backgroundColor: Colors.green));
+              },
+              child: const Text('Submit Withdrawal'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _dial(String name) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
@@ -452,8 +485,15 @@ class _DashboardState extends State<Dashboard> {
             const CircleAvatar(radius: 34, child: Icon(Icons.person, size: 34)),
             const SizedBox(height: 8),
             Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 20)),
-            const SizedBox(height: 10),
-            ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
+                const SizedBox(width: 12),
+                OutlinedButton(onPressed: _showWithdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white))),
+              ],
+            ),
           ],
         ),
       );
