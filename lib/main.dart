@@ -98,10 +98,68 @@ class Login extends StatelessWidget {
   }
 }
 
-class LiveStreamRoom extends StatelessWidget {
+class LiveStreamRoom extends StatefulWidget {
   final Map<String, String> host;
+  final int gems;
+  final Function(int) onGems;
   final VoidCallback onCall;
-  const LiveStreamRoom({super.key, required this.host, required this.onCall});
+  const LiveStreamRoom({super.key, required this.host, required this.gems, required this.onGems, required this.onCall});
+  @override
+  State<LiveStreamRoom> createState() => _LiveStreamRoomState();
+}
+
+class _LiveStreamRoomState extends State<LiveStreamRoom> {
+  late int _g;
+  String _gift = "";
+  final _chatCtrl = TextEditingController();
+  final List<String> _roomChat = [
+    'System: Welcome to private live stream! Follow rules.',
+    'User44: You look gorgeous today! ❤️',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _g = widget.gems;
+  }
+
+  void _sendGift(String name, int cost, String em) {
+    if (_g >= cost) {
+      setState(() {
+        _g -= cost;
+        _gift = "Sent $em $name to ${widget.host['name']}!";
+      });
+      widget.onGems(_g);
+      Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _gift = ""); });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not enough gems!')));
+    }
+  }
+
+  void _showGifts() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF14141E),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Rose', 50, '🌹'); }, child: const Text('🌹 50')),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
+            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _sendMsg() {
+    final t = _chatCtrl.text.trim();
+    if (t.isEmpty) return;
+    setState(() => _roomChat.add('You: $t'));
+    _chatCtrl.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,39 +168,75 @@ class LiveStreamRoom extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.network(host['pic']!, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[900])),
+            child: Image.network(widget.host['pic']!, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[900])),
           ),
           Container(color: Colors.black38),
           SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      CircleAvatar(radius: 20, backgroundImage: NetworkImage(host['pic']!)),
+                      CircleAvatar(radius: 20, backgroundImage: NetworkImage(widget.host['pic']!)),
                       const SizedBox(width: 8),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('🔴 LIVE • ${host['views']} watching', style: const TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                        Text(widget.host['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text('🔴 LIVE • ${widget.host['views']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 11)),
                       ]),
                       const Spacer(),
                       IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 28), onPressed: () => Navigator.pop(context)),
                     ],
                   ),
                 ),
+                if (_gift.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.circular(10)),
+                    child: Text(_gift, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
                 const Spacer(),
+                // Floating Comments Box
+                Container(
+                  height: 120,
+                  width: 250,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: ListView.builder(
+                    itemCount: _roomChat.length,
+                    itemBuilder: (ctx, i) => Container(
+                      margin: const EdgeInsets.symmetric(vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                      child: Text(_roomChat[i], style: const TextStyle(color: Colors.white, fontSize: 11)),
+                    ),
+                  ),
+                ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(16)), child: const Text('Say hello in live chat... ❤️', style: TextStyle(color: Colors.white70, fontSize: 12))),
-                      ElevatedButton.icon(
-                        onPressed: onCall,
-                        icon: const Icon(Icons.videocam, color: Colors.white),
-                        label: const Text('1-on-1 Call'),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                      Expanded(
+                        child: TextField(
+                          controller: _chatCtrl,
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                          decoration: InputDecoration(
+                            hintText: 'Chat in live stream...',
+                            hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+                            filled: true,
+                            fillColor: Colors.black54,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                          ),
+                        ),
+                      ),
+                      IconButton(icon: const Icon(Icons.send, color: Colors.amber, size: 22), onPressed: _sendMsg),
+                      IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 26), onPressed: _showGifts),
+                      ElevatedButton(
+                        onPressed: widget.onCall,
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                        child: const Text('1-on-1 Call', style: TextStyle(fontSize: 11)),
                       ),
                     ],
                   ),
@@ -314,6 +408,7 @@ class _DashboardState extends State<Dashboard> {
                 onPressed: () {
                   setState(() => _gems += (p['gems'] as int));
                   Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
                 },
                 child: Text('₹${p['price']}'),
               ),
@@ -333,7 +428,20 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _watchLive(Map<String, String> h) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamRoom(host: h, onCall: () { Navigator.pop(context); _dial(h['name']!, h['pic']!); })));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LiveStreamRoom(
+          host: h,
+          gems: _gems,
+          onGems: (g) => setState(() => _gems = g),
+          onCall: () {
+            Navigator.pop(context);
+            _dial(h['name']!, h['pic']!);
+          },
+        ),
+      ),
+    );
   }
 
   Widget _body() {
@@ -375,36 +483,4 @@ class _DashboardState extends State<Dashboard> {
         ])),
       ]);
     } else if (_tab == 1) {
-      return ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]);
-    } else if (_tab == 2) {
-      return Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems')));
-    } else if (_tab == 3) {
-      return ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]);
-    } else {
-      return Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
-          const SizedBox(height: 8),
-          Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(12)), child: const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12))),
-          const SizedBox(height: 10),
-          Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 14),
-          ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
-        ]),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const icons = [Icons.home, Icons.favorite, Icons.casino, Icons.chat, Icons.person];
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
-      appBar: AppBar(title: const Text('Fizz Live Pro'), actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))]),
-      body: _body(),
-      bottomNavigationBar: Container(height: 50, color: const Color(0xFF0E0E14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [for (int i = 0; i < icons.length; i++) IconButton(icon: Icon(icons[i], color: _tab == i ? Colors.pink : Colors.grey), onPressed: () => setState(() => _tab = i))])),
-    );
-  }
-}
-
+      return ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic'
