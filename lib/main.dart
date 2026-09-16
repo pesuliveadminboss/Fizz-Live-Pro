@@ -135,7 +135,7 @@ class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
   final Function(int) onGems;
-  final Function(String) onEnd;
+  final Function(String, int) onEnd;
   const CallScreen({super.key, required this.host, required this.pic, required this.gems, required this.onGems, required this.onEnd});
   @override
   State<CallScreen> createState() => _CallScreenState();
@@ -145,6 +145,10 @@ class _CallScreenState extends State<CallScreen> {
   Widget? _cam;
   int? _vid;
   late int _g;
+  String _gift = "";
+  bool _mic = true;
+  bool _glow = false;
+  bool _frontCam = true;
   int _sec = 0;
   Timer? _t;
 
@@ -169,8 +173,9 @@ class _CallScreenState extends State<CallScreen> {
 
   void _exitCall() {
     _t?.cancel();
+    final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}';
     Navigator.pop(context);
-    widget.onEnd('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}');
+    widget.onEnd(dur, _sec);
   }
 
   Future<void> _initZego() async {
@@ -182,6 +187,25 @@ class _CallScreenState extends State<CallScreen> {
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     });
     if (mounted) setState(() => _cam = w);
+  }
+
+  void _flipCam() async {
+    _frontCam = !_frontCam;
+    await ZegoExpressEngine.instance.useFrontCamera(_frontCam);
+    setState(() {});
+  }
+
+  void _sendGift(String n, int cost, String em) {
+    if (_g >= cost) {
+      setState(() {
+        _g -= cost;
+        _gift = "Sent $em $n!";
+      });
+      widget.onGems(_g);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _gift = "");
+      });
+    }
   }
 
   @override
@@ -199,9 +223,38 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: Image.network(widget.pic, fit: BoxFit.cover)),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(_glow ? 0.3 : 0.5), BlendMode.darken))),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(radius: 40, backgroundImage: NetworkImage(widget.pic)),
+                    const SizedBox(height: 8),
+                    Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    if (_g < 1800) const Text('⚠️ Low Gems!', style: TextStyle(color: Colors.orangeAccent, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
-          Positioned(bottom: 30, left: 0, right: 0, child: Center(child: IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 40), onPressed: _exitCall))),
+          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
+          Positioned(
+            bottom: 20, left: 0, right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () { setState(() => _mic = !_mic); ZegoExpressEngine.instance.muteMicrophone(!_mic); }),
+                IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: _flipCam),
+                IconButton(icon: Icon(Icons.auto_awesome, color: _glow ? Colors.amber : Colors.white), onPressed: () => setState(() => _glow = !_glow)),
+                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
+                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: () => _sendGift('Car', 1000, '🏎️')),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -225,8 +278,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200'},
     {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200'},
-    {'name': 'Divya', 'city': 'Hyderabad', 'views': '6.8k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200'},
-    {'name': 'Riya', 'city': 'Kolkata', 'views': '4.5k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200'},
   ];
 
   final _packs = const [
@@ -242,6 +293,32 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: 5, vsync: this);
+  }
+
+  void _showSummary(String host, String dur, int sec) {
+    int spent = 1800 + (sec ~/ 60) * 1800;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14141E),
+        title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Duration: $dur', style: const TextStyle(color: Colors.greenAccent)),
+            const SizedBox(height: 4),
+            Text('Gems Spent: $spent 💎', style: const TextStyle(color: Colors.amber)),
+            const SizedBox(height: 4),
+            Text('Balance: $_gems 💎', style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 10),
+            const Text('Rate Host:', style: TextStyle(color: Colors.white70)),
+            const Row(children: [Text('⭐⭐⭐⭐⭐', style: TextStyle(fontSize: 18))]),
+          ],
+        ),
+        actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+      ),
+    );
   }
 
   void _recharge() {
@@ -267,7 +344,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void _dial(String n, String p) {
     if (_gems >= 1800) {
       setState(() => _gems -= 1800);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (dur) => showDialog(context: context, builder: (ctx) => AlertDialog(title: Text('Call Ended ($dur)'), actions: [ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))])))));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) => _showSummary(n, d, s))));
     } else {
       _recharge();
     }
@@ -351,3 +428,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 }
+
