@@ -192,6 +192,7 @@ class _DashboardState extends State<Dashboard> {
   int _tab = 0;
   int _cat = 0;
   int _gems = 1670;
+  String _userName = "User7789";
   bool _inc = false;
   final _cats = const ['Popular', 'Nearby', 'New', 'Follow'];
   final _hosts = const [
@@ -238,13 +239,26 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _withdraw() {
+    final upiCtrl = TextEditingController();
     showModalBottomSheet(context: context, builder: (ctx) => Padding(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, children: [
       Text('Balance: $_gems Gems', style: const TextStyle(fontSize: 18)),
       const SizedBox(height: 10),
-      const TextField(decoration: InputDecoration(hintText: 'Enter UPI ID', border: OutlineInputBorder())),
+      TextField(controller: upiCtrl, decoration: const InputDecoration(hintText: 'Enter UPI ID', border: OutlineInputBorder())),
       const SizedBox(height: 10),
       ElevatedButton(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal submitted!'))); }, child: const Text('Withdraw')),
     ])));
+  }
+
+  void _editName() {
+    final nCtrl = TextEditingController(text: _userName);
+    showDialog(context: context, builder: (ctx) => AlertDialog(
+      backgroundColor: const Color(0xFF14141E),
+      title: const Text('Edit Profile Name', style: TextStyle(color: Colors.white)),
+      content: TextField(controller: nCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(border: OutlineInputBorder())),
+      actions: [
+        ElevatedButton(onPressed: () { setState(() => _userName = nCtrl.text); Navigator.pop(ctx); }, child: const Text('Save')),
+      ],
+    ));
   }
 
   void _dial(String name, String pic) {
@@ -278,7 +292,28 @@ class _DashboardState extends State<Dashboard> {
     } else if (_tab == 3) {
       return ListView(children: [for (var h in _hosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]);
     } else {
-      return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const CircleAvatar(radius: 30, child: Icon(Icons.person)), const SizedBox(height: 8), Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18)), const SizedBox(height: 10), Row(mainAxisAlignment: MainAxisAlignment.center, children: [ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')), const SizedBox(width: 10), OutlinedButton(onPressed: _withdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white)))])]));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
+            const SizedBox(height: 8),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              IconButton(icon: const Icon(Icons.edit, size: 16, color: Colors.grey), onPressed: _editName),
+            ]),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(12)), child: const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12))),
+            const SizedBox(height: 10),
+            Text('Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 14),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              ElevatedButton(onPressed: _recharge, child: const Text('Buy Gems')),
+              const SizedBox(width: 10),
+              OutlinedButton(onPressed: _withdraw, child: const Text('Withdraw', style: TextStyle(color: Colors.white))),
+            ]),
+          ],
+        ),
+      );
     }
   }
 
