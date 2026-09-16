@@ -284,6 +284,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   int _cat = 0;
   int _gems = 1670;
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
+  final List<Map<String, String>> _favorites = [];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _allHosts = const [
@@ -306,7 +307,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     _tabCtrl = TabController(length: 5, vsync: this);
   }
 
+  void _toggleFavorite(Map<String, String> h) {
+    setState(() {
+      if (_favorites.contains(h)) {
+        _favorites.remove(h);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Removed from Favorites')));
+      } else {
+        _favorites.add(h);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to Favorites')));
+      }
+    });
+  }
+
   void _showHostProfile(Map<String, String> h) {
+    final isFav = _favorites.contains(h);
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF14141E),
@@ -325,8 +339,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                OutlinedButton.icon(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Following Host!'))); }, icon: const Icon(Icons.favorite, color: Colors.pink), label: const Text('Follow', style: TextStyle(color: Colors.white))),
-                ElevatedButton.icon(onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); }, icon: const Icon(Icons.videocam), label: const Text('Direct Call (1800)'), style: ElevatedButton.styleFrom(backgroundColor: Colors.pink)),
+                OutlinedButton.icon(
+                  onPressed: () { Navigator.pop(ctx); _toggleFavorite(h); },
+                  icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: Colors.pink),
+                  label: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); },
+                  icon: const Icon(Icons.videocam),
+                  label: const Text('Direct Call (1800)'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                ),
               ],
             ),
           ],
@@ -435,7 +458,19 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ),
             ],
           ),
-          ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)), trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')))]),
+          _favorites.isEmpty
+              ? const Center(child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)))
+              : ListView(
+                  children: [
+                    for (var h in _favorites)
+                      ListTile(
+                        leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)),
+                        title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)),
+                        trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
+                      )
+                  ],
+                ),
           Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
           ListView(children: [for (var h in _allHosts) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)), title: Text(h['name']!, style: const TextStyle(color: Colors.white)), subtitle: const Text('Online • Tap to chat', style: TextStyle(color: Colors.greenAccent)), onTap: () => _dial(h['name']!, h['pic']!))]),
           ListView(
@@ -446,18 +481,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ElevatedButton.icon(
                 onPressed: () => setState(() => _gems += 500),
                 icon: const Icon(Icons.card_giftcard),
-                label: const Text('Claim Daily VIP Bonus (+500 Gems)'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black),
-              ),
-              const SizedBox(height: 20),
-              const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 10),
-              for (var item in _history)
-                Card(color: const Color(0xFF14141E), child: ListTile(leading: const Icon(Icons.history, color: Colors.pink), title: Text(item, style: const TextStyle(color: Colors.white)))),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+                l
