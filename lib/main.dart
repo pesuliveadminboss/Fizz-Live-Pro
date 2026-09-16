@@ -25,7 +25,7 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
+      backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -59,7 +59,7 @@ class _PinGateState extends State<PinGate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
+      backgroundColor: Colors.black,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -68,7 +68,7 @@ class _PinGateState extends State<PinGate> {
             children: [
               const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 10),
-              TextField(controller: _c, keyboardType: TextInputType.number, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber, fontSize: 22), decoration: const InputDecoration(filled: true, fillColor: Color(0xFF14141E), hintText: "••••")),
+              TextField(controller: _c, keyboardType: TextInputType.number, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber, fontSize: 22), decoration: const InputDecoration(filled: true, fillColor: Colors.grey, hintText: "••••")),
               const SizedBox(height: 10),
               ElevatedButton(onPressed: () { if (_c.text.trim() == "7777") Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login())); }, child: const Text('Unlock')),
             ],
@@ -84,7 +84,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
+      backgroundColor: Colors.black,
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
@@ -116,7 +116,7 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFF07070A),
+      backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -203,7 +203,7 @@ class _CallScreenState extends State<CallScreen> {
   void _showGiftBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF14141E),
+      backgroundColor: Colors.grey,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -295,8 +295,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _allHosts = const [
-    {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Professional model & live streamer ❤️'},
-    {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover & friendly host ✨'},
+    {'name': 'Pooja', 'city': 'Mumbai', 'views': '3.2k', 'cat': 'Popular', 'pic': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'bio': 'Model & live streamer ❤️'},
+    {'name': 'Ananya', 'city': 'Delhi', 'views': '5.1k', 'cat': 'Hot Live', 'pic': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'bio': 'Dance lover ✨'},
     {'name': 'Sneha', 'city': 'Chennai', 'views': '2.4k', 'cat': 'Party Match', 'pic': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'bio': 'Music & Fun 🎵'},
     {'name': 'Kavya', 'city': 'Bangalore', 'views': '4.3k', 'cat': 'Nearby', 'pic': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'bio': 'Chat with me 💬'},
   ];
@@ -321,7 +321,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF14141E),
+        backgroundColor: Colors.grey,
         title: Text('Call Ended with $host', style: const TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -346,10 +346,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     setState(() {
       if (_favorites.contains(h)) {
         _favorites.remove(h);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Removed from Favorites')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Removed')));
       } else {
         _favorites.add(h);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to Favorites')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added')));
       }
     });
   }
@@ -358,7 +358,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     final isFav = _favorites.contains(h);
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF14141E),
+      backgroundColor: Colors.grey,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -382,7 +382,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 ElevatedButton.icon(
                   onPressed: () { Navigator.pop(ctx); _dial(h['name']!, h['pic']!); },
                   icon: const Icon(Icons.videocam),
-                  label: const Text('Direct Call (1800)'),
+                  label: const Text('Direct Call'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
                 ),
               ],
@@ -396,7 +396,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void _recharge() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF14141E),
+      backgroundColor: Colors.grey,
       builder: (ctx) => ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -433,9 +433,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   Widget _buildFavoritesTab() {
     if (_favorites.isEmpty) {
-      return const Center(
-        child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)),
-      );
+      return const Center(child: Text('No Favorite Hosts yet!', style: TextStyle(color: Colors.grey)));
     }
     return ListView(
       children: [
@@ -444,10 +442,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             leading: CircleAvatar(backgroundImage: NetworkImage(h['pic']!)),
             title: Text(h['name']!, style: const TextStyle(color: Colors.white)),
             subtitle: Text(h['city']!, style: const TextStyle(color: Colors.grey)),
-            trailing: ElevatedButton(
-              onPressed: () => _dial(h['name']!, h['pic']!),
-              child: const Text('Call'),
-            ),
+            trailing: ElevatedButton(onPressed: () => _dial(h['name']!, h['pic']!), child: const Text('Call')),
           ),
       ],
     );
@@ -459,7 +454,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     final list = _allHosts.where((h) => _cat == 0 || h['cat'] == curCat).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF07070A),
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Fizz Live Pro'),
         actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
@@ -492,7 +487,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ActionChip(
                           label: Text(_cats[i]),
-                          backgroundColor: _cat == i ? Colors.pink : const Color(0xFF14141E),
+                          backgroundColor: _cat == i ? Colors.pink : Colors.grey,
                           onPressed: () => setState(() => _cat = i),
                         ),
                       ),
@@ -518,4 +513,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                       GestureDetector(
                         onTap: () => _showHostProfile(h),
                         child: Card(
-                          color: const Color(0xFF141
+                          color: Colors.grey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h['pic
