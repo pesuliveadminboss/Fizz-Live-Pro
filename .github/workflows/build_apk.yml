@@ -25,7 +25,7 @@ jobs:
           flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Scaffold Android Files
+      - name: Setup Android Project
         run: |
           flutter create . --org com.fizzlivepro.app --project-name fizz_live_pro
           sed -i 's/android:label=".*"/android:label="Fizz Live Pro"/' android/app/src/main/AndroidManifest.xml || true
@@ -34,229 +34,382 @@ jobs:
           echo "flutter.minSdkVersion=21" >> android/local.properties
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' android/app/src/main/AndroidManifest.xml || true
 
-      - name: Write 55-Point Code Directly
+      - name: Overwrite Main Dart Cleanly
         run: |
-          rm -f lib/main.dart
-          cat << 'EOF' | base64 -d > lib/main.dart
-          aW1wb3J0ICdwYWNrYWdlOmZsdXR0ZXIvbWF0ZXJpYWwuZGFydCc7CmltcG9ydCAncGFja2Fn
-          ZTpwZXJtaXNzaW9uX2hhbmRsZXIvcGVybWlzc2lvbl9oYW5kbGVyLmRhcnQnOwppbXBvcnQg
-          J3BhY2thZ2U6emVnb19leHByZXNzX2VuZ2luZS96ZWdvX2V4cHJlc3NfZW5naW5lLmRhcnQn
-          OwoKdm9pZCBtYWluKCkgewogIFdpZGdldHNGbHV0dGVyQmluZGluZy5lbnN1cmVJbml0aWFs
-          aXplZCgpOwogIHJ1bkFwcChjb25zdCBNYXRlcmlhbEFwcChkZWJ1Z1Nob3dDaGVja2VkTW9k
-          ZUJhbm5lcjogZmFsc2UsIGhvbWU6IFNwbGFzaCgpKSk7Cn0KCmNsYXNzIFNwbGFzaCBleHRl
-          bmRzIFN0YXRlZnVsV2lkZ2V0IHsKICBjb25zdCBTcGxhc2goe3N1cGVyLmtleX0pOwogIEBv
-          dmVycmlkZQogIFN0YXRlPFNwbGFzaD4gY3JlYXRlU3RhdGUoKSA9PiBfU3BsYXNoU3RhdGUo
-          KTsKfQoKY2xhc3MgX1NwbGFzaFN0YXRlIGV4dGVuZHMgU3RhdGU8U3BsYXNoPiB7CiAgQG92
-          ZXJyaWRlCiAgdm9pZCBpbml0U3RhdGUoKSB7CiAgICBzdXBlci5pbml0U3RhdGUoKTsKICAg
-          IEZ1dHVyZS5kZWxheWVkKGNvbnN0IER1cmF0aW9uKG1pbGxpc2Vjb25kczogMTIwMCksICgp
-          IHsKICAgICAgaWYgKG1vdW50ZWQpIE5hdmlnYXRvci5wdXNoUmVwbGFjZW1lbnQoY29udGV4
-          dCwgTWF0ZXJpYWxQYWdlUm91dGUoYnVpbGRlcjogKF8pID0+IGNvbnN0IFBpbkdhdGUoKSkp
-          OwogICAgfSk7CiAgfQogIEBvdmVycmlkZQogIFdpZGdldCBidWlsZChCdWlsZENvbnRleHQg
-          Y29udGV4dCkgewogICAgcmV0dXJuIGNvbnN0IFNjYWZmb2xkKAogICAgICBiYWNrZ3JvdW5k
-          Q29sb3I6IENvbG9yKDB4MEYwNzA3MEEpLAogICAgICBib2R5OiBDZW50ZXIoCiAgICAgICAg
-          Y2hpbGQ6IENvbHVtbigKICAgICAgICAgIG1haW5BeGlzQWxpZ25tZW50OiBNYWluQXhpc0Fs
-          aWdubWVudC5jZW50ZXIsCiAgICAgICAgICBjaGlsZHJlbjogWwogICAgICAgICAgICBJY29u
-          KEljb25zLnZpZGVvY2FtX3JvdW5kZWQsIHNpemU6IDc1LCBjb2xvcjogQ29sb3IoMHhGRkYy
-          RTkzKSksCiAgICAgICAgICAgIFNpemVkQm94KGhlaWdodDogMTYpLAogICAgICAgICAgICBU
-          ZXh0KCdGSVpaIExJVkUgUFJPJywgc3R5bGU6IFRleHRTdHlsZShmb250U2l6ZTogMjQsIGZv
-          bnRXZWlnaHQ6IEZvbnRXZWlnaHQuYm9sZCwgbGV0dGVyU3BhY2luZzogMywgY29sb3I6IENv
-          bG9yKDB4RkZGRDcwMCkpKSwKICAgICAgICAgIF0sCiAgICAgICAgKSwKICAgICAgKSwKICAg
-          ICk7CiAgfQp9CgpjbGFzcyBQaW5HYXRlIGV4dGVuZHMgU3RhdGVmdWxXaWRnZXQgewogIGNv
-          bnN0IFBpbkdhdGUoe3N1cGVyLmtleX0pOwogIEBvdmVycmlkZQogIFN0YXRlPFBpbkdhdGU+
-          IGNyZWF0ZVN0YXRlKCkgPT4gX1BpbkdhdGVTdGF0ZSgpOwp9CgpjbGFzcyBfUGluR2F0ZVN0
-          YXRlIGV4dGVuZHMgU3RhdGU8UGluR2F0ZT4gewogIGZpbmFsIF9jdHJsID0gVGV4dEVkaXRp
-          bmdDb250cm9sbGVyKCk7CiAgU3RyaW5nIF9lcnIgPSAiIjsKICB2b2lkIF92ZXJpZnkoKSB7
-          CiAgICBpZiAoX2N0cmwudGV4dC50cmltKCkgPT0gIjc3NzciKSB7CiAgICAgIE5hdmlnYXRv
-          ci5wdXNoUmVwbGFjZW1lbnQoY29udGV4dCwgTWF0ZXJpYWxQYWdlUm91dGUoYnVpbGRlcjog
-          KF8pID0+IGNvbnN0IExvZ2luKCkpKTsKICAgIH0gZWxzZSB7CiAgICAgIHNldFN0YXRlKCkg
-          PT4gX2VyciA9ICJJbnZhbGlkIFBJTiEiKTsKICAgICAgX2N0cmwuY2xlYXIoKTsKICAgIH0K
-          ICB9CiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7
-          CiAgICByZXR1cm4gU2NhZmZvbGQoCiAgICAgIGJhY2tncm91bmRDb2xvcjogY29uc3QgQ29s
-          b3IoMHgwRjA3MDcwQSksCiAgICAgIGJvZHk6IFBhZGRpbmcoCiAgICAgICAgcGFkZGluZzog
-          Y29uc3QgS2RnaW5zZXRzLmFsbCgyNC4wKSwKICAgICAgICBjaGlsZDogQ2VudGVyKAogICAg
-          ICAgICAgY2hpbGQ6IENvbHVtbigKICAgICAgICAgICAgbWFpbkF4aXNBbGlnbm1lbnQ6IE1h
-          aW5BeGlzQWxpZ25tZW50LmNlbnRlciwKICAgICAgICAgICAgY2hpbGRyZW46IFsKICAgICAg
-          ICAgICAgICBjb25zdCBJY29uKEljb25zLmFkbWluX3BhbmVsX3NldHRpbmdzX3JvdW5kZWQs
-          IHNpemU6IDYwLCBjb2xvcjogQ29sb3IoMHhGRkZEMzAwKSksCiAgICAgICAgICAgICAgY29u
-          c3QgU2l6ZWRCb3goaGVpZ2h0OiAxNiksCiAgICAgICAgICAgICAgY29uc3QgVGV4dCgnQWRt
-          aW4gVmVyaWZpY2F0aW9uICg3Nzc3KScsIHN0eWxlOiBUZXh0U3R5bGUoZm9udFNpemU6IDE4
-          LCBmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQsIGNvbG9yOiBDb2xvcnMud2hpdGUpKSwK
-          ICAgICAgICAgICAgICBjb25zdCBTaXplZEJveChoZWlnaHQ6IDE2KSwKICAgICAgICAgICAg
-          ICBUZXh0RmllbGQoCiAgICAgICAgICAgICAgICBjb250cm9sbGVyOiBfY3RybCwKICAgICAg
-          ICAgICAgICAgIGtleWJvYXJkVHlwZTogVGV4dElucHV0VHlwZS5udW1iZXIsCiAgICAgICAg
-          ICAgICAgICBvYnNjdXJlVGV4dDogdHJ1ZSwKICAgICAgICAgICAgICAgIHRleHRBbGlnbjog
-          VGV4dEFsaWduLmNlbnRlciwKICAgICAgICAgICAgICAgIG1heExlbmd0aDogNCwKICAgICAg
-          ICAgICAgICAgIHN0eWxlOiBjb25zdCBUZXh0U3R5bGUoY29sb3I6IENvbG9yKDB4RkZGRDcw
-          MCksIGZvbnRTaXplOiAyNCwgbGV0dGVyU3BhY2luZzogOCksCiAgICAgICAgICAgICAgICBk
-          ZWNvcmF0aW9uOiBjb25zdCBJbnB1dERlY29yYXRpb24oY291bnRlclRleHQ6ICIiLCBmaWxs
-          ZWQ6IHRydWUsIGZpbGxDb2xvcjogQ29sb3IoMHgwRjE0MTRJRSksIGhpbnRUZXh0OiAi4oCi
-          4oCi4oCi4oCiIsIGJvcmRlcjogT3V0bGluZUlucHV0Qm9yZGVyKCkpLAogICAgICAgICAgICAg
-          ICksCiAgICAgICAgICAgICAgaWYgKF9lcnIuaXNOb3RFbXB0eSkgUGFkZGluZyhwYWRkaW5n
-          OiBjb25zdCBFZGdlSW5zZXRzLm9ubHkodG9wOiA4KSwgY2hpbGQ6IFRleHQoX2Vyciwgc3R5
-          bGU6IGNvbnN0IFRleHRTdHlsZShjb2xvcjogQ29sb3JzLnJlZEFjY2VudCkpKSwKICAgICAg
-          ICAgICAgICBjb25zdCBTaXplZEJveChoZWlnaHQ6IDIwKSwKICAgICAgICAgICAgICBTaXpl
-          ZEJveCgKICAgICAgICAgICAgICAgIHdpZHRoOiBkb3VibGUuaW5maW5pdHksCiAgICAgICAg
-          ICAgICAgICBoZWlnaHQ6IDQ4LAogICAgICAgICAgICAgICAgY2hpbGQ6IEVsZXZhdGVkQnV0
-          dG9uKAogICAgICAgICAgICAgICAgICBvblByZXNzZWQ6IF92ZXJpZnksCiAgICAgICAgICAg
-          ICAgICAgIHN0eWxlOiBFbGV2YXRlZEJ1dHRvbi5zdHlsZUZyb20oYmFja2dyb3VuZENvbG9y
-          OiBjb25zdCBDb2xvcigweEZGRkQ3MDApLCBmb3JlZ3JvdW5kQ29sb3I6IENvbG9ycy5ibGFj
-          ayksCiAgICAgICAgICAgICAgICAgIGNoaWxkOiBjb25zdCBUZXh0KCdVbmxvY2sgQXBwJywg
-          c3R5bGU6IFRleHRTdHlsZShmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQpKSwKICAgICAg
-          ICAgICAgICAgICApLAogICAgICAgICAgICAgICksCiAgICAgICAgICAgIF0sCiAgICAgICAg
-          ICApLAogICAgICAgICksCiAgICAgICksCiAgICApOwogIH0KfQoKY2xhc3MgTG9naW4gZXh0
-          ZW5kcyBTdGF0ZWxlc3NXaWRnZXQgewogIGNvbnN0IExvZ2luKHtzdXBlci5rZXl9KTsKICBA
-          b3ZlcnJpZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIHsKICAgIHJl
-          dHVybiBTY2FmZm9sZCgKICAgICAgYmFja2dyb3VuZENvbG9yOiBjb25zdCBDb2xvcigweDBG
-          MDcwNzBBKSwKICAgICAgYm9keTogU2FmZUFyZWEoCiAgICAgICAgY2hpbGQ6IFBhZGRpbmco
-          CiAgICAgICAgICBwYWRkaW5nOiBjb25zdCBFZGdlSW5zZXRzLmFsbCgyNC4wKSwKICAgICAg
-          ICAgIGNoaWxkOiBDb2x1bW4oCiAgICAgICAgICAgIGNoaWxkcmVuOiBbCiAgICAgICAgICAg
-          ICAgY29uc3QgU3BhY2VyKCksCiAgICAgICAgICAgICAgY29uc3QgQ2lyY2xlQXZhdGFyKHJh
-          ZGl1czogNDUsIGJhY2tncm91bmRDb2xvcjogQ29sb3IoMHgwRjFFMUUyQyksIGNoaWxkOiBJ
-          Y29uKEljb25zLnBlcnNvbiwgc2l6ZTogNDUsIGNvbG9yOiBDb2xvcnMud2hpdGUpKSwKICAg
-          ICAgICAgICAgICBjb25zdCBTaXplZEJveChoZWlnaHQ6IDE2KSwKICAgICAgICAgICAgICBj
-          b25zdCBUZXh0KCdNZWV0IFJlYWwgRnJpZW5kcyBOZWFyYnknLCBzdHlsZTogVGV4dFN0eWxl
-          KGNvbG9yOiBDb2xvcnMud2hpdGUsIGZvbnRTaXplOiAyMCwgZm9udFdlaWdodDogRm9udFdl
-          aWdodC5ib2xkKSksCiAgICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiA4KSwK
-          ICAgICAgICAgICAgICBjb25zdCBUZXh0KCdMaXZlIHZpZGVvIGNhbGxzIHdpdGggYmVhdXRp
-          ZXMgMjQvNycsIHN0eWxlOiBUZXh0U3R5bGUoY29sb3I6IENvbG9ycy5ncmV5LCBmb250U2l6
-          ZTogMTMpKSwKICAgICAgICAgICAgICBjb25zdCBTcGFjZXIoKSwKICAgICAgICAgICAgICBT
-          aXplZEJveCgKICAgICAgICAgICAgICAgIHdpZHRoOiBkb3VibGUuaW5maW5pdHksCiAgICAg
-          ICAgICAgICAgICBoZWlnaHQ6IDUwLAogICAgICAgICAgICAgICAgY2hpbGQ6IEVsZXZhdGVk
-          QnV0dG9uKAogICAgICAgICAgICAgICAgICBvblByZXNzZWQ6ICgpID0+IE5hdmlnYXRvci5w
-          dXNoUmVwbGFjZW1lbnQoY29udGV4dCwgTWF0ZXJpYWxQYWdlUm91dGUoYnVpbGRlcjogKF8p
-          ID0+IGNvbnN0IFBlcm1zKCkpKSwKICAgICAgICAgICAgICAgICAgc3R5bGU6IEVsZXZhdGVk
-          QnV0dG9uLnN0eWxlRnJvbShiYWNrZ3JvdW5kQ29sb3I6IGNvbnN0IENvbG9yKDB4RkZGRjJF
-          OTMpKSwKICAgICAgICAgICAgICAgICAgY2hpbGQ6IGNvbnN0IFRleHQoJ0Zhc3QgTG9naW4n
-          LCBzdHlsZTogVGV4dFN0eWxlKGZvbnRTaXplOiAxNiwgZm9udFdlaWdodDogRm9udFdlaWdo
-          dC5ib2xkLCBjb2xvcjogQ29sb3JzLndoaXRlKSksCiAgICAgICAgICAgICAgICApLAogICAg
-          ICAgICAgICAgICksCiAgICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiAxMiks
-          CiAgICAgICAgICAgICAgY29uc3QgVGV4dCgnQWdyZWUgdG8gVGVybXMgJiBQcml2YWN5IFBv
-          bGljeScsIHN0eWxlOiBUZXh0U3R5bGUoY29sb3I6IENvbG9ycy53aGl0ZTM4LCBmb250U2l6
-          ZTogMTEpKSwKICAgICAgICAgICAgXSwKICAgICAgICAgICksCiAgICAgICAgKSwKICAgICAg
-          KSwKICAgICk7CiAgfQp9CgpjbGFzcyBQZXJtcyBleHRlbmRzIFN0YXRsZXNzV2lkZ2V0IHsK
-          ICBjb25zdCBQZXJtcyh7c3VwZXIua2V5fSk7CiAgRnV0dXJlPHZvaWQ+IF9hc2soQnVpbGRD
-          b250ZXh0IGNvbnRleHQpIGFzeW5jIHsKICAgIGF3YWl0IFtQZXJtaXNzaW9uLmNhbWVyYSwg
-          UGVybWlzc2lvbi5taWNyb3Bob25lXS5yZXF1ZXN0KCk7CiAgICBpZiAoY29udGV4dC5tb3Vu
-          dGVkKSB7CiAgICAgIE5hdmlnYXRvci5wdXNoUmVwbGFjZW1lbnQoY29udGV4dCwgTWF0ZXJp
-          YWxQYWdlUm91dGUoYnVpbGRlcjogKF8pID0+IGNvbnN0IERhc2hib2FyZCgpKSk7CiAgICB9
-          CiAgfQogIEBvdmVycmlkZQogIFdpZGdldCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkg
-          ewogICAgcmV0dXJuIFNjYWZmb2xkKAogICAgICBiYWNrZ3JvdW5kQ29sb3I6IGNvbnN0IENv
-          bG9yKDB4MEYwNzA3MEEpLAogICAgICBib2R5OiBTYWZlQXJlYSgKICAgICAgICBjaGlsZDog
-          UGFkZGluZygKICAgICAgICAgIHBhZGRpbmc6IGNvbnN0IEVkZ2VJbnNldHMuYWxsKDI0LjAp
-          LAogICAgICAgICAgY2hpbGQ6IENvbHVtbigKICAgICAgICAgICAgY3Jvc3NBeGlzQWxpZ25t
-          ZW50OiBDcm9zc0F4aXNBbGlnbm1lbnQuc3RhcnQsCiAgICAgICAgICAgIGNoaWxkcmVuOiBb
-          CiAgICAgICAgICAgICAgY29uc3QgU2l6ZWRCb3goaGVpZ2h0OiAyMCksCiAgICAgICAgICAg
-          ICAgY29uc3QgVGV4dCgnQXV0aG9yaXphdGlvbicsIHN0eWxlOiBUZXh0U3R5bGUoZm9udFNp
-          emU6IDIyLCBmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQsIGNvbG9yOiBDb2xvcnMud2hp
-          dGUpKSwKICAgICAgICAgICAgICBjb25zdCBTaXplZEJveChoZWlnaHQ6IDgpLAogICAgICAg
-          ICAgICAgIGNvbnN0IFRleHQoJ0FsbG93IENhbWVyYSAmIE1pYyBmb3IgMS1vbi0xIGNhbGxz
-          LicsIHN0eWxlOiBUZXh0U3R5bGUoY29sb3I6IENvbG9ycy5ncmV5KSksCiAgICAgICAgICAg
-          ICAgY29uc3QgU3BhY2VyKCksCiAgICAgICAgICAgICAgU2l6ZWRCb3goCiAgICAgICAgICAg
-          ICAgICB3aWR0aDogZG91YmxlLmluZmluaXR5LAogICAgICAgICAgICAgICAgaGVpZ2h0OiA0
-          OCwKICAgICAgICAgICAgICAgIGNoaWxkOiBFbGV2YXRlZEJ1dHRvbigKICAgICAgICAgICAg
-          ICAgICAgb25QcmVzc2VkOiAoKSA9PiBfYXNrKGNvbnRleHQpLAogICAgICAgICAgICAgICAg
-          ICBzdHlsZTogRWxldmF0ZWRCdXR0b24uc3R5bGVGcm9tKGJhY2tncm91bmRDb2xvcjogY29u
-          c3QgQ29sb3IoMHgwRjAwRTVGRiksIGZvcmVncm91bmRDb2xvcjogQ29sb3JzLmJsYWNrKSwK
-          ICAgICAgICAgICAgICAgICAgY2hpbGQ6IGNvbnN0IFRleHQoJ0FsbG93IHBlcm1pc3Npb25z
-          Jywgc3R5bGU6IFRleHRTdHlsZShmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQpKSwKICAg
-          ICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgXSwKICAgICAg
-          ICAgICksCiAgICAgICAgKSwKICAgICAgKSwKICAgICk7CiAgfQp9CgpjbGFzcyBDYWxsU2Ny
-          ZWVuIGV4dGVuZHMgU3RhdGVmdWxXaWRnZXQgewogIGZpbmFsIFN0cmluZyBob3N0OwogIGZp
-          bmFsIFN0cmluZyByb29tOwogIGNvbnN0IENhbGxTY3JlZW4oe3N1cGVyLmtleSwgcmVxdWly
-          ZWQgdGhpcy5ob3N0LCByZXF1aXJlZCB0aGlzLnJvb219KTsKICBAb3ZlcnJpZGUKICBTdGF0
-          ZTxDYWxsU2NyZWVuPiBjcmVhdGVTdGF0ZSgpID0+IF9DYWxsU2NyZWVuU3RhdGUoKTsKfQoK
-          Y2xhc3MgX0NhbGxTY3JlZW5TdGF0ZSBleHRlbmRzIFN0YXRlPENhbGxTY3JlZW4+IHsKICBX
-          aWRnZXQ/IF92OwogIGludD8gX3ZpZDsKICBAb3ZlcnJpZGUKICB2b2lkIGluaXRTdGF0ZSgp
-          IHsKICAgIHN1cGVyLmluaXRTdGF0ZSgpOwogICAgX2luaXRaZWdvKCk7CiAgfQogIEZ1dHVy
-          ZTx2b2lkPiBfaW5pdFplZ28oKSBhc3luYyB7CiAgICBjb25zdCBhcHBJRCA9IDcxMDE3NjYz
-          MDsKICAgIGNvbnN0IGFwcFNpZ24gPSAnMGI4YjBmNGFkYWI4NWMxMDE2OThmMjFmNGU3Yzdi
-          MWFhNDc3YzkwMWFjNThkODBhNzVlNTRjMTdlZDA1YWQ4YSc7CiAgICBhd2FpdCBaZWdvRXhw
-          cmVzc0VuZ2luZS5jcmVhdGVFbmdpbmVXaXRoUHJvZmlsZShaZWdvRW5naW5lUHJvZmlsZShh
-          cHBJRCwgWmVnb1NjZW5hcmlvLlN0YW5kYXJkVmlkZW9DYWxsLCBhcHBTaWduOiBhcHBTaWdu
-          KSk7CiAgICBhd2FpdCBaZWdvRXhwcmVzc0VuZ2luZS5pbnN0YW5jZS5jcmVhdGVDYW52YXNW
-          aWV3KChpZCkgewogICAgICBfdmlkID0gaWQ7CiAgICAgIFplZ29FeHByZXNzRW5naW5lLmlu
-          c3RhbmNlLnN0YXJ0UHJldmlldyhjYW52YXM6IFplZ29DYW52YXMoaWQpKTsKICAgIH0pLnRo
-          ZW4oKHcpID0+IHNldFN0YXRlKCkgPT4gX3YgPSB3KSk7CiAgICBmaW5hbCB1ID0gWmVnb1Vz
-          ZXIoJ3VfJyArIChEYXRlVGltZS5ub3coKS5taWxsaXNlY29uZHNTaW5jZUVwb2NoICUgMTAw
-          MDApLnRvU3RyaW5nKCksICdHdWVzdCcpOwogICAgYXdhaXQgWmVnb0V4cHJlc3NFbmdpbmUu
-          aW5zdGFuY2UubG9naW5Sb29tKHdpZGdldC5yb29tLCB1KTsKICAgIGF3YWl0IFplZ29FeHBy
-          ZXNzRW5naW5lLmluc3RhbmNlLnN0YXJ0UHVibGlzaGluZ1N0cmVhbSgnc18nICsgdS51c2Vy
-          SUQpOwogIH0KICBAb3ZlcnJpZGUKICB2b2lkIGRpc3Bvc2UoKSB7CiAgICBpZiAoX3ZpZCAh
-          PSBudWxsKSBaZWdvRXhwcmVzc0VuZ2luZS5pbnN0YW5jZS5kZXN0cm95Q2FudmFzVmlldyhf
-          dmlkISk7CiAgICBaZWdvRXhwcmVzc0VuZ2luZS5pbnN0YW5jZS5zdG9wUHJldmlldygpOwog
-          ICAgWmVnb0V4cHJlc3NFbmdpbmUuaW5zdGFuY2UubG9nb3V0Um9vbSgpOwogICAgWmVnb0V4
-          cHJlc3NFbmdpbmUuZGVzdHJveUVuZ2luZSgpOwogICAgc3VwZXIuZGlzcG9zZSgpOwogIH0K
-          ICBAb3ZlcnJpZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIHsKICAg
-          IHJldHVybiBTY2FmZm9sZCgKICAgICAgYmFja2dyb3VuZENvbG9yOiBDb2xvcnMuYmxhY2ss
-          CiAgICAgIGJvZHk6IFN0YWNrKAogICAgICAgIGNoaWxkcmVuOiBbCiAgICAgICAgICBQb3Np
-          dGlvbmVkLmZpbGwoY2hpbGQ6IF92ID8/IGNvbnN0IENlbnRlcihjaGlsZDogQ2lyY3VsYXJQ
-          cm9ncmVzc0luZGljYXRvcihjb2xvcjogQ29sb3IoMHhGRkYyRTkzKSkpKSwKICAgICAgICAg
-          IFNhZmVBcmVhKAogICAgICAgICAgICBjaGlsZDogQ29sdW1uKAogICAgICAgICAgICAgIGNo
-          aWxkcmVuOiBbCiAgICAgICAgICAgICAgICBQYWRkaW5nKAogICAgICAgICAgICAgICAgICBw
-          YWRkaW5nOiBjb25zdCBFZGdlSW5zZXRzLmFsbCgxNiksCiAgICAgICAgICAgICAgICAgIGNo
-          aWxkOiBSb3coCiAgICAgICAgICAgICAgICAgICAgbWFpbkF4aXNBbGlnbm1lbnQ6IE1haW5B
-          eGlzQWxpZ25tZW50LnNwYWNlQmV0d2VlbiwKICAgICAgICAgICAgICAgICAgICBjaGlsZHJl
-          bjogWwogICAgICAgICAgICAgICAgICAgICAgQ29udGFpbmVyKHBhZGRpbmc6IGNvbnN0IEVk
-          Z2VJbnNldHMuYWxsKDgpLCBkZWNvcmF0aW9uOiBCb3hEZWNvcmF0aW9uKGNvbG9yOiBDb2xv
-          cnMuYmxhY2s1NCwgYm9yZGVyUmFkaXVzOiBCb3JkZXJSYWRpdXMuY2lyY3VsYXIoOCkpLCBj
-          aGlsZDogVGV4dCh3aWRnZXQuaG9zdCwgc3R5bGU6IGNvbnN0IFRleHRTdHlsZShjb2xvcjog
-          Q29sb3JzLndoaXRlLCBmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQpKiksCiAgICAgICAg
-          ICAgICAgICAgICAgIGNvbnN0IENoaXAobGFiZWw6IFRleHQoJ0xJVkUnLCBzdHlsZTogVGV4
-          dFN0eWxlKGNvbG9yOiBDb2xvcnMud2hpdGUpKSwgYmFja2dyb3VuZENvbG9yOiBDb2xvcnMu
-          cmVkKSwKICAgICAgICAgICAgICAgICAgICBdLAogICAgICAgICAgICAgICAgICApLAogICAg
-          ICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgIGNvbnN0IFNwYWNlcigpLAogICAgICAg
-          ICAgICAgICAgUGFkZGluZygKICAgICAgICAgICAgICAgICAgcGFkZGluZzogY29uc3QgRWRn
-          ZUluc2V0cy5hbGwoMjQpLAogICAgICAgICAgICAgICAgICBjaGlsZDogQ2lyY2xlQXZhdGFy
-          KHJhZGl1czogMzAsIGJhY2tncm91bmRDb2xvcjogQ29sb3JzLnJlZCwgY2hpbGQ6IEljb25C
-          dXR0b24oaWNvbjogY29uc3QgSWNvbihJY29ucy5jYWxsX2VuZCwgY29sb3I6IENvbG9ycy53
-          aGl0ZSksIG9uUHJlc3NlZDogKCkgPT4gTmF2aWdhdG9yLnBvcChjb250ZXh0KSkpLAogICAg
-          ICAgICAgICAgICAgKSwKICAgICAgICAgICAgICBdLAogICAgICAgICAgICApLAogICAgICAg
-          ICAgKSwKICAgICAgICBdLAogICAgICApLAogICAgKTsKICB9Cn0KCmNsYXNzIERhc2hib2Fy
-          ZCBleHRlbmRzIFN0YXRlZnVsV2lkZ2V0IHsKICBjb25zdCBEYXNoYm9hcmQoe3N1cGVyLmtl
-          eX0pOwogIEBvdmVycmlkZQogIFN0YXRlPERhc2hib2FyZD4gY3JlYXRlU3RhdGUoKSA9PiBf
-          RGFzaGJvYXJkU3RhdGUoKTsKfQoKY2xhc3MgX0Rhc2hib2FyZFN0YXRlIGV4dGVuZHMgU3Rh
-          dGU8RGFzaGJvYXJkPiB7CiAgaW50IF90YWIgPSAwOwogIGludCBfY2F0ID0gMDsKICBpbnQg
-          X2dlbXMgPSAxNjcwOwoKICBmaW5hbCBfY2F0cyA9IGNvbnN0IFsnUG9wdWxhcicsICdOZWFy
-          YnknLCAnTmV3JywgJ0ZvbGxvdyddOwogIGZpbmFsIF9ob3N0cyA9IGNvbnN0IFsKICAgIHsn
-          bmFtZSc6ICdQb29qYScsICdjaXR5JzogJ011bWJhaScsICdsdmwnOiAnTHYuNyd9LAogICAg
-          eyduYW1lJzogJ0FuYW55YScsICdjaXR5JzogJ0RlbGhpJywgJ2x2bCc6ICdMdi45J30sCiAg
-          ICB7J25hbWUnOiAnU25laGEnLCAnY2l0eSc6ICdDaGVubmFpJywgJ2x2bCc6ICdMdi42J30s
-          CiAgICB7J25hbWUnOiAnS2F2eWEnLCAnY2l0eSc6ICdCYW5nYWxvcmUnLCAnbHZsJzogJ0x2
-          LjgnfSwKICBdOwoKICBmaW5hbCBfcGFja3MgPSBjb25zdCBbCiAgICB7J2dlbXMnOiA0MDUw
-          LCAncHJpY2UnOiAxMDB9LAogICAgeydnZW1zJzogODEwMCwgJ3ByaWNlJzogMjAwfSwKICAg
-          IHsnZ2Vtcyc6IDE2MzgwLCAncHJpY2UnOiA0MDB9LAogICAgeydnZW1zJzogMzI5NDAsICdw
-          cmljZSc6IDgwMH0sCiAgICB7J2dlbXMnOiA2NjYwMCwgJ3ByaWNlJzogMTYwMH0sCiAgICB7
-          J2dlbXMnOiAxNjc0MDAsICdwcmljZSc6IDQwMDB9LAogIF07CgogIHZvaWQgX3Nob3dSZWNo
-          YXJnZSgpIHsKICAgIHNob3dNb2RhbEJvdHRvbVNoZWV0KAogICAgICBjb250ZXh0OiBjb250
-          ZXh0LAogICAgICBpc1Njcm9sbENvbnRyb2xsZWQ6IHRydWUsCiAgICAgIGJhY2tncm91bmRD
-          b2xvcjogY29uc3QgQ29sb3IoMHgwRjE0MTRJRSksCiAgICAgIHNoYXBlOiBjb25zdCBSb3Vu
-          ZGVkUmVjdGFuZ2xlQm9yZGVyKGJvcmRlclJhZGl1czogQm9yZGVyUmFkaXVzLnZlcnRpY2Fs
-          KHRvcDogUmFkaXVzLmNpcmN1bGFyKDIwKSkpLAogICAgICBidWlsZGVyOiAoY3R4KSB7CiAg
-          ICAgICAgcmV0dXJuIFBhZGRpbmcoCiAgICAgICAgICBwYWRkaW5nOiBjb25zdCBFZGdlSW5z
-          ZXRzLmFsbCgxNiksCiAgICAgICAgICBjaGlsZDogQ29sdW1uKAogICAgICAgICAgICBtYWlu
-          QXhpc1NpemU6IE1haW5BeGlzU2l6ZS5taW4sCiAgICAgICAgICAgIGNoaWxkcmVuOiBbCiAg
-          ICAgICAgICAgICAgUm93KAogICAgICAgICAgICAgICAgbWFpbkF4aXNBbGlnbm1lbnQ6IE1h
-          aW5BeGlzQWxpZ25tZW50LnNwYWNlQmV0d2VlbiwKICAgICAgICAgICAgICAgIGNoaWxkcmVu
-          OiBbCiAgICAgICAgICAgICAgICAgIGNvbnN0IFRleHQoJ1JlY2hhcmdlIEdlbXMnLCBzdHls
-          ZTogVGV4dFN0eWxlKGNvbG9yOiBDb2xvcnMud2hpdGUsIGZvbnRTaXplOiAxOCwgZm9udFdl
-          aWdodDogRm9udFdlaWdodC5ib2xkKSksCiAgICAgICAgICAgICAgICAgIFRleHQoJ015IEdl
-          bXM6ICcgKyBfZ2Vtcy50b1N0cmluZygpLCBzdHlsZTogY29uc3QgVGV4dFN0eWxlKGNvbG9y
-          OiBDb2xvcigweEZGRkQ3MDApLCBmb250V2VpZ2h0OiBGb250V2VpZ2h0LmJvbGQpKSwKICAg
-          ICAgICAgICAgICAgIF0sCiAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICBjb25zdCBT
-          aXplZEJveChoZWlnaHQ6IDEyKSwKICAgICAgICAgICAgICBmb3IgKHZhciBwIGluIF9wYWNr
-          cykKICAgICAgICAgICAgICAgIENhcmQoCiAgICAgICAgICAgICAgICAgIGNvbG9yOiBjb25z
-          dCBDb2xvcigweDBGMTFFMkMpLAogICAgICAgICAgICAgICAgICBjaGlsZDogTGlzdFRpbGUo
-          CiAgICAgICAgICAgICAgICAgICAgZGVuc2U6IHRydWUsCiAgICAgICAgICAgICAgICAgICAg
-          bGVhZGluZzogY29uc3QgSWNvbihJY29ucy5kaWFtb25kLCBjb2xvcjogQ29sb3IoMHhGRkZE
-          NzAwKSksCiAgICAgICAgICAgICAgICAgICAgdGl0bGU6IFRleHQocFsnZ2VtcyddLnRvU3Ry
-          aW5nKCkgKyAnIEdlbXMnLCBzdHlsZTogY29uc3QgVGV4dFN0eWxlKGNvbG9yOiBDb2xvcnMu
-          d2hpdGUsIGZvbnRXZWlnaHQ6IEZvbnRXZWlnaHQuYm9sZCkpLAogICAgICAgICAgICAgICAg
-          ICAgIHRyYWlsaW5nOiBFbGV2YXRlZEJ1dHRvbigKICAgICAgICAgICAgICAgICAgICAgIG9u
-          UHJlc3NlZDogKCkgewogICAgICAgICAgICAgICAgICAgICAgICBzZXRTdGF0ZSgpID0+IF9n
-          ZW1zICs9IChwWydnZW1zJ10gYXMgaW50KTsKICAgICAgICAgICAgICAgICAgICAgICAgTmF2
-          aWdhdG9yLnBvcChjdHgpOwogICAgICAgICAgICAgICAgICAgICAgICBTY2FmZm9sZE1lc3Nl
-          bmdlci5vZihjb250ZXh0KS5zaG93U25hY2tCYXIoU25hY2tCYXIoY29udGVudDogVGV4dCgn
-          QWRkZWQgJyArIHBbJ2dlbXMnXS50b1N0cmluZygpICsgJyBHZW1zIScpLCBiYWNrZ3JvdW5k
-          Q29sb3I6IENvbG9ycy5ncmVlbikpOwogICAgICAgICAgICAgICAgICAgICAgfSwKICAgICAg
-          ICAgICAgICAgICAgICAgc3R5bGU6IEVsZXZhdGVkQnV0dG9uLnN0eWxlRnJvbShiYWNrZ3Jv
-          dW5kQ29sb3I6IGNvbnN0IENvbG9yKDB4RkZGRjJFOTMpKSwKICAgICAgICAgICA
+          node -e '
+          const fs = require("fs");
+          const code = `import "package:flutter/material.dart";
+          import "package:permission_handler/permission_handler.dart";
+          import "package:zego_express_engine/zego_express_engine.dart";
+
+          void main() {
+            WidgetsFlutterBinding.ensureInitialized();
+            runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
+          }
+
+          class Splash extends StatefulWidget {
+            const Splash({super.key});
+            @override
+            State<Splash> createState() => _SplashState();
+          }
+
+          class _SplashState extends State<Splash> {
+            @override
+            void initState() {
+              super.initState();
+              Future.delayed(const Duration(milliseconds: 1200), () {
+                if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
+              });
+            }
+            @override
+            Widget build(BuildContext context) {
+              return const Scaffold(
+                backgroundColor: Color(0xFF07070A),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.videocam_rounded, size: 75, color: Color(0xFFFF2E93)),
+                      SizedBox(height: 16),
+                      Text("FIZZ LIVE PRO", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+
+          class PinGate extends StatefulWidget {
+            const PinGate({super.key});
+            @override
+            State<PinGate> createState() => _PinGateState();
+          }
+
+          class _PinGateState extends State<PinGate> {
+            final _ctrl = TextEditingController();
+            String _err = "";
+            void _verify() {
+              if (_ctrl.text.trim() == "7777") {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
+              } else {
+                setState(() => _err = "Invalid PIN!");
+                _ctrl.clear();
+              }
+            }
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: const Color(0xFF07070A),
+                body: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.admin_panel_settings_rounded, size: 60, color: Color(0xFFFFD700)),
+                        const SizedBox(height: 16),
+                        const Text("Admin Verification (7777)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _ctrl,
+                          keyboardType: TextInputType.number,
+                          obscureText: true,
+                          textAlign: TextAlign.center,
+                          maxLength: 4,
+                          style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 8),
+                          decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
+                        ),
+                        if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _verify,
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                            child: const Text("Unlock App", style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+
+          class Login extends StatelessWidget {
+            const Login({super.key});
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: const Color(0xFF07070A),
+                body: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      children: [
+                        const Spacer(),
+                        const CircleAvatar(radius: 45, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 45, color: Colors.white)),
+                        const SizedBox(height: 16),
+                        const Text("Meet Real Friends Nearby", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        const Text("Live video calls with beauties 24/7", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Perms())),
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                            child: const Text("Fast Login", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text("Agree to Terms & Privacy Policy", style: TextStyle(color: Colors.white38, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+
+          class Perms extends StatelessWidget {
+            const Perms({super.key});
+            Future<void> _ask(BuildContext context) async {
+              await [Permission.camera, Permission.microphone].request();
+              if (context.mounted) {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+              }
+            }
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: const Color(0xFF07070A),
+                body: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text("Authorization", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 8),
+                        const Text("Allow Camera & Mic for 1-on-1 calls.", style: TextStyle(color: Colors.grey)),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () => _ask(context),
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
+                            child: const Text("Allow permissions", style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+
+          class CallScreen extends StatefulWidget {
+            final String host;
+            final String room;
+            const CallScreen({super.key, required this.host, required this.room});
+            @override
+            State<CallScreen> createState() => _CallScreenState();
+          }
+
+          class _CallScreenState extends State<CallScreen> {
+            Widget? _v;
+            int? _vid;
+            @override
+            void initState() {
+              super.initState();
+              _initZego();
+            }
+            Future<void> _initZego() async {
+              const appID = 710176630;
+              const appSign = "0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a";
+              await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
+              await ZegoExpressEngine.instance.createCanvasView((id) {
+                _vid = id;
+                ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
+              }).then((w) => setState(() => _v = w));
+              final u = ZegoUser("u_" + (DateTime.now().millisecondsSinceEpoch % 10000).toString(), "Guest");
+              await ZegoExpressEngine.instance.loginRoom(widget.room, u);
+              await ZegoExpressEngine.instance.startPublishingStream("s_" + u.userID);
+            }
+            @override
+            void dispose() {
+              if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
+              ZegoExpressEngine.instance.stopPreview();
+              ZegoExpressEngine.instance.logoutRoom();
+              ZegoExpressEngine.destroyEngine();
+              super.dispose();
+            }
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                backgroundColor: Colors.black,
+                body: Stack(
+                  children: [
+                    Positioned.fill(child: _v ?? const Center(child: CircularProgressIndicator(color: Color(0xFFFF2E93)))),
+                    SafeArea(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(widget.host, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                                const Chip(label: Text("LIVE", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: CircleAvatar(radius: 30, backgroundColor: Colors.red, child: IconButton(icon: const Icon(Icons.call_end, color: Colors.white), onPressed: () => Navigator.pop(context))),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+
+          class Dashboard extends StatefulWidget {
+            const Dashboard({super.key});
+            @override
+            State<Dashboard> createState() => _DashboardState();
+          }
+
+          class _DashboardState extends State<Dashboard> {
+            int _tab = 0;
+            int _cat = 0;
+            int _gems = 1670;
+
+            final _cats = const ["Popular", "Nearby", "New", "Follow"];
+            final _hosts = const [
+              {"name": "Pooja", "city": "Mumbai", "lvl": "Lv.7"},
+              {"name": "Ananya", "city": "Delhi", "lvl": "Lv.9"},
+              {"name": "Sneha", "city": "Chennai", "lvl": "Lv.6"},
+              {"name": "Kavya", "city": "Bangalore", "lvl": "Lv.8"},
+            ];
+
+            final _packs = const [
+              {"gems": 4050, "price": 100},
+              {"gems": 8100, "price": 200},
+              {"gems": 16380, "price": 400},
+              {"gems": 32940, "price": 800},
+              {"gems": 66600, "price": 1600},
+              {"gems": 167400, "price": 4000},
+            ];
+
+            void _showRecharge() {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: const Color(0xFF14141E),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                builder: (ctx) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Recharge Gems", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text("My Gems: " + _gems.toString(), style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        for (var p in _packs)
+                          Card(
+                            color: const Color(0xFF1E1E2C),
+                            child: ListTile(
+                              leading: const Icon(Icons.diamond, color: Color(0xFFFFD700)),
+                              title: Text(p["gems"].toString() + " Gems", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              trailing: ElevatedButton(
+                                onPressed: () {
+                                  setState(() => _gems += (p["gems"] as int));
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added " + p["gems"].toString() + " Gems!"), backgroundColor: Colors.green));
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                                child: Text("₹" + p["price"].toString(), style: const TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+
+            void _dial(String name) {
+              if (_gems >= 1800) {
+                setState(() => _gems -= 1800);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: name, room: "room_" + name.toLowerCase())));
+              } else {
+                _showRecharge();
+              }
+            }
+
+            Widget _buildBody() {
+              if (_tab == 0) {
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 44,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _cats.length,
+                        itemBuilder: (ctx, i) {
+                          final sel = _cat == i;
+                          return GestureDetector(
+                            onTap: () => setState(() => _cat = i),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              decoration: BoxDecoration(color: sel ? const Color(0xFFFF2E93) : const Color(0xFF14141E), borderRadius: BorderRadius.circular(16)),
+                              alignment: Alignment.center,
+                              child: Text(_cats[i], style: TextStyle(color: sel ? Colors.white : Colors.grey, fontWeight: FontWeight.bold)),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.82,
+                        padding: const EdgeInsets.all(10),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        children: [
+                          for (var h in _hosts)
+                            Container(
+                              decoration: BoxDecoration(color: const Color(0xFF14141E), borderRadius: BorderRadius.circular(12)),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircleAvatar(radius: 32, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 36, color: Colors.white)),
+                                  const SizedBox(height: 6),
+                                  Text(h["name"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                  Text(h["city"]! + " • " + h["lvl"]!, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                                  const SizedBox(height: 6),
+                                  ElevatedButton.icon(
+                                    onPressed: () => _dial(h["name"]!),
+                                    icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
+                                    label: const Text("Call", style: TextStyle(color:
