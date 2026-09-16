@@ -29,7 +29,7 @@ class _SplashState extends State<Splash> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.videocam_rounded, size: 75, color: Color(0xFFFF2E93)),
+            Icon(Icons.videocam, size: 75, color: Color(0xFFFF2E93)),
             SizedBox(height: 16),
             Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 3, color: Color(0xFFFFD700))),
           ],
@@ -46,14 +46,14 @@ class PinGate extends StatefulWidget {
 }
 
 class _PinGateState extends State<PinGate> {
-  final _ctrl = TextEditingController();
-  String _err = "";
-  void _verify() {
-    if (_ctrl.text.trim() == "7777") {
+  final _c = TextEditingController();
+  String _msg = "";
+  void _check() {
+    if (_c.text.trim() == "7777") {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login()));
     } else {
-      setState(() => _err = "Invalid PIN!");
-      _ctrl.clear();
+      setState(() => _msg = "Invalid PIN!");
+      _c.clear();
     }
   }
   @override
@@ -66,12 +66,12 @@ class _PinGateState extends State<PinGate> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.admin_panel_settings_rounded, size: 60, color: Color(0xFFFFD700)),
+              const Icon(Icons.admin_panel_settings, size: 60, color: Color(0xFFFFD700)),
               const SizedBox(height: 16),
               const Text('Admin Verification (7777)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 16),
               TextField(
-                controller: _ctrl,
+                controller: _c,
                 keyboardType: TextInputType.number,
                 obscureText: true,
                 textAlign: TextAlign.center,
@@ -79,14 +79,13 @@ class _PinGateState extends State<PinGate> {
                 style: const TextStyle(color: Color(0xFFFFD700), fontSize: 24, letterSpacing: 8),
                 decoration: const InputDecoration(counterText: "", filled: true, fillColor: Color(0xFF14141E), hintText: "••••", border: OutlineInputBorder()),
               ),
-              if (_err.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_err, style: const TextStyle(color: Colors.redAccent))),
+              if (_msg.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_msg, style: const TextStyle(color: Colors.redAccent))),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _verify,
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                  onPressed: _check,
                   child: const Text('Unlock App', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -121,8 +120,7 @@ class Login extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Perms())),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                  child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(height: 12),
@@ -163,7 +161,6 @@ class Perms extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () => _ask(context),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black),
                   child: const Text('Allow permissions', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -189,9 +186,9 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void initState() {
     super.initState();
-    _initZego();
+    _start();
   }
-  Future<void> _initZego() async {
+  Future<void> _start() async {
     const appID = 710176630;
     const appSign = '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a';
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(appID, ZegoScenario.StandardVideoCall, appSign: appSign));
@@ -305,8 +302,7 @@ class _DashboardState extends State<Dashboard> {
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added ${p['gems']} Gems!'), backgroundColor: Colors.green));
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
-                      child: Text('₹${p['price']}', style: const TextStyle(color: Colors.white)),
+                      child: Text('₹${p['price']}'),
                     ),
                   ),
                 ),
@@ -371,9 +367,8 @@ class _DashboardState extends State<Dashboard> {
                         const SizedBox(height: 6),
                         ElevatedButton.icon(
                           onPressed: () => _dial(h['name']!),
-                          icon: const Icon(Icons.video_call, size: 16, color: Colors.white),
-                          label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12)),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)),
+                          icon: const Icon(Icons.video_call, size: 16),
+                          label: const Text('Call', style: TextStyle(fontSize: 12)),
                         ),
                       ],
                     ),
@@ -394,7 +389,7 @@ class _DashboardState extends State<Dashboard> {
                 leading: const CircleAvatar(backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, color: Colors.white)),
                 title: Text(h['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 subtitle: Text('${h['city']} • Online now', style: const TextStyle(color: Colors.greenAccent, fontSize: 12)),
-                trailing: ElevatedButton(onPressed: () => _dial(h['name']!), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E93)), child: const Text('Call', style: TextStyle(color: Colors.white))),
+                trailing: ElevatedButton(onPressed: () => _dial(h['name']!), child: const Text('Call')),
               ),
             ),
         ],
@@ -420,7 +415,6 @@ class _DashboardState extends State<Dashboard> {
                     setState(() => _gems += 150);
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Won 150 Gems!'), backgroundColor: Colors.green));
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
                   child: const Text('Play Spin', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
@@ -482,6 +476,32 @@ class _DashboardState extends State<Dashboard> {
               height: 48,
               child: ElevatedButton.icon(
                 onPressed: _showRecharge,
-                icon: const Icon(Icons.diamond, color: Colors.black),
-                label: const Text('Recharge / Buy Gems', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
-                style: ElevatedButton.styl
+                icon: const Icon(Icons.diamond),
+                label: const Text('Recharge / Buy Gems', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF101016),
+        title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          GestureDetector(
+            onTap: _showRecharge,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                children: [
+                  const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 16),
+                  const SizedBox(width: 4),
+                  Text('$_gems', style: const TextStyle(color: Color(0xFFFFD700), font
