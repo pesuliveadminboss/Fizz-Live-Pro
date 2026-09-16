@@ -126,7 +126,7 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               const Spacer(),
-              const CircleAvatar(radius: 45, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 45, color: Colors.white)),
+              const CircleAvatar(radius: 40, backgroundColor: Color(0xFF1E1E2C), child: Icon(Icons.person, size: 40, color: Colors.white)),
               const SizedBox(height: 12),
               const Text('Meet Real Friends Nearby', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               const Spacer(),
@@ -526,4 +526,4 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         children: [
           const ListTile(
-            leading: CircleAvatar(rad
+            leading: CircleAvatar(bac
