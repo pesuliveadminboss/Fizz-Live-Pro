@@ -244,7 +244,7 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void dispose() {
     _t?.cancel();
-    if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
+    if (_vid != null) ZegoExpressEngine.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
@@ -304,44 +304,20 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin {
-  late TabController _tabCtrl;
+class _DashboardState extends State<Dashboard> {
   int _cat = 0;
   int _gems = 1670;
-  String _userName = 'User7789';
-  String _userBio = 'VIP Member & Live Chat Lover';
-
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
   final List<Host> _favorites = [];
-
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
-  final List<Host> _allHosts = const [
+  final _allHosts = const [
     Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
     Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
-    Host(name: 'Sneha', city: 'Chennai', views: '2.4k', cat: 'Party Match', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', bio: 'Music & Fun 🎵'),
-    Host(name: 'Kavya', city: 'Bangalore', views: '4.3k', cat: 'Nearby', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'Chat with me 💬'),
   ];
-
   final _packs = const [
     {'gems': 4050, 'price': 100},
     {'gems': 8100, 'price': 200},
-    {'gems': 16380, 'price': 400},
-    {'gems': 32940, 'price': 800},
-    {'gems': 66600, 'price': 1600},
-    {'gems': 167400, 'price': 4000},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabCtrl = TabController(length: 5, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabCtrl.dispose();
-    super.dispose();
-  }
 
   void _showSummary(String host, String dur, int sec) {
     showDialog(
@@ -353,16 +329,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
       ),
     );
-  }
-
-  void _toggleFavorite(Host h) {
-    setState(() {
-      if (_favorites.contains(h)) {
-        _favorites.remove(h);
-      } else {
-        _favorites.add(h);
-      }
-    });
   }
 
   void _openRandomMatch() {
@@ -379,39 +345,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  void _editProfile() {
-    final nameCtrl = TextEditingController(text: _userName);
-    final bioCtrl = TextEditingController(text: _userBio);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Name')),
-            TextField(controller: bioCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Bio')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _userName = nameCtrl.text;
-                _userBio = bioCtrl.text;
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showHostProfile(Host h) {
-    final isFav = _favorites.contains(h);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey,
@@ -425,18 +359,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             Text(h.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13)),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton(
-                  onPressed: () { Navigator.pop(ctx); _toggleFavorite(h); },
-                  child: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
-                  child: const Text('Call'),
-                ),
-              ],
+            ElevatedButton(
+              onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
+              child: const Text('Call'),
             ),
           ],
         ),
@@ -515,7 +440,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ),
         ),
         body: TabBarView(
-          controller: _tabCtrl,
           children: [
             Column(
               children: [
@@ -557,4 +481,61 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                         child: Card(
                           color: Colors.grey,
                           child: Column(
-                   
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundImage: NetworkImage(h.pic),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                h.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => _dial(h.name, h.pic),
+                                child: const Text(
+                                  'Call',
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))),
+            const Center(child: Text('Spin & Win 150 Gems feature coming soon!', style: TextStyle(color: Colors.white70))),
+            ListView.builder(
+              itemCount: _allHosts.length,
+              itemBuilder: (ctx, i) {
+                final h = _allHosts[i];
+                return ListTile(
+                  leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+                  title: Text(h.name, style: const TextStyle(color: Colors.white)),
+                  onTap: () => _dial(h.name, h.pic),
+                );
+              },
+            ),
+            ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const Center(
+                  child: Column(
+                    children: [
+                      CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                      SizedBox(height: 6),
+                      Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)),
+                      Text('VIP Member & Live Chat Lover', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      SizedBox(height: 6),
+                      Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                    ],
+                  ),
+               
