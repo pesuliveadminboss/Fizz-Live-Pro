@@ -143,7 +143,6 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   Widget? _cam;
-  int? _vid;
   late int _g;
   String _gift = "";
   bool _mic = true, _frontCam = true;
@@ -181,7 +180,6 @@ class _CallScreenState extends State<CallScreen> {
     await ZegoExpressEngine.instance.enableCamera(true);
     await ZegoExpressEngine.instance.useFrontCamera(true);
     final w = await ZegoExpressEngine.instance.createCanvasView((id) {
-      _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     });
     if (mounted) setState(() => _cam = w);
@@ -320,7 +318,7 @@ class _DashboardState extends State<Dashboard> {
   final List<Host> _favorites = [];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
-  final List<Host> _allHosts = const [
+  final _allHosts = const [
     Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
     Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
   ];
@@ -552,4 +550,4 @@ class _DashboardState extends State<Dashboard> {
                               Text(
                                 h.name,
                                 style: const TextStyle(
-             
+                                  color: Colors.white,
