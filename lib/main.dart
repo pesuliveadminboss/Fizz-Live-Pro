@@ -147,7 +147,8 @@ class _CallScreenState extends State<CallScreen> {
   String _gift = "";
   bool _mic = true, _frontCam = true;
   int _sec = 0;
-  Timer? _t;
+  int _pingMs = 45;
+  Timer? _t, _netTimer;
 
   @override
   void initState() {
@@ -166,10 +167,18 @@ class _CallScreenState extends State<CallScreen> {
         }
       }
     });
+    // Simulate live network fluctuation
+    _netTimer = Timer.periodic(const Duration(seconds: 3), (t) {
+      if (!mounted) return;
+      setState(() {
+        _pingMs = 35 + (DateTime.now().second % 40);
+      });
+    });
   }
 
   void _exitCall() {
     _t?.cancel();
+    _netTimer?.cancel();
     final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}';
     Navigator.pop(context);
     widget.onEnd(dur, _sec);
@@ -250,11 +259,15 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void dispose() {
     _t?.cancel();
+    _netTimer?.cancel();
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
   }
+
+  Color get _netColor => _pingMs < 60 ? Colors.greenAccent : (_pingMs < 120 ? Colors.amber : Colors.redAccent);
+  IconData get _netIcon => _pingMs < 60 ? Icons.signal_cellular_4_bar : (_pingMs < 120 ? Icons.signal_cellular_alt : Icons.signal_cellular_alt_2_bar);
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +293,22 @@ class _CallScreenState extends State<CallScreen> {
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
           Positioned(top: 40, left: 16, child: IconButton(icon: const Icon(Icons.flag, color: Colors.redAccent), onPressed: _showReportDialog)),
+          // Network Quality Indicator Chip
+          Positioned(
+            top: 40,
+            left: 70,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Icon(_netIcon, color: _netColor, size: 16),
+                  const SizedBox(width: 4),
+                  Text('${_pingMs}ms', style: TextStyle(color: _netColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ),
           if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
@@ -447,7 +476,7 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
-    void _editProfile() {
+   void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
     showDialog(
