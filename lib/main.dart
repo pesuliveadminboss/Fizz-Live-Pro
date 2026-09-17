@@ -40,7 +40,6 @@ class _SplashState extends State<Splash> {
     );
   }
 }
-
 class PinGate extends StatefulWidget {
   const PinGate({super.key});
   @override
@@ -123,7 +122,6 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -294,7 +292,6 @@ class Host {
   final String name, city, views, cat, pic, bio;
   const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
 }
-
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -311,7 +308,7 @@ class _DashboardState extends State<Dashboard> {
   final List<Host> _favorites = [];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
-  final _allHosts = const [
+  final List<Host> _allHosts = const [
     Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
     Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
   ];
@@ -449,7 +446,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _dial(String n, String p) {
+    void _dial(String n, String p) {
     if (_gems >= 1800) {
       setState(() {
         _gems -= 1800;
@@ -551,4 +548,75 @@ class _DashboardState extends State<Dashboard> {
                                 onPressed: () => _dial(h.name, h.pic),
                                 child: const Text(
                                   'Call',
-                                 
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            _favorites.isEmpty
+                ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey)))
+                : ListView.builder(
+                    itemCount: _favorites.length,
+                    itemBuilder: (ctx, i) {
+                      final h = _favorites[i];
+                      return ListTile(
+                        leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+                        title: Text(h.name, style: const TextStyle(color: Colors.white)),
+                        trailing: ElevatedButton(
+                          onPressed: () => _dial(h.name, h.pic),
+                          child: const Text('Call'),
+                        ),
+                      );
+                    },
+                  ),
+            const Center(child: Text('Spin & Win 150 Gems feature coming soon!', style: TextStyle(color: Colors.white70))),
+            ListView.builder(
+              itemCount: _allHosts.length,
+              itemBuilder: (ctx, i) {
+                final h = _allHosts[i];
+                return ListTile(
+                  leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+                  title: Text(h.name, style: const TextStyle(color: Colors.white)),
+                  onTap: () => _dial(h.name, h.pic),
+                );
+              },
+            ),
+            ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                      const SizedBox(height: 6),
+                      Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                      Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _editProfile,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  child: const Text('Edit Profile'),
+                ),
+                const SizedBox(height: 20),
+                const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+                ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
