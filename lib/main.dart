@@ -181,7 +181,6 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -200,9 +199,6 @@ class _CallScreenState extends State<CallScreen> {
   bool _mic = true, _frontCam = true;
   int _sec = 0;
   int _pingMs = 45;
-  double _beautySmooth = 80.0;
-  double _audioVolume = 100.0;
-  String _activeFilter = 'Normal';
   Timer? _t, _netTimer;
 
   @override
@@ -480,6 +476,7 @@ class HostRank {
   final String name, pic, gems;
   const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
 }
+// Part 3 placeholder / container if needed or merged safely inside Dashboard scope
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -489,10 +486,8 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _cat = 0;
   int _gems = 1670;
-  String _userName = 'User7789';
-  String _userBio = 'VIP Member & Live Chat Lover';
-  int _hostEarningsINR = 12500;
-  int _hostGemsEarned = 25000;
+  final String _userName = 'User7789';
+  final String _userBio = 'VIP Member & Live Chat Lover';
   bool _dailyRewardClaimed = false;
 
   bool _hasMiniPlayer = false;
@@ -501,12 +496,6 @@ class _DashboardState extends State<Dashboard> {
   bool _isMiniDual = false;
 
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
-  final List<Host> _favorites = [];
-  final List<Map<String, String>> _notifications = [
-    {'title': 'VIP Bonus Unlocked!', 'desc': 'Claim +500 free gems in profile tab.', 'time': '10m ago'},
-    {'title': 'New Host Alert', 'desc': 'Anitha & Malar are live in Co-Host mode!', 'time': '1h ago'},
-  ];
-
   final _cats = const ['Hot', 'Live', 'Party', 'Match'];
   final List<Host> _allHosts = const [
     Host(name: 'Anitha', city: 'Chennai', views: '5.1k', cat: 'Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Full screen live stream ❤️'),
@@ -515,10 +504,10 @@ class _DashboardState extends State<Dashboard> {
     Host(name: 'Divya', city: 'Jaipur', views: '6.2k', cat: 'Party', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'VIP Party Room 👑'),
   ];
   final _packs = const [
-    {'gems': 4050, 'price': 100, 'tag': ''},
-    {'gems': 8100, 'price': 200, 'tag': 'Popular'},
-    {'gems': 21000, 'price': 500, 'tag': '+15% Extra'},
-    {'gems': 45000, 'price': 1000, 'tag': '+25% Extra'},
+    {'gems': 4050, 'price': 100},
+    {'gems': 8100, 'price': 200},
+    {'gems': 21000, 'price': 500},
+    {'gems': 45000, 'price': 1000},
   ];
 
   @override
@@ -533,9 +522,9 @@ class _DashboardState extends State<Dashboard> {
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.grey[900],
         title: const Text('Daily Rewards 🎁', style: TextStyle(color: Colors.amber)),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.card_giftcard, size: 50, color: Colors.pinkAccent),
             SizedBox(height: 10),
             Text('Sign in for daily bonuses!', style: TextStyle(color: Colors.white70, fontSize: 13)),
@@ -624,37 +613,6 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _editProfile() {
-    final nameCtrl = TextEditingController(text: _userName);
-    final bioCtrl = TextEditingController(text: _userBio);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Name')),
-            TextField(controller: bioCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Bio')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _userName = nameCtrl.text;
-                _userBio = bioCtrl.text;
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _recharge() {
     showModalBottomSheet(
       context: context,
@@ -715,7 +673,7 @@ class _DashboardState extends State<Dashboard> {
       _recharge();
     }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
