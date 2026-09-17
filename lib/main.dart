@@ -218,6 +218,47 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
+  void _showReportDialog() {
+    final reasonCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text('Report / Block ${widget.host}', style: const TextStyle(color: Colors.redAccent)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Select reason or describe issue:', style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 10),
+            TextField(
+              controller: reasonCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: 'e.g., Inappropriate behavior',
+                hintStyle: TextStyle(color: Colors.white54),
+                filled: true,
+                fillColor: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${widget.host} reported and blocked.')),
+              );
+            },
+            child: const Text('Report & Block'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _t?.cancel();
@@ -250,6 +291,7 @@ class _CallScreenState extends State<CallScreen> {
             ),
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
+          Positioned(top: 40, left: 16, child: IconButton(icon: const Icon(Icons.flag, color: Colors.redAccent), onPressed: _showReportDialog)),
           if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
@@ -514,109 +556,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
         const SizedBox(height: 20),
         const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-        ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
-      ],
-    );
-  }
-
-  Widget _buildRandomMatchButton() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-        onPressed: _openRandomMatch,
-        child: const Text('Random Match (1800 gems)'),
-      ),
-    );
-  }
-
-  Widget _buildCategoryChips() {
-    return SizedBox(
-      height: 38,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _cats.length,
-        itemBuilder: (ctx, i) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: ActionChip(
-            label: Text(_cats[i]),
-            backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-            onPressed: () => setState(() => _cat = i),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const tabIcons = [
-      Tab(icon: Icon(Icons.home)),
-      Tab(icon: Icon(Icons.favorite)),
-      Tab(icon: Icon(Icons.casino)),
-      Tab(icon: Icon(Icons.chat)),
-      Tab(icon: Icon(Icons.person)),
-    ];
-
-    final curCat = _cats[_cat];
-    final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
-
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: const Text('Fizz Live Pro'),
-          actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-          bottom: TabBar(
-            controller: _tabCtrl,
-            indicatorColor: Colors.pink,
-            labelColor: Colors.pink,
-            unselectedLabelColor: Colors.grey,
-            tabs: tabIcons,
-          ),
-        ),
-        body: TabBarView(
-          controller: _tabCtrl,
-          children: [
-            Column(
-              children: [
-                _buildCategoryChips(),
-                _buildRandomMatchButton(),
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
-                    padding: const EdgeInsets.all(6),
-                    itemCount: list.length,
-                    itemBuilder: (ctx, i) {
-                      final h = list[i];
-                      return GestureDetector(
-                        onTap: () => _showHostProfile(h),
-                        child: Card(
-                          color: Colors.grey,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
-                              const SizedBox(height: 4),
-                              Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            _buildFavList(),
-            const Center(child: Text('Spin & Win 150 Gems feature coming soon!')),
-            _buildChatList(),
-            _buildProfileTab(),
-          ],
-        ),
-      ),
-    );
-  }
-}
+        ..._history.map((item) => Card(color: Colors.grey
