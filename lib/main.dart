@@ -537,7 +537,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   }
 
   Widget _buildProfileTab() {
-    const titleStyle = TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -562,4 +561,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         const SizedBox(height: 10),
         ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
         const SizedBox(height: 20),
-     
+        const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold
