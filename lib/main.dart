@@ -553,10 +553,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _cats.length,
-                  itemBuilder: (ctx, i) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: ActionChip(
-                      label: Text(_cats[i]),
-                      backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                      onPressed: () => setState(() => _cat = i),
-     
+                  itemBuilder: (ctx, i) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ActionChip(
+                        label: Text(_cats[i]),
+                        backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+                        onPressed: (
