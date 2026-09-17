@@ -335,6 +335,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     });
   }
 
+  void _openRandomMatch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RandomMatchScreen(
+          onMatched: (n, p) {
+            Navigator.pop(context);
+            _dial(n, p);
+          },
+        ),
+      ),
+    );
+  }
+
   void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
@@ -545,15 +559,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                       child: ActionChip(
                         label: Text(_cats[i]),
                         backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                        onPressed: () {
-                          setState(() {
-                            _cat = i;
-                          });
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                
+                        onPressed: (
