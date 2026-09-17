@@ -130,6 +130,7 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
+
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -399,6 +400,12 @@ class Host {
   final String name, city, views, cat, pic, bio;
   const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
 }
+class HostRank {
+  final int rank;
+  final String name, pic, gems;
+  const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
+}
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -419,6 +426,11 @@ class _DashboardState extends State<Dashboard> {
     {'title': 'VIP Bonus Unlocked!', 'desc': 'Claim +500 free gems in profile tab.', 'time': '10m ago'},
     {'title': 'New Host Alert', 'desc': 'Pooja is live now in Hot Live category.', 'time': '1h ago'},
     {'title': 'Recharge Offer', 'desc': 'Get +25% extra gems on ₹1000 pack today.', 'time': '3h ago'},
+  ];
+  final List<HostRank> _leaderboard = const [
+    HostRank(rank: 1, name: 'Ananya', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', gems: '145k 💎'),
+    HostRank(rank: 2, name: 'Pooja', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', gems: '120k 💎'),
+    HostRank(rank: 3, name: 'Divya', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', gems: '98k 💎'),
   ];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
@@ -700,7 +712,7 @@ class _DashboardState extends State<Dashboard> {
             tabs: [
               Tab(icon: Icon(Icons.home)),
               Tab(icon: Icon(Icons.favorite)),
-              Tab(icon: Icon(Icons.casino)),
+              Tab(icon: Icon(Icons.emoji_events, textAttr: 'Ranking')),
               Tab(icon: Icon(Icons.chat)),
               Tab(icon: Icon(Icons.person)),
             ],
@@ -794,7 +806,29 @@ class _DashboardState extends State<Dashboard> {
                       );
                     },
                   ),
-            const Center(child: Text('Spin & Win 150 Gems feature coming soon!', style: TextStyle(color: Colors.white70))),
+            // Leaderboard / Ranking Tab
+            ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: _leaderboard.length,
+              itemBuilder: (ctx, i) {
+                final r = _leaderboard[i];
+                final color = r.rank == 1 ? Colors.amber : (r.rank == 2 ? Colors.white70 : Colors.brown);
+                return Card(
+                  color: Colors.grey[900],
+                  child: ListTile(
+                    leading: CircleAvatar(backgroundColor: color, child: Text('#${r.rank}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
+                    title: Row(
+                      children: [
+                        CircleAvatar(backgroundImage: NetworkImage(r.pic), radius: 18),
+                        const SizedBox(width: 8),
+                        Text(r.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    trailing: Text(r.gems, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                  ),
+                );
+              },
+            ),
             ListView.builder(
               itemCount: _allHosts.length,
               itemBuilder: (ctx, i) {
