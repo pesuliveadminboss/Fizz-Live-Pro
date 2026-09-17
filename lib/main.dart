@@ -519,17 +519,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildRandomMatchButton() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-        onPressed: _openRandomMatch,
-        child: const Text('Random Match (1800 gems)'),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
@@ -564,4 +553,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _cats.length,
-                  itemBuilder: (ctx, i) => Pad
+                  itemBuilder: (ctx, i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ActionChip(
+                      label: Text(_cats[i]),
+                      backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+                      onPressed: () => setState(() => _cat = i),
+     
