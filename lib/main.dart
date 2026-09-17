@@ -564,5 +564,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _cats.length,
-                  itemBuilder: (ctx, i) {
-    
+                  itemBuilder: (ctx, i) => Pad
