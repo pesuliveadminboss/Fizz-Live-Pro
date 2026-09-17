@@ -244,7 +244,6 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void dispose() {
     _t?.cancel();
-    if (_vid != null) ZegoExpressEngine.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
@@ -538,4 +537,6 @@ class _DashboardState extends State<Dashboard> {
                       Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
                     ],
                   ),
-               
+                ),
+                const SizedBox(height: 10),
+                El
