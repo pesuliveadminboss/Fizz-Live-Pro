@@ -24,23 +24,16 @@ class _SplashState extends State<Splash> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80, height: 80,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network('https://i.ibb.co/3k5fB0K/fizz-logo.png', errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 50, color: Colors.pink)),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
-            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
+            Icon(Icons.videocam, size: 60, color: Colors.pink),
+            SizedBox(height: 10),
+            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
+            Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
           ],
         ),
       ),
@@ -230,16 +223,7 @@ class _CallScreenState extends State<CallScreen> {
           children: [
             const Text('Select reason or describe issue:', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 10),
-            TextField(
-              controller: reasonCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: 'e.g., Inappropriate behavior',
-                hintStyle: TextStyle(color: Colors.white54),
-                filled: true,
-                fillColor: Colors.grey,
-              ),
-            ),
+            TextField(controller: reasonCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(filled: true, fillColor: Colors.grey, hintText: 'Reason')),
           ],
         ),
         actions: [
@@ -248,9 +232,7 @@ class _CallScreenState extends State<CallScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${widget.host} reported and blocked.')),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${widget.host} reported & blocked')));
             },
             child: const Text('Report & Block'),
           ),
@@ -502,64 +484,74 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     }
   }
 
-  Widget _buildFavList() {
-    if (_favorites.isEmpty) {
-      return const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey)));
-    }
-    return ListView.builder(
-      itemCount: _favorites.length,
-      itemBuilder: (ctx, i) {
-        final h = _favorites[i];
-        return ListTile(
-          leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-          title: Text(h.name, style: const TextStyle(color: Colors.white)),
-          trailing: ElevatedButton(
-            onPressed: () => _dial(h.name, h.pic),
-            child: const Text('Call'),
-          ),
-        );
-      },
-    );
-  }
+  @override
+  Widget build(BuildContext context) {
+    const tabIcons = [
+      Tab(icon: Icon(Icons.home)),
+      Tab(icon: Icon(Icons.favorite)),
+      Tab(icon: Icon(Icons.casino)),
+      Tab(icon: Icon(Icons.chat)),
+      Tab(icon: Icon(Icons.person)),
+    ];
 
-  Widget _buildChatList() {
-    return ListView.builder(
-      itemCount: _allHosts.length,
-      itemBuilder: (ctx, i) {
-        final h = _allHosts[i];
-        return ListTile(
-          leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-          title: Text(h.name, style: const TextStyle(color: Colors.white)),
-          onTap: () => _dial(h.name, h.pic),
-        );
-      },
-    );
-  }
+    final curCat = _cats[_cat];
+    final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
 
-  Widget _buildProfileTab() {
-    const titleStyle = TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16);
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Center(
-          child: Column(
-            children: [
-              const CircleAvatar(radius: 30, child: Icon(Icons.person)),
-              const SizedBox(height: 6),
-              Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
-              Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-              const SizedBox(height: 6),
-              const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
-            ],
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text('Fizz Live Pro'),
+          actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+          bottom: TabBar(
+            controller: _tabCtrl,
+            indicatorColor: Colors.pink,
+            labelColor: Colors.pink,
+            unselectedLabelColor: Colors.grey,
+            tabs: tabIcons,
           ),
         ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: _editProfile,
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-          child: const Text('Edit Profile'),
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
-        const SizedBox(height: 20),
-     
+        body: TabBarView(
+          controller: _tabCtrl,
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 38,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _cats.length,
+                    itemBuilder: (ctx, i) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ActionChip(
+                        label: Text(_cats[i]),
+                        backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+                        onPressed: () => setState(() => _cat = i),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                    onPressed: _openRandomMatch,
+                    child: const Text('Random Match (1800 gems)'),
+                  ),
+                ),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
+                    padding: const EdgeInsets.all(6),
+                    itemCount: list.length,
+                    itemBuilder: (ctx, i) {
+                      final h = list[i];
+                      return GestureDetector(
+                        onTap: () => _showHostProfile(h),
+                        child: Card(
+                          color: Colors.grey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                             
