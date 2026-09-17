@@ -159,9 +159,6 @@ class _CallScreenState extends State<CallScreen> {
   bool _mic = true, _frontCam = true;
   int _sec = 0;
   int _pingMs = 45;
-  double _beautySmooth = 80.0;
-  double _audioVolume = 100.0;
-  String _activeFilter = 'Normal';
   Timer? _t, _netTimer;
 
   @override
@@ -342,7 +339,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
                     decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Pic), fit: BoxFit.cover)),
                   ),
           ),
-          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withValues(alpha: 0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
+          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withOpacity(0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
           Positioned(
             top: 40, left: 16, right: 16,
             child: Row(
@@ -396,7 +393,7 @@ class HostRank {
   final String name, pic, gems;
   const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
 }
-// Core models bridge wrapper
+// Placeholder bridge
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -721,3 +718,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
