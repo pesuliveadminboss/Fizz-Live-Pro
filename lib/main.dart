@@ -551,5 +551,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ),
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(buil
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                
