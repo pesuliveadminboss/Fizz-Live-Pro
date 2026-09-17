@@ -81,17 +81,68 @@ class _PinGateState extends State<PinGate> {
 
 class Login extends StatelessWidget {
   const Login({super.key});
+
+  void _showAuthSheet(BuildContext context, String type) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Continue with $type', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            if (type == 'Google') ListTile(leading: const Icon(Icons.g_mobiledata, color: Colors.amber, size: 32), title: const Text('Chandran S (chandran6222@gmail.com)', style: TextStyle(color: Colors.white)), onTap: () { Navigator.pop(ctx); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard())); }),
+            if (type == 'Phone') Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: TextField(style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter Phone Number', hintStyle: TextStyle(color: Colors.white54)))),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+              },
+              child: const Text('Confirm Login'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            await [Permission.camera, Permission.microphone].request();
-            if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-          },
-          child: const Text('Fast Login & Permissions'),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.live_tv, size: 70, color: Colors.pinkAccent),
+              const SizedBox(height: 12),
+              const Text('Fast Login', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent), label: const Text('Google', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Google')),
+                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.phone, color: Colors.greenAccent), label: const Text('Phone', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Phone')),
+                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.person_outline, color: Colors.blueAccent), label: const Text('Guest', style: TextStyle(color: Colors.white)), onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()))),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () async {
+                  await [Permission.camera, Permission.microphone].request();
+                  if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+                },
+                child: const Text('Fast Login & Permissions', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -172,9 +223,7 @@ class _CallScreenState extends State<CallScreen> {
     });
     _netTimer = Timer.periodic(const Duration(seconds: 3), (t) {
       if (!mounted) return;
-      setState(() {
-        _pingMs = 35 + (DateTime.now().second % 40);
-      });
+      setState(() => _pingMs = 35 + (DateTime.now().second % 40));
     });
   }
 
@@ -201,11 +250,11 @@ class _CallScreenState extends State<CallScreen> {
     if (_g >= cost) {
       setState(() {
         _g -= cost;
-        _gift = "Sent $em $name!";
+        _gift = 'Sent $em $name!';
       });
       widget.onGems(_g);
       Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = "");
+        if (mounted) setState(() => _gift = '');
       });
     }
   }
@@ -244,28 +293,14 @@ class _CallScreenState extends State<CallScreen> {
               const SizedBox(height: 16),
               const Text('Skin Smoothing / Beauty Level', style: TextStyle(color: Colors.white70, fontSize: 13)),
               Slider(
-                value: _beautySmooth,
-                min: 0,
-                max: 100,
-                activeColor: Colors.pink,
-                inactiveColor: Colors.grey,
-                onChanged: (val) {
-                  setModalState(() => _beautySmooth = val);
-                  setState(() => _beautySmooth = val);
-                },
+                value: _beautySmooth, min: 0, max: 100, activeColor: Colors.pink, inactiveColor: Colors.grey,
+                onChanged: (val) { setModalState(() => _beautySmooth = val); setState(() => _beautySmooth = val); },
               ),
               const SizedBox(height: 10),
               const Text('Call Volume / Gain', style: TextStyle(color: Colors.white70, fontSize: 13)),
               Slider(
-                value: _audioVolume,
-                min: 0,
-                max: 200,
-                activeColor: Colors.amber,
-                inactiveColor: Colors.grey,
-                onChanged: (val) {
-                  setModalState(() => _audioVolume = val);
-                  setState(() => _audioVolume = val);
-                },
+                value: _audioVolume, min: 0, max: 200, activeColor: Colors.amber, inactiveColor: Colors.grey,
+                onChanged: (val) { setModalState(() => _audioVolume = val); setState(() => _audioVolume = val); },
               ),
               const SizedBox(height: 10),
               const Text('Video Filter Mode', style: TextStyle(color: Colors.white70, fontSize: 13)),
@@ -274,15 +309,9 @@ class _CallScreenState extends State<CallScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: ['Normal', 'Glow', 'Pinkish', 'Vintage'].map((f) => ChoiceChip(
                   label: Text(f, style: const TextStyle(fontSize: 11)),
-                  selected: _activeFilter == f,
-                  selectedColor: Colors.pink,
+                  selected: _activeFilter == f, selectedColor: Colors.pink,
                   labelStyle: TextStyle(color: _activeFilter == f ? Colors.white : Colors.white70),
-                  onSelected: (selected) {
-                    if (selected) {
-                      setModalState(() => _activeFilter = f);
-                      setState(() => _activeFilter = f);
-                    }
-                  },
+                  onSelected: (selected) { if (selected) { setModalState(() => _activeFilter = f); setState(() => _activeFilter = f); } },
                 )).toList(),
               ),
             ],
@@ -311,10 +340,7 @@ class _CallScreenState extends State<CallScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${widget.host} reported & blocked')));
-            },
+            onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${widget.host} reported & blocked'))); },
             child: const Text('Report & Block'),
           ),
         ],
@@ -361,8 +387,7 @@ class _CallScreenState extends State<CallScreen> {
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
           Positioned(top: 40, left: 16, child: IconButton(icon: const Icon(Icons.flag, color: Colors.redAccent), onPressed: _showReportDialog)),
           Positioned(
-            top: 40,
-            left: 70,
+            top: 40, left: 70,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
@@ -395,6 +420,80 @@ class _CallScreenState extends State<CallScreen> {
   }
 }
 
+class LiveStreamDualRoom extends StatefulWidget {
+  final String streamer1Name, streamer1Pic, streamer2Name, streamer2Pic;
+  final VoidCallback onMinimizeToMini;
+  const LiveStreamDualRoom({super.key, required this.streamer1Name, required this.streamer1Pic, required this.streamer2Name, required this.streamer2Pic, required this.onMinimizeToMini});
+  @override
+  State<LiveStreamDualRoom> createState() => _LiveStreamDualRoomState();
+}
+
+class _LiveStreamDualRoomState extends State<LiveStreamDualRoom> {
+  bool _audioConnected = true;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('${widget.streamer1Name} x ${widget.streamer2Name} (Co-Host)', style: const TextStyle(fontSize: 13)),
+        leading: IconButton(icon: const Icon(Icons.picture_in_picture_alt), onPressed: widget.onMinimizeToMini),
+        actions: [
+          IconButton(icon: Icon(_audioConnected ? Icons.headset : Icons.headset_off, color: Colors.greenAccent), onPressed: () => setState(() => _audioConnected = !_audioConnected)),
+          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+        ],
+      ),
+      extendBodyBehindAppBar: true,
+      body: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Pic), fit: BoxFit.cover)),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(color: Colors.black54, padding: const EdgeInsets.all(6), child: Text(widget.streamer1Name, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold))),
+                    ),
+                  ),
+                ),
+                Container(width: 2, color: Colors.pinkAccent),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer2Pic), fit: BoxFit.cover)),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(color: Colors.black54, padding: const EdgeInsets.all(6), child: Text(widget.streamer2Name, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold))),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.grey[900],
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Dual Streamer Live Connected 🟢', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  icon: const Icon(Icons.card_giftcard, size: 16),
+                  label: const Text('Send Gift'),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class Host {
   final String name, city, views, cat, pic, bio;
   const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
@@ -418,6 +517,8 @@ class _DashboardState extends State<Dashboard> {
   String _userBio = 'VIP Member & Live Chat Lover';
   int _hostEarningsINR = 12500;
   int _hostGemsEarned = 25000;
+  bool _dailyRewardClaimed = false;
+  bool _hasMiniPlayer = false;
 
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
   final List<Host> _favorites = [];
@@ -432,10 +533,12 @@ class _DashboardState extends State<Dashboard> {
     HostRank(rank: 3, name: 'Divya', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', gems: '98k 💎'),
   ];
 
-  final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
+  final _cats = const ['Hot', 'Live', 'Party', 'Match'];
   final List<Host> _allHosts = const [
-    Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
-    Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
+    Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Hot', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
+    Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
+    Host(name: 'Kajal', city: 'Kolkata', views: '4.8k', cat: 'Live', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', bio: 'Music & chat 🎶'),
+    Host(name: 'Divya', city: 'Jaipur', views: '6.2k', cat: 'Party', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'VIP Party Room 👑'),
   ];
   final _packs = const [
     {'gems': 4050, 'price': 100, 'tag': ''},
@@ -445,6 +548,67 @@ class _DashboardState extends State<Dashboard> {
     {'gems': 95000, 'price': 2000, 'tag': 'Best Value'},
     {'gems': 250000, 'price': 5000, 'tag': 'Mega VIP'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 500), _showDailyRewardDialog);
+  }
+
+  void _showDailyRewardDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text('Daily Rewards 🎁', style: TextStyle(color: Colors.amber)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.card_giftcard, size: 50, color: Colors.pinkAccent),
+            const SizedBox(height: 10),
+            const Text('Sign in for 7 days to get a surprise!', style: TextStyle(color: Colors.white70, fontSize: 13)),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _rewardBox('Day 1', '+40 💎', true),
+                _rewardBox('Day 2', '+80 💎', false),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: _dailyRewardClaimed ? Colors.grey : Colors.amber),
+            onPressed: _dailyRewardClaimed ? null : () {
+              setState(() {
+                _gems += 40;
+                _dailyRewardClaimed = true;
+                _history.insert(0, 'Daily Reward: +40 Gems');
+              });
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed +40 Gems!')));
+            },
+            child: Text(_dailyRewardClaimed ? 'Claimed' : 'Check-in (+40 Gems)'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _rewardBox(String day, String gem, bool done) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: done ? Colors.pink.withValues(alpha: 0.3) : Colors.grey[850], borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        children: [
+          Text(day, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+          const SizedBox(height: 4),
+          Text(gem, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
 
   void _showNotifications() {
     showModalBottomSheet(
@@ -608,6 +772,27 @@ class _DashboardState extends State<Dashboard> {
                   child: Text(isFav ? 'Favorited' : 'Favorite', style: const TextStyle(color: Colors.white)),
                 ),
                 ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LiveStreamDualRoom(
+                          streamer1Name: h.name,
+                          streamer1Pic: h.pic,
+                          streamer2Name: 'Kajal (Co-Host)',
+                          streamer2Pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',
+                          onMinimizeToMini: () {
+                            Navigator.pop(context);
+                            setState(() => _hasMiniPlayer = true);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Dual Live'),
+                ),
+                ElevatedButton(
                   onPressed: () { Navigator.pop(ctx); _dial(h.name, h.pic); },
                   child: const Text('Call'),
                 ),
@@ -698,6 +883,7 @@ class _DashboardState extends State<Dashboard> {
         appBar: AppBar(
           title: const Text('Fizz Live Pro'),
           actions: [
+            IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent), onPressed: _showDailyRewardDialog),
             IconButton(icon: const Icon(Icons.notifications, color: Colors.amber), onPressed: _showNotifications),
             TextButton(
               onPressed: _recharge,
@@ -709,182 +895,194 @@ class _DashboardState extends State<Dashboard> {
             labelColor: Colors.pink,
             unselectedLabelColor: Colors.grey,
             tabs: [
-              Tab(icon: Icon(Icons.home)),
-              Tab(icon: Icon(Icons.favorite)),
-              Tab(icon: Icon(Icons.emoji_events), child: Text('Rank', style: TextStyle(fontSize: 10))),
-              Tab(icon: Icon(Icons.chat)),
-              Tab(icon: Icon(Icons.person)),
+              Tab(icon: Icon(Icons.favorite), child: Text('For You', style: TextStyle(fontSize: 10))),
+              Tab(icon: Icon(Icons.people), child: Text('Follow', style: TextStyle(fontSize: 10))),
+              Tab(icon: Icon(Icons.live_tv), child: Text('Live', style: TextStyle(fontSize: 10))),
+              Tab(icon: Icon(Icons.message), child: Text('Messages', style: TextStyle(fontSize: 10))),
+              Tab(icon: Icon(Icons.person), child: Text('Me', style: TextStyle(fontSize: 10))),
             ],
           ),
         ),
-        body: TabBarView(
+        body: Stack(
           children: [
-            Column(
+            TabBarView(
               children: [
-                SizedBox(
-                  height: 38,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _cats.length,
-                    itemBuilder: (ctx, i) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ActionChip(
-                        label: Text(_cats[i]),
-                        backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                        onPressed: () => setState(() => _cat = i),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                    onPressed: _openRandomMatch,
-                    child: const Text('Random Match (1800 gems)'),
-                  ),
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.8,
-                    ),
-                    padding: const EdgeInsets.all(6),
-                    itemCount: list.length,
-                    itemBuilder: (ctx, i) {
-                      final h = list[i];
-                      return GestureDetector(
-                        onTap: () => _showHostProfile(h),
-                        child: Card(
-                          color: Colors.grey,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 28,
-                                backgroundImage: NetworkImage(h.pic),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                h.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _dial(h.name, h.pic),
-                                child: const Text(
-                                  'Call',
-                                  style: TextStyle(fontSize: 10),
-                                ),
-                              ),
-                            ],
+                // 1. For You Tab
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 38,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _cats.length,
+                        itemBuilder: (ctx, i) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ActionChip(
+                            label: Text(_cats[i]),
+                            backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+                            onPressed: () => setState(() => _cat = i),
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                        onPressed: _openRandomMatch,
+                        child: const Text('Random Match (1800 gems)'),
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
+                        padding: const EdgeInsets.all(6),
+                        itemCount: list.length,
+                        itemBuilder: (ctx, i) {
+                          final h = list[i];
+                          return GestureDetector(
+                            onTap: () => _showHostProfile(h),
+                            child: Card(
+                              color: Colors.grey,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
+                                  const SizedBox(height: 4),
+                                  Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                  ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                // 2. Follower Tab
+                _favorites.isEmpty
+                    ? const Center(child: Text('No Followed hosts yet!', style: TextStyle(color: Colors.grey)))
+                    : ListView.builder(
+                        itemCount: _favorites.length,
+                        itemBuilder: (ctx, i) {
+                          final h = _favorites[i];
+                          return ListTile(
+                            leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+                            title: Text(h.name, style: const TextStyle(color: Colors.white)),
+                            trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')),
+                          );
+                        },
+                      ),
+                // 3. Live Tab
+                ListView.builder(
+                  itemCount: _allHosts.length,
+                  itemBuilder: (ctx, i) {
+                    final h = _allHosts[i];
+                    return ListTile(
+                      leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+                      title: Text('${h.name} (Dual Co-Host Live)', style: const TextStyle(color: Colors.white)),
+                      subtitle: const Text('2 streamers talking live 🎙️', style: TextStyle(color: Colors.amber, fontSize: 11)),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => LiveStreamDualRoom(
+                              streamer1Name: h.name,
+                              streamer1Pic: h.pic,
+                              streamer2Name: 'Kajal (Co-Host)',
+                              streamer2Pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',
+                              onMinimizeToMini: () {
+                                Navigator.pop(context);
+                                setState(() => _hasMiniPlayer = true);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                // 4. Messages Tab
+                ListView(
+                  padding: const EdgeInsets.all(12),
+                  children: const [
+                    ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Go and find more date 💖')),
+                    ListTile(leading: CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')), title: Text('Pooja', style: TextStyle(color: Colors.white)), subtitle: Text('kuch special harte hain call karo mujhemuhe 💋')),
+                  ],
+                ),
+                // 5. Me Tab
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Center(
+                      child: Column(
+                        children: [
+                          const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                          const SizedBox(height: 6),
+                          Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                          Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                          const SizedBox(height: 6),
+                          const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Card(
+                      color: Colors.grey[850],
+                      child: ListTile(
+                        leading: const Icon(Icons.account_balance_wallet, color: Colors.greenAccent),
+                        title: Text('Host Earnings: ₹$_hostEarningsINR', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        subtitle: Text('Gems Earned: $_hostGemsEarned 💎', style: const TextStyle(color: Colors.amber)),
+                        trailing: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.green), onPressed: _showPayoutModal, child: const Text('Payout')),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(onPressed: _editProfile, style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), child: const Text('Edit Profile')),
+                    const SizedBox(height: 10),
+                    ElevatedButton(onPressed: _showDailyRewardDialog, style: ElevatedButton.styleFrom(backgroundColor: Colors.amber[800]), child: const Text('Daily Check-in 🎁')),
+                    const SizedBox(height: 20),
+                    const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
+                  ],
                 ),
               ],
             ),
-            _favorites.isEmpty
-                ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey)))
-                : ListView.builder(
-                    itemCount: _favorites.length,
-                    itemBuilder: (ctx, i) {
-                      final h = _favorites[i];
-                      return ListTile(
-                        leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-                        title: Text(h.name, style: const TextStyle(color: Colors.white)),
-                        trailing: ElevatedButton(
-                          onPressed: () => _dial(h.name, h.pic),
-                          child: const Text('Call'),
+            // Floating Mini-Screen PiP Overlay
+            if (_hasMiniPlayer)
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => _hasMiniPlayer = false);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LiveStreamDualRoom(
+                          streamer1Name: 'Ananya',
+                          streamer1Pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200',
+                          streamer2Name: 'Kajal (Co-Host)',
+                          streamer2Pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',
+                          onMinimizeToMini: () => Navigator.pop(context),
                         ),
-                      );
-                    },
-                  ),
-            // Leaderboard / Ranking Tab
-            ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: _leaderboard.length,
-              itemBuilder: (ctx, i) {
-                final r = _leaderboard[i];
-                final color = r.rank == 1 ? Colors.amber : (r.rank == 2 ? Colors.white70 : Colors.brown);
-                return Card(
-                  color: Colors.grey[900],
-                  child: ListTile(
-                    leading: CircleAvatar(backgroundColor: color, child: Text('#${r.rank}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
-                    title: Row(
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 130,
+                    height: 180,
+                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.pinkAccent, width: 2), boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 10)]),
+                    child: Stack(
                       children: [
-                        CircleAvatar(backgroundImage: NetworkImage(r.pic), radius: 18),
-                        const SizedBox(width: 8),
-                        Text(r.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', fit: BoxFit.cover, width: 130, height: 180)),
+                        Positioned(top: 4, right: 4, child: InkWell(onTap: () => setState(() => _hasMiniPlayer = false), child: const CircleAvatar(radius: 10, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 12, color: Colors.white)))),
+                        const Positioned(bottom: 6, left: 6, child: Text('Mini PiP 🎙️', style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold))),
                       ],
                     ),
-                    trailing: Text(r.gems, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-                  ),
-                );
-              },
-            ),
-            ListView.builder(
-              itemCount: _allHosts.length,
-              itemBuilder: (ctx, i) {
-                final h = _allHosts[i];
-                return ListTile(
-                  leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-                  title: Text(h.name, style: const TextStyle(color: Colors.white)),
-                  onTap: () => _dial(h.name, h.pic),
-                );
-              },
-            ),
-            ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Center(
-                  child: Column(
-                    children: [
-                      const CircleAvatar(radius: 30, child: Icon(Icons.person)),
-                      const SizedBox(height: 6),
-                      Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                      Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                      const SizedBox(height: 6),
-                      const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
-                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                Card(
-                  color: Colors.grey[850],
-                  child: ListTile(
-                    leading: const Icon(Icons.account_balance_wallet, color: Colors.greenAccent),
-                    title: Text('Host Earnings: ₹$_hostEarningsINR', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    subtitle: Text('Gems Earned: $_hostGemsEarned 💎', style: const TextStyle(color: Colors.amber)),
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                      onPressed: _showPayoutModal,
-                      child: const Text('Payout'),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _editProfile,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                  child: const Text('Edit Profile'),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _showNotifications,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800]),
-                  child: const Text('Activity & Notifications 🔔'),
-                ),
-                const SizedBox(height: 20),
-                const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-                ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
-              ],
-            ),
+              ),
           ],
         ),
       ),
