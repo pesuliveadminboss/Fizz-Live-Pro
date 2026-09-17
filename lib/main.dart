@@ -335,6 +335,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     });
   }
 
+  void _openRandomMatch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RandomMatchScreen(
+          onMatched: (n, p) {
+            Navigator.pop(context);
+            _dial(n, p);
+          },
+        ),
+      ),
+    );
+  }
+
   void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
@@ -505,6 +519,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
+  Widget _buildRandomMatchButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+        onPressed: _openRandomMatch,
+        child: const Text('Random Match (1800 gems)'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final curCat = _cats[_cat];
@@ -540,18 +565,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   scrollDirection: Axis.horizontal,
                   itemCount: _cats.length,
                   itemBuilder: (ctx, i) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ActionChip(
-                        label: Text(_cats[i]),
-                        backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                        onPressed: () => setState(() => _cat = i),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton(
-                  s
+    
