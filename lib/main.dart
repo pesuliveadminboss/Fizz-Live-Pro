@@ -566,6 +566,5 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       appBar: AppBar(
         title: const Text('Fizz Live Pro'),
         actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-        bottom: TabBar(
-          controller: _tabCtrl,
-          i
+        bottom: PreferredSize(
+          preferredSize: const Size.
