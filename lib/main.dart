@@ -148,6 +148,9 @@ class _CallScreenState extends State<CallScreen> {
   bool _mic = true, _frontCam = true;
   int _sec = 0;
   int _pingMs = 45;
+  double _beautySmooth = 80.0;
+  double _audioVolume = 100.0;
+  String _activeFilter = 'Normal';
   Timer? _t, _netTimer;
 
   @override
@@ -167,7 +170,6 @@ class _CallScreenState extends State<CallScreen> {
         }
       }
     });
-    // Simulate live network fluctuation
     _netTimer = Timer.periodic(const Duration(seconds: 3), (t) {
       if (!mounted) return;
       setState(() {
@@ -221,6 +223,70 @@ class _CallScreenState extends State<CallScreen> {
             ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
             ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showBeautyDialog() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          padding: const EdgeInsets.all(20),
+          height: 340,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Beauty & Audio FX ✨', style: TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Skin Smoothing / Beauty Level', style: TextStyle(color: Colors.white70, fontSize: 13)),
+              Slider(
+                value: _beautySmooth,
+                min: 0,
+                max: 100,
+                activeColor: Colors.pink,
+                inactiveColor: Colors.grey,
+                onChanged: (val) {
+                  setModalState(() => _beautySmooth = val);
+                  setState(() => _beautySmooth = val);
+                },
+              ),
+              const SizedBox(height: 10),
+              const Text('Call Volume / Gain', style: TextStyle(color: Colors.white70, fontSize: 13)),
+              Slider(
+                value: _audioVolume,
+                min: 0,
+                max: 200,
+                activeColor: Colors.amber,
+                inactiveColor: Colors.grey,
+                onChanged: (val) {
+                  setModalState(() => _audioVolume = val);
+                  setState(() => _audioVolume = val);
+                },
+              ),
+              const SizedBox(height: 10),
+              const Text('Video Filter Mode', style: TextStyle(color: Colors.white70, fontSize: 13)),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: ['Normal', 'Glow', 'Pinkish', 'Vintage'].map((f) => ChoiceChip(
+                  label: Text(f, style: const TextStyle(fontSize: 11)),
+                  selected: _activeFilter == f,
+                  selectedColor: Colors.pink,
+                  labelStyle: TextStyle(color: _activeFilter == f ? Colors.white : Colors.white70),
+                  onSelected: (selected) {
+                    if (selected) {
+                      setModalState(() => _activeFilter = f);
+                      setState(() => _activeFilter = f);
+                    }
+                  },
+                )).toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -286,6 +352,7 @@ class _CallScreenState extends State<CallScreen> {
                     const SizedBox(height: 8),
                     Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    if (_activeFilter != 'Normal') Text('Filter: $_activeFilter (Glow ${_beautySmooth.toInt()}%)', style: const TextStyle(color: Colors.pinkAccent, fontSize: 10)),
                   ],
                 ),
               ),
@@ -293,7 +360,6 @@ class _CallScreenState extends State<CallScreen> {
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
           Positioned(top: 40, left: 16, child: IconButton(icon: const Icon(Icons.flag, color: Colors.redAccent), onPressed: _showReportDialog)),
-          // Network Quality Indicator Chip
           Positioned(
             top: 40,
             left: 70,
@@ -316,6 +382,7 @@ class _CallScreenState extends State<CallScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
+                IconButton(icon: const Icon(Icons.face_retouching_natural, color: Colors.amberAccent, size: 28), onPressed: _showBeautyDialog),
                 IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () => ZegoExpressEngine.instance.useFrontCamera(_frontCam = !_frontCam)),
                 IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: _showGiftBottomSheet),
                 IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
@@ -476,7 +543,7 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
-   void _editProfile() {
+    void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
     showDialog(
