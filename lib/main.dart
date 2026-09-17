@@ -409,21 +409,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         children: [
           Text('My Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          for (var p in _packs)
-            ListTile(
-              leading: const Icon(Icons.diamond, color: Colors.amber),
-              title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
-              trailing: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _gems += (p['gems'] as int);
-                    _history.insert(0, 'Recharge: +${p['gems']} Gems');
-                  });
-                  Navigator.pop(ctx);
-                },
-                child: Text('₹${p['price']}'),
-              ),
+          ..._packs.map((p) => ListTile(
+            leading: const Icon(Icons.diamond, color: Colors.amber),
+            title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
+            trailing: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _gems += (p['gems'] as int);
+                  _history.insert(0, 'Recharge: +${p['gems']} Gems');
+                });
+                Navigator.pop(ctx);
+              },
+              child: Text('₹${p['price']}'),
             ),
+          )),
         ],
       ),
     );
@@ -523,9 +522,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               ),
             ],
           ),
-          _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: [for (var h in _favorites) ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))]),
-          Center(child: ElevatedButton(onPressed: () => setState(() => _gems += 150), child: const Text('Spin & Win 150 Gems'))),
+          _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: _favorites.map((h) => ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))).toList()),
+          const Center(child: Text('Spin & Win 150 Gems feature coming soon!')),
           ListView(
-            children: [
-              for (var h in _allHosts)
-     
+            children: _allHosts.map((h) => ListTile(
+              leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+              title: Te
