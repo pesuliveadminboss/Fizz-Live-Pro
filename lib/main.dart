@@ -130,7 +130,6 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -712,7 +711,7 @@ class _DashboardState extends State<Dashboard> {
             tabs: [
               Tab(icon: Icon(Icons.home)),
               Tab(icon: Icon(Icons.favorite)),
-              Tab(icon: Icon(Icons.emoji_events, textAttr: 'Ranking')),
+              Tab(icon: Icon(Icons.emoji_events), child: Text('Rank', style: TextStyle(fontSize: 10))),
               Tab(icon: Icon(Icons.chat)),
               Tab(icon: Icon(Icons.person)),
             ],
