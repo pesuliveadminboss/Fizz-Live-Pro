@@ -335,6 +335,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     });
   }
 
+  void _openRandomMatch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RandomMatchScreen(
+          onMatched: (n, p) {
+            Navigator.pop(context);
+            _dial(n, p);
+          },
+        ),
+      ),
+    );
+  }
+
   void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
@@ -486,7 +500,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
               Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
               const SizedBox(height: 6),
-              const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+              const Text('👑 VIP Lv.5', style: const TextStyle(color: Colors.amber)),
             ],
           ),
         ),
@@ -545,12 +559,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                       label: Text(_cats[i]),
                       backgroundColor: _cat == i ? Colors.pink : Colors.grey,
                       onPressed: () => setState(() => _cat = i),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, Material
+     
