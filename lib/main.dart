@@ -394,7 +394,7 @@ class _DashboardState extends State<Dashboard> {
             const SizedBox(height: 8),
             Text('Withdrawable Balance: ₹$_hostEarningsINR', style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            const Text('Payout Method: UPI / Bank Transfer', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            const Text('Payout Method: UPI / Bank Transfer', style: TextStyle(color: Colors.white54, fontSize: 12)),
           ],
         ),
         actions: [
@@ -624,8 +624,7 @@ class _DashboardState extends State<Dashboard> {
                       child: ActionChip(
                         label: Text(_cats[i]),
                         backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                        onPressed: _openRandomMatch,
-                        child: const Text('Random Match (1800 gems)'),
+                        onPressed: () => setState(() => _cat = i),
                       ),
                     ),
                   ),
