@@ -24,23 +24,15 @@ class _SplashState extends State<Splash> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80, height: 80,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network('https://i.ibb.co/3k5fB0K/fizz-logo.png', errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 50, color: Colors.pink)),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
-            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
+            Icon(Icons.live_tv, size: 60, color: Colors.pinkAccent),
+            SizedBox(height: 10),
+            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
           ],
         ),
       ),
@@ -81,101 +73,17 @@ class _PinGateState extends State<PinGate> {
 
 class Login extends StatelessWidget {
   const Login({super.key});
-
-  void _showAuthSheet(BuildContext context, String type) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Continue with $type', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            if (type == 'Google') ListTile(leading: const Icon(Icons.g_mobiledata, color: Colors.amber, size: 32), title: const Text('Chandran S (chandran6222@gmail.com)', style: TextStyle(color: Colors.white)), onTap: () { Navigator.pop(ctx); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard())); }),
-            if (type == 'Phone') Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: TextField(style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter Phone Number', hintStyle: TextStyle(color: Colors.white54)))),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-              onPressed: () {
-                Navigator.pop(ctx);
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-              },
-              child: const Text('Confirm Login'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.live_tv, size: 70, color: Colors.pinkAccent),
-              const SizedBox(height: 12),
-              const Text('Fast Login', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent), label: const Text('Google', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Google')),
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.phone, color: Colors.greenAccent), label: const Text('Phone', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Phone')),
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.person_outline, color: Colors.blueAccent), label: const Text('Guest', style: TextStyle(color: Colors.white)), onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()))),
-                ],
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () async {
-                  await [Permission.camera, Permission.microphone].request();
-                  if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-                },
-                child: const Text('Fast Login & Permissions', style: TextStyle(color: Colors.white54, fontSize: 12)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class RandomMatchScreen extends StatefulWidget {
-  final Function(String, String) onMatched;
-  const RandomMatchScreen({super.key, required this.onMatched});
-  @override
-  State<RandomMatchScreen> createState() => _RandomMatchScreenState();
-}
-
-class _RandomMatchScreenState extends State<RandomMatchScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) widget.onMatched('Pooja', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200');
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Colors.pink),
-            SizedBox(height: 20),
-            Text('Finding random host...', style: TextStyle(color: Colors.white, fontSize: 16)),
-          ],
+        child: ElevatedButton(
+          onPressed: () async {
+            await [Permission.camera, Permission.microphone].request();
+            if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
+          },
+          child: const Text('Fast Login & Permissions'),
         ),
       ),
     );
@@ -195,11 +103,8 @@ class _CallScreenState extends State<CallScreen> {
   Widget? _cam;
   int? _vid;
   late int _g;
-  String _gift = "";
-  bool _mic = true, _frontCam = true;
   int _sec = 0;
-  int _pingMs = 45;
-  Timer? _t, _netTimer;
+  Timer? _t;
 
   @override
   void initState() {
@@ -210,23 +115,13 @@ class _CallScreenState extends State<CallScreen> {
       if (!mounted) return;
       setState(() => _sec++);
       if (_sec > 0 && _sec % 60 == 0) {
-        if (_g >= 1800) {
-          setState(() => _g -= 1800);
-          widget.onGems(_g);
-        } else {
-          _exitCall();
-        }
+        if (_g >= 1800) { setState(() => _g -= 1800); widget.onGems(_g); } else { _exitCall(); }
       }
-    });
-    _netTimer = Timer.periodic(const Duration(seconds: 3), (t) {
-      if (!mounted) return;
-      setState(() => _pingMs = 35 + (DateTime.now().second % 40));
     });
   }
 
   void _exitCall() {
     _t?.cancel();
-    _netTimer?.cancel();
     final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}';
     Navigator.pop(context);
     widget.onEnd(dur, _sec);
@@ -243,41 +138,9 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _cam = w);
   }
 
-  void _sendGift(String name, int cost, String em) {
-    if (_g >= cost) {
-      setState(() {
-        _g -= cost;
-        _gift = 'Sent $em $name!';
-      });
-      widget.onGems(_g);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _gift = '');
-      });
-    }
-  }
-
-  void _showGiftBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Rose', 50, '🌹'); }, child: const Text('🌹 50')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Ring', 200, '💎'); }, child: const Text('💎 200')),
-            ElevatedButton(onPressed: () { Navigator.pop(ctx); _sendGift('Car', 1000, '🏎️'); }, child: const Text('🏎️ 1000')),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _t?.cancel();
-    _netTimer?.cancel();
     if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
@@ -290,66 +153,41 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.pic), fit: BoxFit.cover)),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(radius: 40, backgroundImage: NetworkImage(widget.pic)),
-                    const SizedBox(height: 8),
-                    Text(widget.host, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          Positioned.fill(child: Image.network(widget.pic, fit: BoxFit.cover)),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
-          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
-          Positioned(
-            bottom: 20, left: 0, right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(icon: Icon(_mic ? Icons.mic : Icons.mic_off, color: Colors.white), onPressed: () => setState(() => _mic = !_mic)),
-                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.amber, size: 32), onPressed: _showGiftBottomSheet),
-                IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
-              ],
-            ),
-          ),
+          Positioned(bottom: 20, left: 0, right: 0, child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall),
+          ])),
         ],
       ),
     );
   }
 }
 
-class LiveStreamDualRoom extends StatefulWidget {
+class LiveStreamPKRoom extends StatefulWidget {
   final String streamer1Name, streamer1Pic, streamer2Name, streamer2Pic;
-  final bool isDual;
+  final bool isPK;
   final Function(String) onCloseWithPiP;
-  const LiveStreamDualRoom({
+  const LiveStreamPKRoom({
     super.key,
     required this.streamer1Name,
     required this.streamer1Pic,
     required this.streamer2Name,
     required this.streamer2Pic,
-    required this.isDual,
+    required this.isPK,
     required this.onCloseWithPiP,
   });
 
   @override
-  State<LiveStreamDualRoom> createState() => _LiveStreamDualRoomState();
+  State<LiveStreamPKRoom> createState() => _LiveStreamPKRoomState();
 }
 
-class _LiveStreamDualRoomState extends State<LiveStreamDualRoom> {
+class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
   final List<Map<String, String>> _messages = [
-    {'user': 'Rahul', 'msg': 'Hi super! 💖'},
-    {'user': 'Kavi', 'msg': 'Awesome live! 🔥'},
+    {'user': 'bosi', 'msg': 'Hi!'},
+    {'user': 'system', 'msg': 'Rules apply!'},
   ];
-  final TextEditingController _msgCtrl = TextEditingController();
-  bool _isFollowing = false;
+  final _msgCtrl = TextEditingController();
 
   void _sendMessage() {
     if (_msgCtrl.text.trim().isNotEmpty) {
@@ -367,38 +205,46 @@ class _LiveStreamDualRoomState extends State<LiveStreamDualRoom> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: widget.isDual
-                ? Row(
+            child: widget.isPK
+                ? Column(
                     children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Name == 'Anitha' ? 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200' : widget.streamer1Pic), fit: BoxFit.cover)),
-                          child: Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(color: Colors.black54, padding: const EdgeInsets.all(6), child: Text(widget.streamer1Name, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold))),
-                          ),
+                      Container(
+                        height: 28,
+                        color: Colors.grey[900],
+                        child: Row(
+                          children: [
+                            Container(width: MediaQuery.of(context).size.width * 0.48, color: Colors.cyan),
+                            Container(padding: const EdgeInsets.symmetric(horizontal: 8), color: Colors.pink, child: const Text('PK 02:00', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+                            Expanded(child: Container(color: Colors.pink[700])),
+                          ],
                         ),
                       ),
-                      Container(width: 2, color: Colors.pinkAccent),
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer2Pic), fit: BoxFit.cover)),
-                          child: Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(color: Colors.black54, padding: const EdgeInsets.all(6), child: Text(widget.streamer2Name, style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold))),
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Pic), fit: BoxFit.cover)),
+                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: Text(widget.streamer1Name, style: const TextStyle(color: Colors.amber, fontSize: 11)))),
+                              ),
+                            ),
+                            Container(width: 2, color: Colors.black),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer2Pic), fit: BoxFit.cover)),
+                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: Text(widget.streamer2Name, style: const TextStyle(color: Colors.amber, fontSize: 11)))),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   )
                 : Container(
                     decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Pic), fit: BoxFit.cover)),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(color: Colors.black54, padding: const EdgeInsets.all(12), child: Text(widget.streamer1Name, style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold))),
-                    ),
                   ),
           ),
+          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withOpacity(0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
           Positioned(
             top: 40, left: 16, right: 16,
             child: Row(
@@ -406,58 +252,34 @@ class _LiveStreamDualRoomState extends State<LiveStreamDualRoom> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(backgroundImage: NetworkImage(widget.streamer1Pic)),
-                    const SizedBox(width: 8),
-                    Text(widget.streamer1Name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: _isFollowing ? Colors.grey : Colors.pink, minimumSize: const Size(60, 30)),
-                      onPressed: () => setState(() => _isFollowing = !_isFollowing),
-                      child: Text(_isFollowing ? 'Following' : 'Follow', style: const TextStyle(fontSize: 11)),
-                    ),
+                    CircleAvatar(radius: 18, backgroundImage: NetworkImage(widget.streamer1Pic)),
+                    const SizedBox(width: 6),
+                    Text(widget.streamer1Name, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 IconButton(
-                  icon: const CircleAvatar(backgroundColor: Colors.black54, child: Icon(Icons.close, color: Colors.white, size: 18)),
-                  onPressed: () {
-                    widget.onCloseWithPiP(widget.streamer1Name);
-                    Navigator.pop(context);
-                  },
+                  icon: const CircleAvatar(radius: 12, backgroundColor: Colors.black54, child: Icon(Icons.close, color: Colors.white, size: 14)),
+                  onPressed: () { widget.onCloseWithPiP(widget.streamer1Name); Navigator.pop(context); },
                 ),
               ],
             ),
           ),
           Positioned(
-            bottom: 80, left: 16, right: 100, height: 150,
-            child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (ctx, i) {
-                final m = _messages[i];
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(8)),
-                  child: Text('${m['user']}: ${m['msg']}', style: const TextStyle(color: Colors.white, fontSize: 12)),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            bottom: 20, left: 16, right: 16,
+            bottom: 16, left: 16, right: 16,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _msgCtrl,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                     decoration: InputDecoration(
-                      filled: true, fillColor: Colors.grey[850], hintText: 'Say something...', hintStyle: const TextStyle(color: Colors.white54),
+                      filled: true, fillColor: Colors.black54, hintText: 'Say something...', hintStyle: const TextStyle(color: Colors.white54, fontSize: 12),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton(icon: const Icon(Icons.send, color: Colors.pinkAccent), onPressed: _sendMessage),
+                IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent), onPressed: _sendMessage),
               ],
             ),
           ),
@@ -468,15 +290,14 @@ class _LiveStreamDualRoomState extends State<LiveStreamDualRoom> {
 }
 
 class Host {
-  final String name, city, views, cat, pic, bio;
-  const Host({required this.name, required this.city, required this.views, required this.cat, required this.pic, required this.bio});
+  final String name, pic, cat, tag;
+  const Host({required this.name, required this.pic, required this.cat, required this.tag});
 }
 class HostRank {
   final int rank;
   final String name, pic, gems;
   const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
 }
-// Part 3 placeholder / container if needed or merged safely inside Dashboard scope
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -486,28 +307,27 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _cat = 0;
   int _gems = 1670;
-  final String _userName = 'User7789';
-  final String _userBio = 'VIP Member & Live Chat Lover';
   bool _dailyRewardClaimed = false;
 
   bool _hasMiniPlayer = false;
   String _miniStreamerName = '';
   String _miniStreamerPic = '';
-  bool _isMiniDual = false;
+  bool _isMiniPK = false;
 
-  final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
-  final _cats = const ['Hot', 'Live', 'Party', 'Match'];
+  final List<String> _cats = const ['Hot', 'Live', 'Party', 'Match'];
   final List<Host> _allHosts = const [
-    Host(name: 'Anitha', city: 'Chennai', views: '5.1k', cat: 'Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Full screen live stream ❤️'),
-    Host(name: 'Malar', city: 'Madurai', views: '4.8k', cat: 'Live', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', bio: 'Co-host dual live partner ✨'),
-    Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Hot', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer 💋'),
-    Host(name: 'Divya', city: 'Jaipur', views: '6.2k', cat: 'Party', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', bio: 'VIP Party Room 👑'),
+    Host(name: 'AvniHotnessDil', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Exotic'),
+    Host(name: 'Shiny Sanya', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', cat: 'Hot', tag: 'Party'),
+    Host(name: 'Anitha', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'FREE'),
   ];
-  final _packs = const [
-    {'gems': 4050, 'price': 100},
-    {'gems': 8100, 'price': 200},
-    {'gems': 21000, 'price': 500},
-    {'gems': 45000, 'price': 1000},
+
+  final _exactPacks = const [
+    {'gems': 4050, 'price': 100.0, 'tag': '17% of'},
+    {'gems': 8100, 'price': 200.0, 'tag': '17% of'},
+    {'gems': 16380, 'price': 400.0, 'tag': '17% of'},
+    {'gems': 32940, 'price': 800.0, 'tag': '17% of'},
+    {'gems': 66600, 'price': 1600.0, 'tag': '30% of'},
+    {'gems': 167400, 'price': 4000.0, 'tag': '60% of'},
   ];
 
   @override
@@ -522,24 +342,14 @@ class _DashboardState extends State<Dashboard> {
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.grey[900],
         title: const Text('Daily Rewards 🎁', style: TextStyle(color: Colors.amber)),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.card_giftcard, size: 50, color: Colors.pinkAccent),
-            SizedBox(height: 10),
-            Text('Sign in for daily bonuses!', style: TextStyle(color: Colors.white70, fontSize: 13)),
-          ],
-        ),
+        content: const Text('Sign in for daily bonuses!', style: TextStyle(color: Colors.white70)),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: _dailyRewardClaimed ? Colors.grey : Colors.amber),
             onPressed: _dailyRewardClaimed ? null : () {
-              setState(() {
-                _gems += 40;
-                _dailyRewardClaimed = true;
-              });
+              setState(() => _gems += 40);
+              setState(() => _dailyRewardClaimed = true);
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claimed +40 Gems!')));
             },
             child: Text(_dailyRewardClaimed ? 'Claimed' : 'Check-in (+40 Gems)'),
           ),
@@ -548,112 +358,67 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _openLiveRoom({required String name, required String pic, required bool isDual}) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LiveStreamDualRoom(
-          streamer1Name: name,
-          streamer1Pic: pic,
-          streamer2Name: 'Malar',
-          streamer2Pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200',
-          isDual: isDual,
-          onCloseWithPiP: (closedStreamer) {
-            setState(() {
-              _hasMiniPlayer = true;
-              _miniStreamerName = closedStreamer;
-              _miniStreamerPic = pic;
-              _isMiniDual = isDual;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  void _showHostProfile(Host h) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(radius: 35, backgroundImage: NetworkImage(h.pic)),
-            const SizedBox(height: 8),
-            Text(h.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(h.bio, style: const TextStyle(color: Colors.white70, fontSize: 13)),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _openLiveRoom(name: h.name, pic: h.pic, isDual: false);
-                  },
-                  child: const Text('Live Stream'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _openLiveRoom(name: h.name, pic: h.pic, isDual: true);
-                  },
-                  child: const Text('Dual Live ⚡'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _recharge() {
+  void _showRechargeModal() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[900],
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(16),
-        height: 420,
+        height: 480,
         child: Column(
           children: [
-            const Text('Recharge Gems 💎', style: TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(),
+                const Text('Recharge and continue💋', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                IconButton(icon: const Icon(Icons.close, color: Colors.white54, size: 18), onPressed: () => Navigator.pop(ctx)),
+              ],
+            ),
+            const SizedBox(height: 8),
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 2.2, crossAxisSpacing: 10, mainAxisSpacing: 10),
-                itemCount: _packs.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 1.8, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                itemCount: _exactPacks.length,
                 itemBuilder: (ctx, i) {
-                  final p = _packs[i];
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        _gems += (p['gems'] as int);
-                        _history.insert(0, 'Recharge: +${p['gems']} Gems');
-                      });
-                      Navigator.pop(ctx);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(children: [const Icon(Icons.diamond, color: Colors.amber, size: 16), const SizedBox(width: 4), Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))]),
-                          const SizedBox(height: 4),
-                          Text('₹${p['price']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14)),
-                        ],
+                  final p = _exactPacks[i];
+                  final isFirst = i == 0;
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: isFirst ? Colors.amber[900] : Colors.grey[850],
+                          borderRadius: BorderRadius.circular(12),
+                          border: isFirst ? Border.all(color: Colors.amber, width: 2) : null,
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(children: [const Icon(Icons.diamond, color: Colors.amber, size: 16), const SizedBox(width: 4), Text('${p['gems']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))]),
+                            const SizedBox(height: 6),
+                            Text('₹${p['price']}', style: TextStyle(color: isFirst ? Colors.white : Colors.amberAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ),
-                    ),
+                      Positioned(top: 0, right: 0, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: const BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(8))), child: Text(p['tag'] as String, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)))),
+                    ],
                   );
                 },
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                onPressed: () {
+                  setState(() => _gems += 4050);
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -662,125 +427,79 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _dial(String n, String p) {
-    if (_gems >= 1800) {
-      setState(() {
-        _gems -= 1800;
-        _history.insert(0, 'Video Call with $n: -1800 Gems');
-      });
-      Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: n, pic: p, gems: _gems, onGems: (g) => setState(() => _gems = g), onEnd: (d, s) {})));
-    } else {
-      _recharge();
-    }
+  void _openPKRoom({required String name, required String pic, required bool isPK}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LiveStreamPKRoom(
+          streamer1Name: name,
+          streamer1Pic: pic,
+          streamer2Name: 'An...',
+          streamer2Pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300',
+          isPK: isPK,
+          onCloseWithPiP: (closed) {
+            setState(() { _hasMiniPlayer = true; _miniStreamerName = closed; _miniStreamerPic = pic; _isMiniPK = isPK; });
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final curCat = _cats[_cat];
-    final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
+    final list = _allHosts.where((h) => _cat == 0 || h.cat == _cats[_cat]).toList();
 
     return DefaultTabController(
       length: 5,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text('Fizz Live Pro'),
-          actions: [
-            IconButton(icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent), onPressed: _showDailyRewardDialog),
-            TextButton(
-              onPressed: _recharge,
-              child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)),
-            ),
-          ],
-          bottom: const TabBar(
-            indicatorColor: Colors.pink,
-            labelColor: Colors.pink,
-            unselectedLabelColor: Colors.grey,
-            tabs: [
-              Tab(icon: Icon(Icons.favorite), child: Text('For You', style: TextStyle(fontSize: 10))),
-              Tab(icon: Icon(Icons.people), child: Text('Follow', style: TextStyle(fontSize: 10))),
-              Tab(icon: Icon(Icons.live_tv), child: Text('Live', style: TextStyle(fontSize: 10))),
-              Tab(icon: Icon(Icons.message), child: Text('Messages', style: TextStyle(fontSize: 10))),
-              Tab(icon: Icon(Icons.person), child: Text('Me', style: TextStyle(fontSize: 10))),
-            ],
+          backgroundColor: Colors.black,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: _cats.asMap().entries.map((e) => GestureDetector(
+              onTap: () => setState(() => _cat = e.key),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+            )).toList(),
           ),
+          actions: [
+            IconButton(icon: const Icon(Icons.diamond, color: Colors.amber), onPressed: _showRechargeModal),
+          ],
         ),
         body: Stack(
           children: [
             TabBarView(
               children: [
                 GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.82, crossAxisSpacing: 6, mainAxisSpacing: 6),
                   padding: const EdgeInsets.all(6),
                   itemCount: list.length,
                   itemBuilder: (ctx, i) {
                     final h = list[i];
                     return GestureDetector(
-                      onTap: () => _showHostProfile(h),
-                      child: Card(
-                        color: Colors.grey[850],
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      onTap: () => _openPKRoom(name: h.name, pic: h.pic, isPK: false),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Stack(
+                          fit: StackFit.expand,
                           children: [
-                            CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
-                            const SizedBox(height: 4),
-                            Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, minimumSize: const Size(60, 28)),
-                                  onPressed: () => _openLiveRoom(name: h.name, pic: h.pic, isDual: false),
-                                  child: const Text('Live', style: TextStyle(fontSize: 10)),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, minimumSize: const Size(60, 28)),
-                                  onPressed: () => _openLiveRoom(name: h.name, pic: h.pic, isDual: true),
-                                  child: const Text('Dual', style: TextStyle(fontSize: 10)),
-                                ),
-                              ],
-                            ),
+                            Image.network(h.pic, fit: BoxFit.cover),
+                            Positioned(top: 8, right: 8, child: CircleAvatar(radius: 12, backgroundColor: Colors.black54, child: Icon(h.tag == 'FREE' ? Icons.card_giftcard : Icons.videocam, color: Colors.pinkAccent, size: 14))),
+                            Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
+                            Positioned(bottom: 6, right: 6, child: InkWell(onTap: () => _openPKRoom(name: h.name, pic: h.pic, isPK: true), child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(8)), child: const Text('PK', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold))))),
                           ],
                         ),
                       ),
                     );
                   },
                 ),
-                const Center(child: Text('No Followed hosts yet!', style: TextStyle(color: Colors.grey))),
-                ListView.builder(
-                  itemCount: _allHosts.length,
-                  itemBuilder: (ctx, i) {
-                    final h = _allHosts[i];
-                    return ListTile(
-                      leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-                      title: Text('${h.name} - Live Stream', style: const TextStyle(color: Colors.white)),
-                      subtitle: const Text('Tap to join live room 🎙️', style: TextStyle(color: Colors.amber, fontSize: 11)),
-                      onTap: () => _openLiveRoom(name: h.name, pic: h.pic, isDual: false),
-                    );
-                  },
-                ),
-                ListView(
-                  padding: const EdgeInsets.all(12),
-                  children: const [
-                    ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Find your match 💖')),
-                  ],
-                ),
-                ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          const CircleAvatar(radius: 30, child: Icon(Icons.person)),
-                          const SizedBox(height: 6),
-                          Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                          Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                const Center(child: Text('Follow list empty', style: TextStyle(color: Colors.grey))),
+                const Center(child: Text('Live streams list', style: TextStyle(color: Colors.grey))),
+                const Center(child: Text('Messages', style: TextStyle(color: Colors.grey))),
+                const Center(child: Text('Profile Me', style: TextStyle(color: Colors.grey))),
               ],
             ),
             if (_hasMiniPlayer)
@@ -789,25 +508,16 @@ class _DashboardState extends State<Dashboard> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() => _hasMiniPlayer = false);
-                    _openLiveRoom(name: _miniStreamerName, pic: _miniStreamerPic, isDual: _isMiniDual);
+                    _openPKRoom(name: _miniStreamerName, pic: _miniStreamerPic, isPK: _isMiniPK);
                   },
                   child: Container(
-                    width: 130, height: 180,
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.pinkAccent, width: 2), boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 10)]),
+                    width: 110, height: 150,
+                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.pink, width: 2)),
                     child: Stack(
                       children: [
-                        ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(_miniStreamerPic, fit: BoxFit.cover, width: 130, height: 180)),
-                        Positioned(
-                          top: 4, right: 4,
-                          child: InkWell(
-                            onTap: () => setState(() => _hasMiniPlayer = false),
-                            child: const CircleAvatar(radius: 10, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 12, color: Colors.white)),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 6, left: 6,
-                          child: Text('Mini PiP 🎙️\n($_miniStreamerName)', style: const TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold)),
-                        ),
+                        ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(_miniStreamerPic, fit: BoxFit.cover, width: 110, height: 150)),
+                        Positioned(top: 2, right: 2, child: InkWell(onTap: () => setState(() => _hasMiniPlayer = false), child: const CircleAvatar(radius: 9, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 10, color: Colors.white)))),
+                        Positioned(bottom: 4, left: 4, child: Text('Mini 🎙️\n($_miniStreamerName)', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold))),
                       ],
                     ),
                   ),
