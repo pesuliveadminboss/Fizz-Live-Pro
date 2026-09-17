@@ -307,7 +307,6 @@ class _DashboardState extends State<Dashboard> {
   int _cat = 0;
   int _gems = 1670;
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
-  final List<Host> _favorites = [];
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final _allHosts = const [
     Host(name: 'Pooja', city: 'Mumbai', views: '3.2k', cat: 'Popular', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', bio: 'Model & live streamer ❤️'),
@@ -539,4 +538,5 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                El
+                ElevatedButton(
+                  onPr
