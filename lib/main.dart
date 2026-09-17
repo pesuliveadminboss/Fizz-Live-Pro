@@ -292,7 +292,7 @@ class _CallScreenState extends State<CallScreen> {
           ),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
           Positioned(top: 40, left: 16, child: IconButton(icon: const Icon(Icons.flag, color: Colors.redAccent), onPressed: _showReportDialog)),
-          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
+          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white))))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
@@ -353,6 +353,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabCtrl.dispose();
+    super.dispose();
   }
 
   void _showSummary(String host, String dur, int sec) {
@@ -542,7 +548,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
               Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
               const SizedBox(height: 6),
-              const Text('👑 VIP Lv.5', style: const TextStyle(color: Colors.amber)),
+              const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
             ],
           ),
         ),
@@ -555,5 +561,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         const SizedBox(height: 10),
         ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
         const SizedBox(height: 20),
-        const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-        ..._history.map((item) => Card(color: Colors.grey
+        const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bol
