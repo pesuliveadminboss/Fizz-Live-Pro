@@ -219,6 +219,9 @@ class _CallScreenState extends State<CallScreen> {
     super.dispose();
   }
 
+  Color get _netColor => _pingMs < 60 ? Colors.greenAccent : (_pingMs < 120 ? Colors.amber : Colors.redAccent);
+  IconData get _netIcon => _pingMs < 60 ? Icons.signal_cellular_4_bar : (_pingMs < 120 ? Icons.signal_cellular_alt : Icons.signal_cellular_alt_2_bar);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,6 +230,21 @@ class _CallScreenState extends State<CallScreen> {
         children: [
           Positioned.fill(child: Image.network(widget.pic, fit: BoxFit.cover)),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
+          Positioned(
+            top: 40, left: 70,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Icon(_netIcon, color: _netColor, size: 16),
+                  const SizedBox(width: 4),
+                  Text('${_pingMs}ms', style: TextStyle(color: _netColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ),
+          if (_gift.isNotEmpty) Positioned(top: 100, left: 20, child: Container(padding: const EdgeInsets.all(6), color: Colors.pink, child: Text(_gift, style: const TextStyle(color: Colors.white)))),
           Positioned(
             bottom: 20, left: 0, right: 0,
             child: Row(
@@ -324,7 +342,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
                     decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.streamer1Pic), fit: BoxFit.cover)),
                   ),
           ),
-          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withOpacity(0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
+          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withValues(alpha: 0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
           Positioned(
             top: 40, left: 16, right: 16,
             child: Row(
@@ -386,8 +404,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int _navIndex = 0; // Bottom Navigation Index (5 options)
-  int _cat = 0;       // Top Category Index (4 options)
+  int _navIndex = 0;
+  int _cat = 0;
   int _gems = 1670;
   final String _userName = 'User7789';
   final String _userBio = 'VIP Member & Live Chat Lover';
@@ -407,7 +425,6 @@ class _DashboardState extends State<Dashboard> {
     {'title': 'New Host Alert', 'desc': 'Anitha & Malar are live in Co-Host mode!', 'time': '1h ago'},
   ];
 
-  // Top 4 categories row as requested
   final List<String> _cats = const ['Hot', 'Live', 'Party', 'Match'];
   
   final List<Host> _allHosts = const [
@@ -416,7 +433,6 @@ class _DashboardState extends State<Dashboard> {
     Host(name: 'Anitha', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'FREE', city: 'Chennai', bio: 'Full screen ❤️'),
   ];
 
-  // Exact 6 packs from screenshot 1000034005.jpg
   final _exactPacks = const [
     {'gems': 4050, 'price': 100.0, 'tag': '17% of'},
     {'gems': 8100, 'price': 200.0, 'tag': '17% of'},
@@ -580,13 +596,10 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     final list = _allHosts.where((h) => _cat == 0 || h.cat == _cats[_cat]).toList();
 
-    // Body based on bottom navigation index (5 items)
     Widget bodyContent;
     if (_navIndex == 0) {
-      // Home tab with top 4-category bar
       bodyContent = Column(
         children: [
-          // Top 4 category row
           Container(
             color: Colors.black,
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -682,7 +695,7 @@ class _DashboardState extends State<Dashboard> {
                     children: [
                       ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(_miniStreamerPic, fit: BoxFit.cover, width: 110, height: 150)),
                       Positioned(top: 2, right: 2, child: InkWell(onTap: () => setState(() => _hasMiniPlayer = false), child: const CircleAvatar(radius: 9, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 10, color: Colors.white)))),
-                      Positioned(bottom: 4, left: 4, child: Text('Mini 🎙️\n($_miniStreamerName)', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold)))),
+                      Positioned(bottom: 4, left: 4, child: Text('Mini 🎙️\n($_miniStreamerName)', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold))),
                     ],
                   ),
                 ),
@@ -690,7 +703,6 @@ class _DashboardState extends State<Dashboard> {
             ),
         ],
       ),
-      // Bottom Navigation Bar with 5 rows/options
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
         selectedItemColor: Colors.pink,
@@ -709,4 +721,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-
