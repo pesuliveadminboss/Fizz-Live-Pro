@@ -130,7 +130,6 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -143,6 +142,7 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   Widget? _cam;
+  int? _vid;
   late int _g;
   String _gift = "";
   bool _mic = true, _frontCam = true;
@@ -180,6 +180,7 @@ class _CallScreenState extends State<CallScreen> {
     await ZegoExpressEngine.instance.enableCamera(true);
     await ZegoExpressEngine.instance.useFrontCamera(true);
     final w = await ZegoExpressEngine.instance.createCanvasView((id) {
+      _vid = id;
       ZegoExpressEngine.instance.startPreview(canvas: ZegoCanvas(id));
     });
     if (mounted) setState(() => _cam = w);
@@ -249,6 +250,7 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void dispose() {
     _t?.cancel();
+    if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!);
     ZegoExpressEngine.instance.stopPreview();
     ZegoExpressEngine.destroyEngine();
     super.dispose();
@@ -312,6 +314,8 @@ class _DashboardState extends State<Dashboard> {
   int _gems = 1670;
   String _userName = 'User7789';
   String _userBio = 'VIP Member & Live Chat Lover';
+  int _hostEarningsINR = 12500;
+  int _hostGemsEarned = 25000;
 
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
   final List<Host> _favorites = [];
@@ -372,6 +376,38 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showPayoutModal() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text('Host Earnings & Payout 💰', style: TextStyle(color: Colors.amber)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Total Earned Gems: $_hostGemsEarned 💎', style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text('Withdrawable Balance: ₹$_hostEarningsINR', style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            const Text('Payout Method: UPI / Bank Transfer', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), style: TextButton.styleFrom(foregroundColor: Colors.white), child: const Text('Close')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payout request submitted for ₹12,500!')));
+            },
+            child: const Text('Request Payout'),
+          ),
+        ],
       ),
     );
   }
@@ -588,7 +624,8 @@ class _DashboardState extends State<Dashboard> {
                       child: ActionChip(
                         label: Text(_cats[i]),
                         backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                        onPressed: () => setState(() => _cat = i),
+                        onPressed: _openRandomMatch,
+                        child: const Text('Random Match (1800 gems)'),
                       ),
                     ),
                   ),
@@ -687,6 +724,20 @@ class _DashboardState extends State<Dashboard> {
                       const SizedBox(height: 6),
                       const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Card(
+                  color: Colors.grey[850],
+                  child: ListTile(
+                    leading: const Icon(Icons.account_balance_wallet, color: Colors.greenAccent),
+                    title: Text('Host Earnings: ₹$_hostEarningsINR', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    subtitle: Text('Gems Earned: $_hostGemsEarned 💎', style: const TextStyle(color: Colors.amber)),
+                    trailing: ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                      onPressed: _showPayoutModal,
+                      child: const Text('Payout'),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
