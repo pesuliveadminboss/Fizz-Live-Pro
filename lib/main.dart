@@ -486,14 +486,6 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    const tabIcons = [
-      Tab(icon: Icon(Icons.home)),
-      Tab(icon: Icon(Icons.favorite)),
-      Tab(icon: Icon(Icons.casino)),
-      Tab(icon: Icon(Icons.chat)),
-      Tab(icon: Icon(Icons.person)),
-    ];
-
     final curCat = _cats[_cat];
     final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
 
@@ -503,13 +495,23 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: const Text('Fizz Live Pro'),
-          actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-          bottom: TabBar(
-            controller: _tabCtrl,
+          actions: [
+            TextButton(
+              onPressed: _recharge,
+              child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)),
+            ),
+          ],
+          bottom: const TabBar(
             indicatorColor: Colors.pink,
             labelColor: Colors.pink,
             unselectedLabelColor: Colors.grey,
-            tabs: tabIcons,
+            tabs: [
+              Tab(icon: Icon(Icons.home)),
+              Tab(icon: Icon(Icons.favorite)),
+              Tab(icon: Icon(Icons.casino)),
+              Tab(icon: Icon(Icons.chat)),
+              Tab(icon: Icon(Icons.person)),
+            ],
           ),
         ),
         body: TabBarView(
@@ -542,7 +544,10 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                 ),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.8,
+                    ),
                     padding: const EdgeInsets.all(6),
                     itemCount: list.length,
                     itemBuilder: (ctx, i) {
@@ -552,6 +557,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                         child: Card(
                           color: Colors.grey,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                             
+                   
