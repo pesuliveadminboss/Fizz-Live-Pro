@@ -24,22 +24,30 @@ class _SplashState extends State<Splash> {
   }
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.videocam, size: 60, color: Colors.pink),
-            SizedBox(height: 10),
-            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
-            Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
+            Container(
+              width: 80, height: 80,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network('https://i.ibb.co/3k5fB0K/fizz-logo.png', errorBuilder: (c, e, s) => const Icon(Icons.videocam, size: 50, color: Colors.pink)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
+            const Text('18+ Private Live Video Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
           ],
         ),
       ),
     );
   }
 }
+
 class PinGate extends StatefulWidget {
   const PinGate({super.key});
   @override
@@ -122,6 +130,7 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
+
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -306,6 +315,11 @@ class _DashboardState extends State<Dashboard> {
 
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
   final List<Host> _favorites = [];
+  final List<Map<String, String>> _notifications = [
+    {'title': 'VIP Bonus Unlocked!', 'desc': 'Claim +500 free gems in profile tab.', 'time': '10m ago'},
+    {'title': 'New Host Alert', 'desc': 'Pooja is live now in Hot Live category.', 'time': '1h ago'},
+    {'title': 'Recharge Offer', 'desc': 'Get +25% extra gems on ₹1000 pack today.', 'time': '3h ago'},
+  ];
 
   final _cats = const ['Popular', 'Hot Live', 'Party Match', 'Nearby'];
   final List<Host> _allHosts = const [
@@ -313,9 +327,54 @@ class _DashboardState extends State<Dashboard> {
     Host(name: 'Ananya', city: 'Delhi', views: '5.1k', cat: 'Hot Live', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', bio: 'Dance lover ✨'),
   ];
   final _packs = const [
-    {'gems': 4050, 'price': 100},
-    {'gems': 8100, 'price': 200},
+    {'gems': 4050, 'price': 100, 'tag': ''},
+    {'gems': 8100, 'price': 200, 'tag': 'Popular'},
+    {'gems': 21000, 'price': 500, 'tag': '+15% Extra'},
+    {'gems': 45000, 'price': 1000, 'tag': '+25% Extra'},
+    {'gems': 95000, 'price': 2000, 'tag': 'Best Value'},
+    {'gems': 250000, 'price': 5000, 'tag': 'Mega VIP'},
   ];
+
+  void _showNotifications() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(16),
+        height: 380,
+        child: Column(
+          children: [
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Notifications & Activity 🔔', style: TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
+                Icon(Icons.mark_email_read, color: Colors.pink),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _notifications.length,
+                itemBuilder: (ctx, i) {
+                  final n = _notifications[i];
+                  return Card(
+                    color: Colors.grey[850],
+                    child: ListTile(
+                      leading: const Icon(Icons.notifications_active, color: Colors.pinkAccent),
+                      title: Text(n['title']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: Text(n['desc']!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      trailing: Text(n['time']!, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showSummary(String host, String dur, int sec) {
     showDialog(
@@ -352,8 +411,7 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
-
-  void _editProfile() {
+    void _editProfile() {
     final nameCtrl = TextEditingController(text: _userName);
     final bioCtrl = TextEditingController(text: _userBio);
     showDialog(
@@ -421,32 +479,59 @@ class _DashboardState extends State<Dashboard> {
   void _recharge() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey,
-      builder: (ctx) => ListView.builder(
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Container(
         padding: const EdgeInsets.all(16),
-        itemCount: _packs.length,
-        itemBuilder: (ctx, i) {
-          final p = _packs[i];
-          return ListTile(
-            leading: const Icon(Icons.diamond, color: Colors.amber),
-            title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
-            trailing: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _gems += (p['gems'] as int);
-                  _history.insert(0, 'Recharge: +${p['gems']} Gems');
-                });
-                Navigator.pop(ctx);
-              },
-              child: Text('₹${p['price']}'),
+        height: 420,
+        child: Column(
+          children: [
+            const Text('Recharge Gems 💎', style: TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 2.2, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                itemCount: _packs.length,
+                itemBuilder: (ctx, i) {
+                  final p = _packs[i];
+                  final tag = p['tag'] as String;
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        _gems += (p['gems'] as int);
+                        _history.insert(0, 'Recharge: +${p['gems']} Gems');
+                      });
+                      Navigator.pop(ctx);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(12), border: tag.isNotEmpty ? Border.all(color: Colors.pink, width: 1.5) : null),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Stack(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(children: [const Icon(Icons.diamond, color: Colors.amber, size: 16), const SizedBox(width: 4), Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))]),
+                              const SizedBox(height: 4),
+                              Text('₹${p['price']}', style: const TextStyle(color: Colors.greenAccent, fontSize: 14)),
+                            ],
+                          ),
+                          if (tag.isNotEmpty) Positioned(top: 0, right: 0, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.circular(6)), child: Text(tag, style: const TextStyle(color: Colors.white, fontSize: 8))))
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
 
-    void _dial(String n, String p) {
+  void _dial(String n, String p) {
     if (_gems >= 1800) {
       setState(() {
         _gems -= 1800;
@@ -470,6 +555,7 @@ class _DashboardState extends State<Dashboard> {
         appBar: AppBar(
           title: const Text('Fizz Live Pro'),
           actions: [
+            IconButton(icon: const Icon(Icons.notifications, color: Colors.amber), onPressed: _showNotifications),
             TextButton(
               onPressed: _recharge,
               child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)),
@@ -608,6 +694,12 @@ class _DashboardState extends State<Dashboard> {
                   onPressed: _editProfile,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
                   child: const Text('Edit Profile'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _showNotifications,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800]),
+                  child: const Text('Activity & Notifications 🔔'),
                 ),
                 const SizedBox(height: 20),
                 const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
