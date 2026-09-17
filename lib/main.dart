@@ -561,10 +561,62 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     final curCat = _cats[_cat];
     final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text('Fizz Live Pro'),
-        actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
-        bottom: PreferredSize(
-          preferredSize: const Size.
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          title: const Text('Fizz Live Pro'),
+          actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
+          bottom: TabBar(
+            controller: _tabCtrl,
+            indicatorColor: Colors.pink,
+            labelColor: Colors.pink,
+            unselectedLabelColor: Colors.grey,
+            tabs: tabIcons,
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabCtrl,
+          children: [
+            Column(
+              children: [
+                _buildCategoryChips(),
+                _buildRandomMatchButton(),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.8),
+                    padding: const EdgeInsets.all(6),
+                    itemCount: list.length,
+                    itemBuilder: (ctx, i) {
+                      final h = list[i];
+                      return GestureDetector(
+                        onTap: () => _showHostProfile(h),
+                        child: Card(
+                          color: Colors.grey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
+                              const SizedBox(height: 4),
+                              Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            _buildFavList(),
+            const Center(child: Text('Spin & Win 150 Gems feature coming soon!')),
+            _buildChatList(),
+            _buildProfileTab(),
+          ],
+        ),
+      ),
+    );
+  }
+}
