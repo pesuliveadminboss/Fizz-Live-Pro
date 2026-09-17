@@ -599,7 +599,7 @@ class _DashboardState extends State<Dashboard> {
   Widget _rewardBox(String day, String gem, bool done) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: done ? Colors.pink.withValues(alpha: 0.3) : Colors.grey[850], borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: done ? Colors.pink.withOpacity(0.3) : Colors.grey[850], borderRadius: BorderRadius.circular(8)),
       child: Column(
         children: [
           Text(day, style: const TextStyle(color: Colors.white54, fontSize: 11)),
