@@ -536,22 +536,28 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _cats.length,
-        itemBuilder: (ctx, i) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ActionChip(
-              label: Text(_cats[i]),
-              backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-              onPressed: () => setState(() => _cat = i),
-            ),
-          );
-        },
+        itemBuilder: (ctx, i) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: ActionChip(
+            label: Text(_cats[i]),
+            backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+            onPressed: () => setState(() => _cat = i),
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    const tabIcons = [
+      Tab(icon: Icon(Icons.home)),
+      Tab(icon: Icon(Icons.favorite)),
+      Tab(icon: Icon(Icons.casino)),
+      Tab(icon: Icon(Icons.chat)),
+      Tab(icon: Icon(Icons.person)),
+    ];
+
     final curCat = _cats[_cat];
     final list = _allHosts.where((h) => _cat == 0 || h.cat == curCat).toList();
 
@@ -562,9 +568,4 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         actions: [TextButton(onPressed: _recharge, child: Text('💎 $_gems', style: const TextStyle(color: Colors.amber)))],
         bottom: TabBar(
           controller: _tabCtrl,
-          indicatorColor: Colors.pink,
-          labelColor: Colors.pink,
-          unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(icon: Icon(Icons.home)),
-            
+          i
