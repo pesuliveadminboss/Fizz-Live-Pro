@@ -404,12 +404,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey,
-      builder: (ctx) => ListView(
+      builder: (ctx) => ListView.builder(
         padding: const EdgeInsets.all(16),
-        children: [
-          Text('My Gems: $_gems', style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          ..._packs.map((p) => ListTile(
+        itemCount: _packs.length,
+        itemBuilder: (ctx, i) {
+          final p = _packs[i];
+          return ListTile(
             leading: const Icon(Icons.diamond, color: Colors.amber),
             title: Text('${p['gems']} Gems', style: const TextStyle(color: Colors.white)),
             trailing: ElevatedButton(
@@ -422,8 +422,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               },
               child: Text('₹${p['price']}'),
             ),
-          )),
-        ],
+          );
+        },
       ),
     );
   }
@@ -438,6 +438,71 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     } else {
       _recharge();
     }
+  }
+
+  Widget _buildFavList() {
+    if (_favorites.isEmpty) {
+      return const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey)));
+    }
+    return ListView.builder(
+      itemCount: _favorites.length,
+      itemBuilder: (ctx, i) {
+        final h = _favorites[i];
+        return ListTile(
+          leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+          title: Text(h.name, style: const TextStyle(color: Colors.white)),
+          trailing: ElevatedButton(
+            onPressed: () => _dial(h.name, h.pic),
+            child: const Text('Call'),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildChatList() {
+    return ListView.builder(
+      itemCount: _allHosts.length,
+      itemBuilder: (ctx, i) {
+        final h = _allHosts[i];
+        return ListTile(
+          leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
+          title: Text(h.name, style: const TextStyle(color: Colors.white)),
+          onTap: () => _dial(h.name, h.pic),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Center(
+          child: Column(
+            children: [
+              const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+              const SizedBox(height: 6),
+              Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+              Text(_userBio, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              const SizedBox(height: 6),
+              const Text('👑 VIP Lv.5', style: TextStyle(color: Colors.amber)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: _editProfile,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+          child: const Text('Edit Profile'),
+        ),
+        const SizedBox(height: 10),
+        ElevatedButton(onPressed: () => setState(() => _gems += 500), child: const Text('Claim VIP Bonus (+500 Gems)')),
+        const SizedBox(height: 20),
+        const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+        ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
+      ],
+    );
   }
 
   @override
@@ -471,60 +536,20 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             children: [
               SizedBox(
                 height: 38,
-                child: ListView(
+                child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  children: [
-                    for (int i = 0; i < _cats.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: ActionChip(
-                          label: Text(_cats[i]),
-                          backgroundColor: _cat == i ? Colors.pink : Colors.grey,
-                          onPressed: () => setState(() => _cat = i),
-                        ),
-                      ),
-                  ],
+                  itemCount: _cats.length,
+                  itemBuilder: (ctx, i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ActionChip(
+                      label: Text(_cats[i]),
+                      backgroundColor: _cat == i ? Colors.pink : Colors.grey,
+                      onPressed: () => setState(() => _cat = i),
+                    ),
+                  ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RandomMatchScreen(onMatched: (n, p) { Navigator.pop(context); _dial(n, p); }))),
-                  icon: const Icon(Icons.radar),
-                  label: const Text('Random Match (1800 gems)'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-                ),
-              ),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  padding: const EdgeInsets.all(6),
-                  childAspectRatio: 0.8,
-                  children: [
-                    for (var h in (list.isEmpty ? _allHosts : list))
-                      GestureDetector(
-                        onTap: () => _showHostProfile(h),
-                        child: Card(
-                          color: Colors.grey,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(radius: 28, backgroundImage: NetworkImage(h.pic)),
-                              const SizedBox(height: 4),
-                              Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                              ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call', style: TextStyle(fontSize: 10))),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          _favorites.isEmpty ? const Center(child: Text('No Favorites yet!', style: TextStyle(color: Colors.grey))) : ListView(children: _favorites.map((h) => ListTile(leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)), title: Text(h.name, style: const TextStyle(color: Colors.white)), trailing: ElevatedButton(onPressed: () => _dial(h.name, h.pic), child: const Text('Call')))).toList()),
-          const Center(child: Text('Spin & Win 150 Gems feature coming soon!')),
-          ListView(
-            children: _allHosts.map((h) => ListTile(
-              leading: CircleAvatar(backgroundImage: NetworkImage(h.pic)),
-              title: Te
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(buil
