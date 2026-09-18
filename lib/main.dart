@@ -16,24 +16,26 @@ class GiftItem {
 
 final Map<String, List<GiftItem>> giftCategories = {
   'Hot': [
-    const GiftItem('Champagne', 50, emoji: '🍾', iconUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100'),
-    const GiftItem('Loving Girl', 900, emoji: '💃', iconUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100'),
+    const GiftItem('Champagne', 50, emoji: '🍾', iconUrl: 'https://cdn-icons-png.flaticon.com/512/869/869686.png'),
+    const GiftItem('Loving Girl', 900, emoji: '💃', iconUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048122.png'),
   ],
   'Lucky': [
-    const GiftItem('Mystery Box', 360, emoji: '🎁'),
+    const GiftItem('Mystery Box', 360, emoji: '🎁', iconUrl: 'https://cdn-icons-png.flaticon.com/512/4213/4213958.png'),
   ],
-  'Svip': [],
+  'Svip':,
   'Intimacy': [
-    const GiftItem('In My Hand', 300, emoji: '🤝'),
-    const GiftItem('Kiss', 180, emoji: '💋'),
+    const GiftItem('In My Hand', 300, emoji: '🤝', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2910/2910791.png'),
+    const GiftItem('Kiss', 180, emoji: '💋', iconUrl: 'https://cdn-icons-png.flaticon.com/512/3233/3233485.png'),
   ],
   'Wealth': [
-    const GiftItem('Cruise Eve', 3700, emoji: '🚢'),
+    const GiftItem('Cruise Eve', 3700, emoji: '🚢', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2885/2885441.png'),
   ],
   'Festival': [
-    const GiftItem('Puppy', 180, emoji: '🐶'),
+    const GiftItem('Puppy', 180, emoji: '🐶', iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png'),
   ],
-  'Bag': [],
+  'Bag': [
+    const GiftItem('Rose', 20, emoji: '🌹', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2965/2965567.png'),
+  ],
 };
 
 class Host {
@@ -178,6 +180,7 @@ class Login extends StatelessWidget {
     );
   }
 }
+
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
