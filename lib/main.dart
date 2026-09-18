@@ -83,7 +83,6 @@ class _SplashState extends State<Splash> {
 
 class PinGate extends StatefulWidget {
   const PinGate({super.key});
-  @spec
   @override
   State<PinGate> createState() => _PinGateState();
 }
