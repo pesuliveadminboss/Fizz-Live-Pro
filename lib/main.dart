@@ -22,7 +22,7 @@ final Map<String, List<GiftItem>> giftCategories = {
   'Lucky': [
     const GiftItem('Mystery Box', 360, emoji: '🎁', iconUrl: 'https://cdn-icons-png.flaticon.com/512/4213/4213958.png'),
   ],
-  'Svip':,
+  'Svip': [],
   'Intimacy': [
     const GiftItem('In My Hand', 300, emoji: '🤝', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2910/2910791.png'),
     const GiftItem('Kiss', 180, emoji: '💋', iconUrl: 'https://cdn-icons-png.flaticon.com/512/3233/3233485.png'),
@@ -33,9 +33,7 @@ final Map<String, List<GiftItem>> giftCategories = {
   'Festival': [
     const GiftItem('Puppy', 180, emoji: '🐶', iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png'),
   ],
-  'Bag': [
-    const GiftItem('Rose', 20, emoji: '🌹', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2965/2965567.png'),
-  ],
+  'Bag': [],
 };
 
 class Host {
@@ -85,6 +83,7 @@ class _SplashState extends State<Splash> {
 
 class PinGate extends StatefulWidget {
   const PinGate({super.key});
+  @spec
   @override
   State<PinGate> createState() => _PinGateState();
 }
@@ -180,7 +179,6 @@ class Login extends StatelessWidget {
     );
   }
 }
-
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -237,7 +235,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
                       onTap: () {
                         final totalCost = item.gems * _selectedQty;
                         if (widget.currentGems >= totalCost) {
-                          widget.onSendGift(totalCost, '${item.name} x$_selectedQty');
+                          widget.onSendGift(totalCost, '${item.emoji} ${item.name} x$_selectedQty');
                           Navigator.pop(context);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Insufficient Gems! Recharge first.')));
