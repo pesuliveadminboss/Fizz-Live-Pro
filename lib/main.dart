@@ -257,7 +257,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
               ),
               Row(
                 children: [
-                  [1, 77, 177].map((q) => GestureDetector(
+                  ...[1, 77, 177].map((q) => GestureDetector(
                     onTap: () => setState(() => _selectedQty = q),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -265,7 +265,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
                       decoration: BoxDecoration(color: _selectedQty == q ? Colors.pink : Colors.grey[800], borderRadius: BorderRadius.circular(4)),
                       child: Text('$q', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
-                  )).toList(),
+                  )),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, minimumSize: const Size(60, 30)),
@@ -482,7 +482,7 @@ class _FloatingChatOverlayState extends State<FloatingChatOverlay> {
           curve: Curves.easeOut,
           builder: (ctx, val, child) {
             return Transform.translate(
-              offset: Offset(0, -60 * val), // ~1 inch visual upward float
+              offset: Offset(0, -60 * val),
               child: Opacity(
                 opacity: (1.0 - val).clamp(0.0, 1.0),
                 child: Container(
@@ -604,7 +604,6 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
   void _triggerFollow() {
     setState(() => _followed = true);
     widget.onFollowHost(widget.host);
-    // Show 'Following' at bottom screen center for 1 second
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
     entry = OverlayEntry(
@@ -655,7 +654,6 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
             ),
           ),
           Positioned(top: 80, right: 16, child: Container(width: 80, height: 35, color: Colors.black45, alignment: Alignment.center, child: const Text('AD SLOT', style: TextStyle(color: Colors.white54, fontSize: 9)))),
-          // Floating chat overlay bottom-left rising 1-inch and auto deleting
           Positioned(
             bottom: 70, left: 16, right: 120,
             child: FloatingChatOverlay(messages: _floatingMsgs),
@@ -985,7 +983,6 @@ class _DashboardState extends State<Dashboard> {
             Positioned(
               bottom: 20, right: 20,
               child: GestureDetector(
-                // Tap center of mini screen to expand back to full screen live
                 onTap: () {
                   setState(() => _hasMiniPlayer = false);
                   final matchedHost = _allHosts.firstWhere((h) => h.name == _miniStreamerName, orElse: () => _allHosts.first);
@@ -1030,4 +1027,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-
