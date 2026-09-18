@@ -135,7 +135,9 @@ class Login extends StatelessWidget {
         ),
       ),
     );
-  }class CallScreen extends StatefulWidget {
+  }
+}
+class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
   final Function(int) onGems;
@@ -234,7 +236,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -280,6 +282,16 @@ class HostProfileSheet extends StatelessWidget {
   }
 }
 
+class Host {
+  final String name, pic, cat, tag, flag, status;
+  final int id;
+  const Host({required this.name, required this.pic, required this.cat, required this.tag, required this.flag, required this.status, required this.id});
+}
+class HostRank {
+  final int rank;
+  final String name, pic, gems;
+  const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
+}
 class LiveStreamPKRoom extends StatefulWidget {
   final Host host;
   final bool isPK;
@@ -385,17 +397,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
     );
   }
 }
-
-class Host {
-  final String name, pic, cat, tag, flag, status;
-  final int id;
-  const Host({required this.name, required this.pic, required this.cat, required this.tag, required this.flag, required this.status, required this.id});
-}class HostRank {
-  final int rank;
-  final String name, pic, gems;
-  const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
-}
-  class Dashboard extends StatefulWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -616,7 +618,3 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
-  
-  
-}
-
