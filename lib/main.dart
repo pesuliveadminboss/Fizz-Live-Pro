@@ -42,11 +42,18 @@ class Host {
   const Host({required this.name, required this.pic, required this.cat, required this.tag, required this.flag, required this.status, required this.id});
 }
 
-class HostRank {
-  final int rank;
-  final String name, pic, gems;
-  const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
+class PartyRoom {
+  final String title, hostName, avatar, membersCount;
+  final int onlineCount;
+  const PartyRoom({required this.title, required this.hostName, required this.avatar, required this.membersCount, required this.onlineCount});
 }
+
+final List<PartyRoom> mockPartyRooms = [
+  const PartyRoom(title: 'কেমন আছো সবাই 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
+  const PartyRoom(title: 'Mahfil a isha 💖', hostName: 'Mahfil', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', membersCount: '10', onlineCount: 13589),
+  const PartyRoom(title: 'super party 💋', hostName: 'Sweet', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', membersCount: '9', onlineCount: 9517),
+  const PartyRoom(title: 'হাসির রানী 💕', hostName: 'Rani', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', membersCount: '6', onlineCount: 4210),
+];
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -521,6 +528,94 @@ class _FloatingChatOverlayState extends State<FloatingChatOverlay> {
   }
 }
 
+class PartyAudioRoomScreen extends StatelessWidget {
+  final PartyRoom room;
+  const PartyAudioRoomScreen({super.key, required this.room});
+
+  @override
+  Widget build(BuildContext context) {
+    final seats = List.generate(10, (index) => index == 0 ? room.avatar : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100');
+    return Scaffold(
+      backgroundColor: const Color(0xFF181028),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text(room.title, style: const TextStyle(fontSize: 14)),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Center(child: Text('👥 ${room.membersCount}', style: const TextStyle(fontSize: 12, color: Colors.white70))),
+          ),
+          IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Upper half audio seats grid (10 members audio avatar ring)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 0.85, crossAxisSpacing: 10, mainAxisSpacing: 10),
+              itemCount: 10,
+              itemBuilder: (ctx, i) {
+                return Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(radius: 20, backgroundImage: NetworkImage(seats[i])),
+                        Positioned(bottom: 0, right: 0, child: const CircleAvatar(radius: 6, backgroundColor: Colors.green, child: Icon(Icons.mic, size: 8, color: Colors.white))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(i == 0 ? 'Host' : 'Seat ${i + 1}', style: const TextStyle(color: Colors.white70, fontSize: 8), overflow: TextOverflow.ellipsis),
+                  ],
+                );
+              },
+            ),
+          ),
+          const Divider(color: Colors.white24),
+          // Lower half slots / ad banner view matching screenshot #2 look
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(colors: [Color(0xFF2E123B), Color(0xFF1B082B)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.amberAccent.withOpacity(0.3))),
+                    child: Column(
+                      children: [
+                        const Text('18+', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+                        const Text('ONLY', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 10)),
+                        const SizedBox(height: 10),
+                        const Text('SLOTS 🎰', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: ['💎', '💎', '💎'].map((e) => Container(margin: const EdgeInsets.symmetric(horizontal: 4), padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(e, style: const TextStyle(fontSize: 16)))).toList(),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text('Loading...', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class LiveStreamSwipeableRoom extends StatefulWidget {
   final List<Host> liveHosts;
   final int initialIndex;
@@ -941,6 +1036,55 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  Widget _buildPartyRoomsList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: mockPartyRooms.length,
+      itemBuilder: (ctx, i) {
+        final r = mockPartyRooms[i];
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => PartyAudioRoomScreen(room: r)));
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: const Color(0xFF1E1428), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white12)),
+            child: Row(
+              children: [
+                CircleAvatar(radius: 26, backgroundImage: NetworkImage(r.avatar)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(r.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          ...List.generate(3, (index) => Padding(
+                            padding: const EdgeInsets.only(right: 3),
+                            child: CircleAvatar(radius: 8, backgroundImage: NetworkImage(r.avatar)),
+                          )),
+                          Text(' 🔊 ${r.onlineCount}', style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                  child: const Text('Party', style: TextStyle(color: Colors.pinkAccent, fontSize: 11)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildCurrentTabContent() {
     switch (_navIndex) {
       case 0: // For You
@@ -950,6 +1094,9 @@ class _DashboardState extends State<Dashboard> {
           return const Center(child: Text('🎮 Games Center (Coming Soon)', style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)));
         }
         final catName = _cats[_cat];
+        if (catName == 'Party') {
+          return _buildPartyRoomsList();
+        }
         final list = _allHosts.where((h) {
           if (_navIndex == 1) return _followedHosts.any((f) => f.id == h.id);
           if (catName == 'Hot') return h.status == 'Online';
