@@ -9,19 +9,33 @@ void main() {
 }
 
 class GiftItem {
-  final String name, emoji;
+  final String name, iconUrl, emoji;
   final int gems;
-  const GiftItem(this.name, this.emoji, this.gems);
+  const GiftItem(this.name, this.gems, {this.iconUrl = '', this.emoji = '🎁'});
 }
 
 final Map<String, List<GiftItem>> giftCategories = {
-  'Hot': [const GiftItem('Champagne', '🍾', 50), const GiftItem('Loving Girl', '💃', 900)],
-  'Lucky': [const GiftItem('Mystery Box', '🎁', 360)],
-  'Svip': [const GiftItem('CP Letter', '💌', 2)],
-  'Intimacy': [const GiftItem('In My Hand', '🤝', 300), const GiftItem('Kiss', '💋', 180)],
-  'Wealth': [const GiftItem('Cruise Eve', '🚢', 3700)],
-  'Festival': [const GiftItem('Puppy', '🐶', 180)],
-  'Bag': [const GiftItem('Rose', '🌹', 20)],
+  'Hot': [
+    const GiftItem('Champagne', 50, emoji: '🍾', iconUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100'),
+    const GiftItem('Loving Girl', 900, emoji: '💃', iconUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100'),
+  ],
+  'Lucky': [
+    const GiftItem('Mystery Box', 360, emoji: '🎁'),
+  ],
+  'Svip':,
+  'Intimacy': [
+    const GiftItem('In My Hand', 300, emoji: '🤝'),
+    const GiftItem('Kiss', 180, emoji: '💋'),
+  ],
+  'Wealth': [
+    const GiftItem('Cruise Eve', 3700, emoji: '🚢'),
+  ],
+  'Festival': [
+    const GiftItem('Puppy', 180, emoji: '🐶'),
+  ],
+  'Bag': [
+    const GiftItem('Rose', 20, emoji: '🌹'),
+  ],
 };
 
 class Host {
@@ -166,6 +180,7 @@ class Login extends StatelessWidget {
     );
   }
 }
+
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -222,7 +237,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
                       onTap: () {
                         final totalCost = item.gems * _selectedQty;
                         if (widget.currentGems >= totalCost) {
-                          widget.onSendGift(totalCost, '${item.emoji} ${item.name} x$_selectedQty');
+                          widget.onSendGift(totalCost, '${item.name} x$_selectedQty');
                           Navigator.pop(context);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Insufficient Gems! Recharge first.')));
@@ -234,7 +249,9 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(item.emoji, style: const TextStyle(fontSize: 24)),
+                            item.iconUrl.isNotEmpty
+                                ? Image.network(item.iconUrl, width: 26, height: 26, errorBuilder: (c, e, s) => Text(item.emoji, style: const TextStyle(fontSize: 24)))
+                                : Text(item.emoji, style: const TextStyle(fontSize: 24)),
                             Text(item.name, style: const TextStyle(color: Colors.white, fontSize: 9), overflow: TextOverflow.ellipsis),
                             Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Text('💎', style: TextStyle(fontSize: 9)), Text('${item.gems}', style: const TextStyle(color: Colors.amber, fontSize: 9))]),
                           ],
@@ -365,7 +382,7 @@ class _CallScreenState extends State<CallScreen> {
                       onSendGift: (cost, desc) {
                         setState(() => _g -= cost);
                         widget.onGems(_g);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gift sent: $desc')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gift sent: $desc (-$cost Gems)')));
                       },
                     ));
                   },
@@ -411,7 +428,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -701,7 +718,7 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
                         currentGems: widget.gems,
                         onSendGift: (cost, desc) {
                           widget.onGemsUpdate(widget.gems - cost);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gift sent: $desc')));
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gift sent: $desc (-$cost Gems)')));
                         },
                       ));
                     },
