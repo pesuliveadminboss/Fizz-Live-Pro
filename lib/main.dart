@@ -178,7 +178,6 @@ class Login extends StatelessWidget {
     );
   }
 }
-
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
