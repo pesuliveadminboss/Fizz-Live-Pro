@@ -425,7 +425,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -898,7 +898,7 @@ class _DashboardState extends State<Dashboard> {
     return Container(
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.grey[900]?.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: Colors.grey[900]?.withOpacity(0.9), borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
