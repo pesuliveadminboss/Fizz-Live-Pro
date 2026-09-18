@@ -1,12 +1,4 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
-}
 
 class GiftItem {
   final String name, iconUrl, emoji;
@@ -51,140 +43,15 @@ class PartyRoom {
 final List<PartyRoom> mockPartyRooms = [
   const PartyRoom(title: 'কেমন আছো সবাই 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
   const PartyRoom(title: 'Mahfil a isha 💖', hostName: 'Mahfil', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', membersCount: '10', onlineCount: 13589),
-  const PartyRoom(title: 'super party 💋', hostName: 'Sweet', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', membersCount: '9', onlineCount: 9517),
-  const PartyRoom(title: 'হাসির রানী 💕', hostName: 'Rani', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', membersCount: '6', onlineCount: 4210),
 ];
 
-class Splash extends StatefulWidget {
-  const Splash({super.key});
-  @override
-  State<Splash> createState() => _SplashState();
+class FloatingChatMsg {
+  final String id, user, text;
+  FloatingChatMsg(this.user, this.text) : id = UniqueKey().toString();
 }
+import 'package:flutter/material.dart';
+import '../models_and_data.dart';
 
-class _SplashState extends State<Splash> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PinGate()));
-    });
-  }
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.live_tv, size: 70, color: Colors.pinkAccent),
-            SizedBox(height: 10),
-            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
-            Text('18+ Private Live Video & PK Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PinGate extends StatefulWidget {
-  const PinGate({super.key});
-  @override
-  State<PinGate> createState() => _PinGateState();
-}
-
-class _PinGateState extends State<PinGate> {
-  final _c = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Admin PIN (7777)', style: TextStyle(fontSize: 18, color: Colors.white)),
-              const SizedBox(height: 10),
-              TextField(controller: _c, keyboardType: TextInputType.number, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber, fontSize: 22), decoration: const InputDecoration(filled: true, fillColor: Colors.grey, hintText: "••••")),
-              const SizedBox(height: 10),
-              ElevatedButton(onPressed: () { if (_c.text.trim() == "7777") Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login())); }, child: const Text('Unlock')),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Login extends StatelessWidget {
-  const Login({super.key});
-
-  void _showAuthSheet(BuildContext context, String type) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Continue with $type', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            if (type == 'Google') ListTile(leading: const Icon(Icons.g_mobiledata, color: Colors.amber, size: 32), title: const Text('Chandran S (chandran@gmail.com)', style: TextStyle(color: Colors.white)), onTap: () { Navigator.pop(ctx); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard())); }),
-            if (type == 'Phone') Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: TextField(style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter Phone Number', hintStyle: TextStyle(color: Colors.white54)))),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
-              onPressed: () { Navigator.pop(ctx); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard())); },
-              child: const Text('Confirm Login'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.live_tv, size: 70, color: Colors.pinkAccent),
-              const SizedBox(height: 12),
-              const Text('Fast Login', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent), label: const Text('Google', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Google')),
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.phone, color: Colors.greenAccent), label: const Text('Phone', style: TextStyle(color: Colors.white)), onPressed: () => _showAuthSheet(context, 'Phone')),
-                  ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[850]), icon: const Icon(Icons.person_outline, color: Colors.blueAccent), label: const Text('Guest', style: TextStyle(color: Colors.white)), onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()))),
-                ],
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () async {
-                  await [Permission.camera, Permission.microphone].request();
-                  if (context.mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Dashboard()));
-                },
-                child: const Text('Fast Login & Permissions', style: TextStyle(color: Colors.white54, fontSize: 12)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -302,6 +169,11 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
     );
   }
 }
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
+import '../models_and_data.dart';
+import '../widgets/gift_sheet.dart';
 
 class CallScreen extends StatefulWidget {
   final String host, pic;
@@ -477,25 +349,21 @@ class HostProfileSheet extends StatelessWidget {
     );
   }
 }
-class FloatingChatMsg {
-  final String id, user, text;
-  FloatingChatMsg(this.user, this.text) : id = UniqueKey().toString();
-}
+import 'dart:async';
+import 'package:flutter/material.dart';
+import '../models_and_data.dart';
+import '../widgets/gift_sheet.dart';
+import 'call_and_profile.dart';
 
-class FloatingChatOverlay extends StatefulWidget {
+class FloatingChatOverlay extends StatelessWidget {
   final List<FloatingChatMsg> messages;
   const FloatingChatOverlay({super.key, required this.messages});
-  @override
-  State<FloatingChatOverlay> createState() => _FloatingChatOverlayState();
-}
-
-class _FloatingChatOverlayState extends State<FloatingChatOverlay> {
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: widget.messages.map((m) {
+      children: messages.map((m) {
         return TweenAnimationBuilder<double>(
           key: ValueKey(m.id),
           tween: Tween(begin: 0.0, end: 1.0),
@@ -956,6 +824,14 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
                     children: [
                       CircleAvatar(backgroundImage: NetworkImage(widget.host.pic), radius: 18),
                       const SizedBox(width: 6),
+
+                    Text('${widget.host.name} 🇮🇳', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSi
+ import 'package:flutter/material.dart';
+import '../models_and_data.dart';
+import '../widgets/gift_sheet.dart';
+import 'call_and_profile.dart';
+import 'live_and_party_rooms.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -1206,9 +1082,9 @@ class _DashboardState extends State<Dashboard> {
 
   Widget _buildCurrentTabContent() {
     switch (_navIndex) {
-      case 0: // For You
-      case 1: // Follow
-      case 2: // Game tab
+      case 0:
+      case 1:
+      case 2:
         if (_navIndex == 2) {
           return const Center(child: Text('🎮 Games Center (Coming Soon)', style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)));
         }
@@ -1252,14 +1128,14 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         );
-      case 3: // Messages
+      case 3:
         return ListView(
           padding: const EdgeInsets.all(12),
           children: const [
             ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Find your match 💖')),
           ],
         );
-      case 4: // Me
+      case 4:
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -1344,11 +1220,11 @@ class _DashboardState extends State<Dashboard> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'For You'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
           BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          bottomNavigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
         ],
       ),
     );
   }
 }
-                      
+                                                                            
