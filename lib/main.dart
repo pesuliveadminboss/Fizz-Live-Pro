@@ -33,6 +33,7 @@ class _SplashState extends State<Splash> {
             Icon(Icons.live_tv, size: 70, color: Colors.pinkAccent),
             SizedBox(height: 10),
             Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.amber)),
+            Text('18+ Private Live Video & PK Chat', style: TextStyle(fontSize: 11, color: Colors.white54)),
           ],
         ),
       ),
@@ -132,6 +133,39 @@ class Login extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class RandomMatchScreen extends StatefulWidget {
+  final Function(String, String) onMatched;
+  const RandomMatchScreen({super.key, required this.onMatched});
+  @override
+  State<RandomMatchScreen> createState() => _RandomMatchScreenState();
+}
+
+class _RandomMatchScreenState extends State<RandomMatchScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) widget.onMatched('Pooja', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300');
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.pink),
+            SizedBox(height: 20),
+            Text('Finding random host...', style: TextStyle(color: Colors.white, fontSize: 16)),
+          ],
         ),
       ),
     );
@@ -287,6 +321,7 @@ class Host {
   final int id;
   const Host({required this.name, required this.pic, required this.cat, required this.tag, required this.flag, required this.status, required this.id});
 }
+
 class HostRank {
   final int rank;
   final String name, pic, gems;
@@ -324,7 +359,47 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: Image.network(widget.host.pic, fit: BoxFit.cover)),
+          Positioned.fill(
+            child: widget.isPK
+                ? Column(
+                    children: [
+                      Container(
+                        height: 28,
+                        color: Colors.grey[900],
+                        child: Row(
+                          children: [
+                            Container(width: MediaQuery.of(context).size.width * 0.48, color: Colors.cyan),
+                            Container(padding: const EdgeInsets.symmetric(horizontal: 8), color: Colors.pink, child: const Text('PK 02:00', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+                            Expanded(child: Container(color: Colors.pink[700])),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.host.pic), fit: BoxFit.cover)),
+                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: Text(widget.host.name, style: const TextStyle(color: Colors.amber, fontSize: 11)))),
+                              ),
+                            ),
+                            Container(width: 2, color: Colors.black),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300'), fit: BoxFit.cover)),
+                                child: const Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: EdgeInsets.all(4), child: Text('An...', style: TextStyle(color: Colors.amber, fontSize: 11)))),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(
+                    decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.host.pic), fit: BoxFit.cover)),
+                  ),
+          ),
+          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withOpacity(0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
           Positioned(
             top: 40, left: 16,
             child: Row(
@@ -496,67 +571,96 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _openRoom(Host h) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamPKRoom(host: h, isPK: false, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g), onCloseWithPiP: (closed) { setState(() => _hasMiniPlayer = true); _miniStreamerName = closed; _miniStreamerPic = h.pic; })));
+  void _openRoom(Host h, {bool isPK = false}) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamPKRoom(host: h, isPK: isPK, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g), onCloseWithPiP: (closed) { setState(() => _hasMiniPlayer = true); _miniStreamerName = closed; _miniStreamerPic = h.pic; })));
+  }
+
+  Widget _buildCurrentTabContent() {
+    switch (_navIndex) {
+      case 0:
+      case 2:
+        final catName = _cats[_cat];
+        final list = _allHosts.where((h) {
+          if (h.cat != catName && catName != 'Live') return true;
+          if (_subCat > 0 && h.tag.toLowerCase() != _subCats[_subCat].toLowerCase()) return false;
+          return true;
+        }).toList();
+
+        return Column(
+          children: [
+            if (_cat == 0 || _cat == 1)
+              Container(
+                color: Colors.black87,
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                child: Row(
+                  children: _subCats.asMap().entries.map((e) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: ChoiceChip(
+                      label: Text(e.value, style: const TextStyle(fontSize: 11)),
+                      selected: _subCat == e.key,
+                      selectedColor: Colors.pink,
+                      backgroundColor: Colors.grey[900],
+                      labelStyle: TextStyle(color: _subCat == e.key ? Colors.white : Colors.white70),
+                      onSelected: (_) => setState(() => _subCat = e.key),
+                    ),
+                  )).toList(),
+                ),
+              ),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.82, crossAxisSpacing: 6, mainAxisSpacing: 6),
+                padding: const EdgeInsets.all(6),
+                itemCount: list.length,
+                itemBuilder: (ctx, i) {
+                  final h = list[i];
+                  return GestureDetector(
+                    onTap: () => showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g))),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.network(h.pic, fit: BoxFit.cover),
+                          Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text('${h.flag} ${h.status}', style: const TextStyle(color: Colors.white, fontSize: 9)))),
+                          Positioned(top: 6, right: 6, child: InkWell(onTap: () => _openRoom(h, isPK: true), child: const CircleAvatar(radius: 12, backgroundColor: Colors.amber, child: Text('PK', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black))))),
+                          Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      case 1:
+        return const Center(child: Text('No Followed hosts yet!', style: TextStyle(color: Colors.grey)));
+      case 3:
+        return ListView(
+          padding: const EdgeInsets.all(12),
+          children: const [
+            ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Find your match 💖')),
+          ],
+        );
+      case 4:
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Center(child: Column(children: [const CircleAvatar(radius: 30, child: Icon(Icons.person)), const SizedBox(height: 6), const Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), const Text('VIP Member', style: TextStyle(color: Colors.white54, fontSize: 12))])),
+            const SizedBox(height: 10),
+            Card(color: Colors.grey[850], child: ListTile(leading: const Icon(Icons.account_balance_wallet, color: Colors.greenAccent), title: const Text('Host Earnings: ₹12500', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), trailing: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.green), onPressed: () {}, child: const Text('Payout')))),
+            const SizedBox(height: 20),
+            const Text('Wallet History:', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
+            ..._history.map((item) => Card(color: Colors.grey, child: ListTile(title: Text(item, style: const TextStyle(color: Colors.white))))),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final catName = _cats[_cat];
-    final list = _allHosts.where((h) {
-      if (h.cat != catName && catName != 'Live') return true;
-      if (_subCat > 0 && h.tag.toLowerCase() != _subCats[_subCat].toLowerCase()) return false;
-      return true;
-    }).toList();
-
-    Widget bodyContent = Column(
-      children: [
-        if (_cat == 0 || _cat == 1)
-          Container(
-            color: Colors.black87,
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-            child: Row(
-              children: _subCats.asMap().entries.map((e) => Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: ChoiceChip(
-                  label: Text(e.value, style: const TextStyle(fontSize: 11)),
-                  selected: _subCat == e.key,
-                  selectedColor: Colors.pink,
-                  backgroundColor: Colors.grey[900],
-                  labelStyle: TextStyle(color: _subCat == e.key ? Colors.white : Colors.white70),
-                  onSelected: (_) => setState(() => _subCat = e.key),
-                ),
-              )).toList(),
-            ),
-          ),
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.82, crossAxisSpacing: 6, mainAxisSpacing: 6),
-            padding: const EdgeInsets.all(6),
-            itemCount: list.length,
-            itemBuilder: (ctx, i) {
-              final h = list[i];
-              return GestureDetector(
-                onTap: () => showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g))),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(h.pic, fit: BoxFit.cover),
-                      Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text('${h.flag} ${h.status}', style: const TextStyle(color: Colors.white, fontSize: 9)))),
-                      Positioned(top: 6, right: 6, child: InkWell(onTap: () => _openRoom(h), child: const CircleAvatar(radius: 12, backgroundColor: Colors.pink, child: Icon(Icons.videocam, size: 12, color: Colors.white)))),
-                      Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -579,7 +683,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: Stack(
         children: [
-          bodyContent,
+          _buildCurrentTabContent(),
           if (_hasMiniPlayer)
             Positioned(
               bottom: 20, right: 20,
