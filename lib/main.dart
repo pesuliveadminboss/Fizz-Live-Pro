@@ -236,7 +236,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -410,6 +410,7 @@ class _DashboardState extends State<Dashboard> {
   int _subCat = 0;
   int _gems = 1670;
   final String _selectedCountry = '🇮🇳 India';
+  final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
 
   bool _hasMiniPlayer = false;
   String _miniStreamerName = '';
@@ -425,11 +426,14 @@ class _DashboardState extends State<Dashboard> {
     Host(name: 'Moka', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300', cat: 'Live', tag: 'Pretty', flag: '🇪🇬', status: 'Live', id: 8002026),
   ];
 
+  // Exact 6 full packs matching original screenshot values (₹100 to ₹4000)
   final _exactPacks = const [
     {'gems': 4050, 'price': 100.0, 'tag': '17% of'},
     {'gems': 8100, 'price': 200.0, 'tag': '17% of'},
     {'gems': 16380, 'price': 400.0, 'tag': '17% of'},
     {'gems': 32940, 'price': 800.0, 'tag': '17% of'},
+    {'gems': 66600, 'price': 1600.0, 'tag': '30% of'},
+    {'gems': 167400, 'price': 4000.0, 'tag': '60% of'},
   ];
 
   void _showRechargeModal() {
@@ -439,22 +443,53 @@ class _DashboardState extends State<Dashboard> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(16),
-        height: 380,
+        height: 480,
         child: Column(
           children: [
-            const Text('Recharge and continue💋', style: TextStyle(color: Colors.white70, fontSize: 11)),
-            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(),
+                const Text('You want to see me? Recharge and we can continue💋', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                IconButton(icon: const Icon(Icons.close, color: Colors.white54, size: 18), onPressed: () => Navigator.pop(ctx)),
+              ],
+            ),
+            const SizedBox(height: 8),
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 2.0, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 1.8, crossAxisSpacing: 10, mainAxisSpacing: 10),
                 itemCount: _exactPacks.length,
                 itemBuilder: (ctx, i) {
                   final p = _exactPacks[i];
-                  return Container(
-                    decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(12)),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text('${p['gems']} 💎', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), Text('₹${p['price']}', style: const TextStyle(color: Colors.greenAccent))]),
+                  final isFirst = i == 0;
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(color: isFirst ? Colors.amber[900] : Colors.grey[850], borderRadius: BorderRadius.circular(12), border: isFirst ? Border.all(color: Colors.amber, width: 2) : null),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(children: [const Icon(Icons.diamond, color: Colors.amber, size: 16), const SizedBox(width: 4), Text('${p['gems']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))]),
+                            const SizedBox(height: 6),
+                            Text('₹${p['price']}', style: TextStyle(color: isFirst ? Colors.white : Colors.amberAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                      Positioned(top: 0, right: 0, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: const BoxDecoration(color: Colors.pink, borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomLeft: Radius.circular(8))), child: Text(p['tag'] as String, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)))),
+                    ],
                   );
                 },
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                onPressed: () { setState(() => _gems += 4050); Navigator.pop(ctx); },
+                child: const Text('Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -585,3 +620,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
