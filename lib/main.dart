@@ -166,6 +166,7 @@ class Login extends StatelessWidget {
     );
   }
 }
+
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -514,6 +515,7 @@ class LiveStreamSwipeableRoom extends StatefulWidget {
   final Function(int) onGemsUpdate;
   final Function(String, String) onCloseWithPiP;
   final Function(Host) onFollowHost;
+  final Function(Host) onOpenProfile;
 
   const LiveStreamSwipeableRoom({
     super.key,
@@ -523,6 +525,7 @@ class LiveStreamSwipeableRoom extends StatefulWidget {
     required this.onGemsUpdate,
     required this.onCloseWithPiP,
     required this.onFollowHost,
+    required this.onOpenProfile,
   });
 
   @override
@@ -558,6 +561,7 @@ class _LiveStreamSwipeableRoomState extends State<LiveStreamSwipeableRoom> {
           onGemsUpdate: widget.onGemsUpdate,
           onCloseWithPiP: widget.onCloseWithPiP,
           onFollowHost: widget.onFollowHost,
+          onOpenProfile: widget.onOpenProfile,
         );
       },
     );
@@ -570,6 +574,7 @@ class SingleLiveRoomView extends StatefulWidget {
   final Function(int) onGemsUpdate;
   final Function(String, String) onCloseWithPiP;
   final Function(Host) onFollowHost;
+  final Function(Host) onOpenProfile;
 
   const SingleLiveRoomView({
     super.key,
@@ -578,6 +583,7 @@ class SingleLiveRoomView extends StatefulWidget {
     required this.onGemsUpdate,
     required this.onCloseWithPiP,
     required this.onFollowHost,
+    required this.onOpenProfile,
   });
 
   @override
@@ -631,13 +637,21 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
       body: Stack(
         children: [
           Positioned.fill(child: Image.network(widget.host.pic, fit: BoxFit.cover)),
+          // Top-Left Streamer Info (Round Icon + Name click to open profile)
           Positioned(
             top: 40, left: 16,
             child: Row(
               children: [
-                CircleAvatar(backgroundImage: NetworkImage(widget.host.pic), radius: 18),
-                const SizedBox(width: 6),
-                Text('${widget.host.name} 🇮🇳', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                GestureDetector(
+                  onTap: () => widget.onOpenProfile(widget.host),
+                  child: Row(
+                    children: [
+                      CircleAvatar(backgroundImage: NetworkImage(widget.host.pic), radius: 18),
+                      const SizedBox(width: 6),
+                      Text('${widget.host.name} 🇮🇳', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
+                ),
                 const SizedBox(width: 6),
                 InkWell(onTap: _triggerFollow, child: Icon(Icons.favorite, color: _followed ? Colors.pink : Colors.white70, size: 18)),
               ],
@@ -843,6 +857,12 @@ class _DashboardState extends State<Dashboard> {
               setState(() => _followedHosts.add(h));
             }
           },
+          onOpenProfile: (h) {
+            showModalBottomSheet(
+              context: context,
+              builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g)),
+            );
+          },
         ),
       ),
     );
@@ -909,7 +929,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Image.network(h.pic, fit: BoxFit.cover),
                           Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text('${h.flag} ${h.status}', style: const TextStyle(color: Colors.white, fontSize: 9)))),
-                          Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
+                          Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)))),
                         ],
                       ),
                     ),
