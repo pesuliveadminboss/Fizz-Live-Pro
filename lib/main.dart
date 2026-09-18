@@ -234,7 +234,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
                       onTap: () {
                         final totalCost = item.gems * _selectedQty;
                         if (widget.currentGems >= totalCost) {
-                          widget.onSendGift(totalCost, '${item.emoji} ${item.name} x$_selectedQty');
+                          widget.onSendGift(totalCost, '${item.name} x$_selectedQty');
                           Navigator.pop(context);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Insufficient Gems! Recharge first.')));
@@ -425,7 +425,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -992,16 +992,19 @@ class _DashboardState extends State<Dashboard> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: _cats.asMap().entries.map((e) => GestureDetector(
-            onTap: () => setState(() { _cat = e.key; _subCat = 0; }),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-          )).toList(),
-        ),
+        // Show Hot/Live/Party/Match category tabs ONLY when For You (_navIndex == 0) is active
+        title: _navIndex == 0
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: _cats.asMap().entries.map((e) => GestureDetector(
+                  onTap: () => setState(() { _cat = e.key; _subCat = 0; }),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
+                )).toList(),
+              )
+            : Text(_navIndex == 1 ? 'Following' : _navIndex == 3 ? 'Messages' : _navIndex == 4 ? 'Profile' : 'Live', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         actions: [
           Center(child: Text(_selectedCountry, style: const TextStyle(fontSize: 11, color: Colors.amber))),
           IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {}),
