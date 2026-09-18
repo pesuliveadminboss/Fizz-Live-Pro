@@ -166,7 +166,6 @@ class Login extends StatelessWidget {
     );
   }
 }
-
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -412,7 +411,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -637,7 +636,6 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
       body: Stack(
         children: [
           Positioned.fill(child: Image.network(widget.host.pic, fit: BoxFit.cover)),
-          // Top-Left Streamer Info (Round Icon + Name click to open profile)
           Positioned(
             top: 40, left: 16,
             child: Row(
@@ -929,7 +927,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Image.network(h.pic, fit: BoxFit.cover),
                           Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text('${h.flag} ${h.status}', style: const TextStyle(color: Colors.white, fontSize: 9)))),
-                          Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)))),
+                          Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
                         ],
                       ),
                     ),
