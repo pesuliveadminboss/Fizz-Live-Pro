@@ -22,7 +22,7 @@ final Map<String, List<GiftItem>> giftCategories = {
   'Lucky': [
     const GiftItem('Mystery Box', 360, emoji: '🎁'),
   ],
-  'Svip':,
+  'Svip': [],
   'Intimacy': [
     const GiftItem('In My Hand', 300, emoji: '🤝'),
     const GiftItem('Kiss', 180, emoji: '💋'),
@@ -33,7 +33,7 @@ final Map<String, List<GiftItem>> giftCategories = {
   'Festival': [
     const GiftItem('Puppy', 180, emoji: '🐶'),
   ],
-  'Bag':,
+  'Bag': [],
 };
 
 class Host {
@@ -178,7 +178,6 @@ class Login extends StatelessWidget {
     );
   }
 }
-
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -426,7 +425,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
