@@ -33,9 +33,7 @@ final Map<String, List<GiftItem>> giftCategories = {
   'Festival': [
     const GiftItem('Puppy', 180, emoji: '🐶'),
   ],
-  'Bag': [
-    const GiftItem('Rose', 20, emoji: '🌹'),
-  ],
+  'Bag':,
 };
 
 class Host {
