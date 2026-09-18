@@ -528,88 +528,290 @@ class _FloatingChatOverlayState extends State<FloatingChatOverlay> {
   }
 }
 
-class PartyAudioRoomScreen extends StatelessWidget {
+class PartyAudioRoomScreen extends StatefulWidget {
   final PartyRoom room;
-  const PartyAudioRoomScreen({super.key, required this.room});
+  final int gems;
+  final Function(int) onGemsUpdate;
+  const PartyAudioRoomScreen({super.key, required this.room, required this.gems, required this.onGemsUpdate});
+
+  @override
+  State<PartyAudioRoomScreen> createState() => _PartyAudioRoomScreenState();
+}
+
+class _PartyAudioRoomScreenState extends State<PartyAudioRoomScreen> {
+  final List<FloatingChatMsg> _partyMsgs = [];
+  final _msgCtrl = TextEditingController();
+  bool _diwaliEffect = false;
+  String _activeGiftBanner = '';
+  final List<Map<String, String>> _joinedMembers = [
+    {'name': 'Beauty', 'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'},
+    {'name': 'Isha', 'avatar': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100'},
+    {'name': 'Sweet', 'avatar': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100'},
+    {'name': 'Rani', 'avatar': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'},
+  ];
+
+  void _triggerDiwaliEffect(String giftText) {
+    setState(() {
+      _diwaliEffect = true;
+      _activeGiftBanner = '🎆 DEWALI CELEBRATION! Gift Sent: $giftText 🎇';
+    });
+    Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _diwaliEffect = false;
+          _activeGiftBanner = '';
+        });
+      }
+    });
+  }
+
+  void _sendPartyMessage() {
+    if (_msgCtrl.text.trim().isNotEmpty) {
+      final text = _msgCtrl.text.trim();
+      final msg = FloatingChatMsg('You', text);
+      setState(() => _partyMsgs.add(msg));
+      _msgCtrl.clear();
+      Timer(const Duration(seconds: 4), () {
+        if (mounted) setState(() => _partyMsgs.removeWhere((item) => item.id == msg.id));
+      });
+    }
+  }
+
+  void _openProfileDialog(Map<String, String> member) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(radius: 40, backgroundImage: NetworkImage(member['avatar']!)),
+            const SizedBox(height: 10),
+            Text(member['name']!, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Party Active Voice Member 🎙️', style: TextStyle(color: Colors.pinkAccent, fontSize: 12)),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.pink),
+                  icon: const Icon(Icons.card_giftcard),
+                  label: const Text('Send Gift'),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    showModalBottomSheet(context: context, builder: (_) => GiftBottomSheet(
+                      currentGems: widget.gems,
+                      onSendGift: (cost, desc) {
+                        widget.onGemsUpdate(widget.gems - cost);
+                        _triggerDiwaliEffect(desc);
+                      },
+                    ));
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800]),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Close'),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final seats = List.generate(10, (index) => index == 0 ? room.avatar : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100');
+    final seats = List.generate(10, (index) => index < _joinedMembers.length ? _joinedMembers[index]['avatar']! : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100');
+    final seatNames = List.generate(10, (index) => index < _joinedMembers.length ? _joinedMembers[index]['name']! : 'Seat ${index + 1}');
+
     return Scaffold(
       backgroundColor: const Color(0xFF181028),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(room.title, style: const TextStyle(fontSize: 14)),
+        leading: IconButton(
+          icon: CircleAvatar(radius: 16, backgroundImage: NetworkImage(widget.room.avatar)),
+          onPressed: () => _openProfileDialog({'name': widget.room.hostName, 'avatar': widget.room.avatar}),
+        ),
+        title: GestureDetector(
+          onTap: () => _openProfileDialog({'name': widget.room.hostName, 'avatar': widget.room.avatar}),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.room.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Host: ${widget.room.hostName}', style: const TextStyle(fontSize: 10, color: Colors.white60)),
+            ],
+          ),
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Center(child: Text('👥 ${room.membersCount}', style: const TextStyle(fontSize: 12, color: Colors.white70))),
+          IconButton(
+            icon: const Icon(Icons.favorite, color: Colors.pinkAccent, size: 22),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Liked Party Room ❤️'), duration: Duration(milliseconds: 600)));
+            },
           ),
           IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Upper half audio seats grid (10 members audio avatar ring)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 0.85, crossAxisSpacing: 10, mainAxisSpacing: 10),
-              itemCount: 10,
-              itemBuilder: (ctx, i) {
-                return Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircleAvatar(radius: 20, backgroundImage: NetworkImage(seats[i])),
-                        Positioned(bottom: 0, right: 0, child: const CircleAvatar(radius: 6, backgroundColor: Colors.green, child: Icon(Icons.mic, size: 8, color: Colors.white))),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(i == 0 ? 'Host' : 'Seat ${i + 1}', style: const TextStyle(color: Colors.white70, fontSize: 8), overflow: TextOverflow.ellipsis),
-                  ],
-                );
-              },
-            ),
-          ),
-          const Divider(color: Colors.white24),
-          // Lower half slots / ad banner view matching screenshot #2 look
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Color(0xFF2E123B), Color(0xFF1B082B)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 0.8, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                  itemCount: 10,
+                  itemBuilder: (ctx, i) {
+                    final memberData = i < _joinedMembers.length ? _joinedMembers[i] : null;
+                    return GestureDetector(
+                      onTap: () {
+                        if (memberData != null) {
+                          _openProfileDialog(memberData);
+                        } else {
+                          setState(() {
+                            if (_joinedMembers.length < 10) {
+                              _joinedMembers.add({'name': 'User${_joinedMembers.length + 1}', 'avatar': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100'});
+                            }
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Joined Party Voice Seat 🎙️')));
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircleAvatar(radius: 20, backgroundImage: NetworkImage(seats[i])),
+                              Positioned(bottom: 0, right: 0, child: const CircleAvatar(radius: 6, backgroundColor: Colors.green, child: Icon(Icons.mic, size: 8, color: Colors.white))),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(seatNames[i], style: const TextStyle(color: Colors.white70, fontSize: 8), overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.amberAccent.withOpacity(0.3))),
+              const Divider(color: Colors.white24),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(colors: [Color(0xFF2E123B), Color(0xFF1B082B)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.amberAccent.withOpacity(0.3))),
+                            child: Column(
+                              children: [
+                                const Text('18+', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+                                const Text('ONLY', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 10)),
+                                const SizedBox(height: 10),
+                                const Text('SLOTS 🎰', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.w900)),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: ['💎', '💎', '💎'].map((e) => Container(margin: const EdgeInsets.symmetric(horizontal: 4), padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(e, style: const TextStyle(fontSize: 16)))).toList(),
+                                ),
+                                const SizedBox(height: 10),
+                                const Text('Loading...', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(bottom: 50, left: 16, right: 16, child: FloatingChatOverlay(messages: _partyMsgs)),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _msgCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        decoration: InputDecoration(filled: true, fillColor: Colors.black54, hintText: 'Party message...', hintStyle: const TextStyle(color: Colors.white54, fontSize: 11), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                        onSubmitted: (_) => _sendPartyMessage(),
+                      ),
+                    ),
+                    IconButton(icon: const Icon(Icons.send, color: Colors.pinkAccent), onPressed: _sendPartyMessage),
+                    CircleAvatar(
+                      backgroundColor: Colors.pink,
+                      radius: 18,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.card_giftcard, size: 18, color: Colors.white),
+                        onPressed: () {
+                          showModalBottomSheet(context: context, builder: (_) => GiftBottomSheet(
+                            currentGems: widget.gems,
+                            onSendGift: (cost, desc) {
+                              widget.onGemsUpdate(widget.gems - cost);
+                              _triggerDiwaliEffect(desc);
+                            },
+                          ));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    CircleAvatar(
+                      backgroundColor: Colors.amber,
+                      radius: 18,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.group_add, size: 18, color: Colors.black),
+                        onPressed: () {
+                          setState(() {
+                            if (_joinedMembers.length < 10) {
+                              _joinedMembers.add({'name': 'JoinedUser', 'avatar': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100'});
+                            }
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Joined Party Mode 🎙️')));
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (_diwaliEffect)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  color: Colors.orange.withOpacity(0.35),
+                  child: Center(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('18+', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 12)),
-                        const Text('ONLY', style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 10)),
-                        const SizedBox(height: 10),
-                        const Text('SLOTS 🎰', style: TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.w900)),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: ['💎', '💎', '💎'].map((e) => Container(margin: const EdgeInsets.symmetric(horizontal: 4), padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text(e, style: const TextStyle(fontSize: 16)))).toList(),
+                        const Text('🎆 🪔 DEWALI CELEBRATION 🪔 🎆', style: TextStyle(color: Colors.amberAccent, fontSize: 26, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.red, blurRadius: 20)])),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.amber)),
+                          child: Text(_activeGiftBanner, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                         ),
-                        const SizedBox(height: 10),
-                        const Text('Loading...', style: TextStyle(color: Colors.white54, fontSize: 11)),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -702,6 +904,23 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
   final List<FloatingChatMsg> _floatingMsgs = [];
   final _msgCtrl = TextEditingController();
   bool _followed = false;
+  bool _diwaliEffect = false;
+  String _activeGiftBanner = '';
+
+  void _triggerDiwaliEffect(String giftText) {
+    setState(() {
+      _diwaliEffect = true;
+      _activeGiftBanner = '🎆 DEWALI CELEBRATION! Gift Sent: $giftText 🎇';
+    });
+    Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _diwaliEffect = false;
+          _activeGiftBanner = '';
+        });
+      }
+    });
+  }
 
   void _sendChatMessage() {
     if (_msgCtrl.text.trim().isNotEmpty) {
@@ -718,24 +937,6 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
   void _triggerFollow() {
     setState(() => _followed = true);
     widget.onFollowHost(widget.host);
-    final overlay = Overlay.of(context);
-    late OverlayEntry entry;
-    entry = OverlayEntry(
-      builder: (ctx) => Positioned(
-        bottom: 80,
-        left: MediaQuery.of(ctx).size.width / 2 - 50,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(16)),
-            child: const Text('Following', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-          ),
-        ),
-      ),
-    );
-    overlay.insert(entry);
-    Future.delayed(const Duration(seconds: 1), () => entry.remove());
   }
 
   @override
@@ -755,97 +956,6 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
                     children: [
                       CircleAvatar(backgroundImage: NetworkImage(widget.host.pic), radius: 18),
                       const SizedBox(width: 6),
-                      Text('${widget.host.name} 🇮🇳', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6),
-                InkWell(onTap: _triggerFollow, child: Icon(Icons.favorite, color: _followed ? Colors.pink : Colors.white70, size: 18)),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 40, right: 16,
-            child: Row(
-              children: [
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10)), child: const Text('👁️ 5', style: TextStyle(color: Colors.white, fontSize: 11))),
-                const SizedBox(width: 8),
-                IconButton(icon: const CircleAvatar(radius: 12, backgroundColor: Colors.black54, child: Icon(Icons.close, color: Colors.white, size: 14)), onPressed: () { widget.onCloseWithPiP(widget.host.name, widget.host.pic); Navigator.pop(context); }),
-              ],
-            ),
-          ),
-          Positioned(top: 80, right: 16, child: Container(width: 80, height: 35, color: Colors.black45, alignment: Alignment.center, child: const Text('AD SLOT', style: TextStyle(color: Colors.white54, fontSize: 9)))),
-          Positioned(
-            bottom: 70, left: 16, right: 120,
-            child: FloatingChatOverlay(messages: _floatingMsgs),
-          ),
-          Positioned(
-            bottom: 20, left: 16, width: MediaQuery.of(context).size.width * 0.52,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                    decoration: InputDecoration(filled: true, fillColor: Colors.black54, hintText: 'Free message...', hintStyle: const TextStyle(color: Colors.white54, fontSize: 11), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
-                    onSubmitted: (_) => _sendChatMessage(),
-                  ),
-                ),
-                IconButton(icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 18), onPressed: _sendChatMessage),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 20, right: 16,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.pink,
-                  radius: 18,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.card_giftcard, size: 18, color: Colors.white),
-                    onPressed: () {
-                      showModalBottomSheet(context: context, builder: (_) => GiftBottomSheet(
-                        currentGems: widget.gems,
-                        onSendGift: (cost, desc) {
-                          widget.onGemsUpdate(widget.gems - cost);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gift sent: $desc (-$cost Gems)')));
-                        },
-                      ));
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CallScreen(
-                          host: widget.host.name,
-                          pic: widget.host.pic,
-                          gems: widget.gems,
-                          onGems: widget.onGemsUpdate,
-                          onEnd: (dur, secs) {},
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Colors.pink, Colors.amber]), borderRadius: BorderRadius.circular(20)),
-                    child: const Row(children: [Icon(Icons.videocam, color: Colors.white, size: 14), SizedBox(width: 4), Text('1800/min', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))]),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
   @override
@@ -1044,7 +1154,16 @@ class _DashboardState extends State<Dashboard> {
         final r = mockPartyRooms[i];
         return GestureDetector(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => PartyAudioRoomScreen(room: r)));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PartyAudioRoomScreen(
+                  room: r,
+                  gems: _gems,
+                  onGemsUpdate: (g) => setState(() => _gems = g),
+                ),
+              ),
+            );
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
@@ -1232,3 +1351,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+                      
