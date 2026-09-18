@@ -178,7 +178,6 @@ class Login extends StatelessWidget {
     );
   }
 }
-
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -426,7 +425,7 @@ class HostProfileSheet extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.pink.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
             child: const Text('Delhi • 34 yrs old', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 12),
@@ -761,7 +760,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _navIndex = 0;
   int _cat = 0;
-  int _subCat = 0;
+  String _liveSubFilter = 'Pretty';
   int _gems = 1670;
   final String _selectedCountry = '🇮🇳 India';
   final List<String> _history = ['Recharge: +4050 Gems', 'Video Call: -1800 Gems'];
@@ -772,13 +771,13 @@ class _DashboardState extends State<Dashboard> {
 
   final List<Host> _followedHosts = [];
   final List<String> _cats = const ['Hot', 'Live', 'Party', 'Match'];
-  final List<String> _subCats = const ['All', 'Pretty', 'New', 'Sexy'];
+  final List<String> _liveSubFilters = const ['Pretty', 'New', 'Sexy'];
 
   final List<Host> _allHosts = const [
-    Host(name: 'AvniHotnessDil', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Pretty', flag: '🇮🇳', status: 'Online', id: 8002023),
-    Host(name: 'Shiny Sanya', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', cat: 'Hot', tag: 'New', flag: '🇮🇳', status: 'Online', id: 8002024),
-    Host(name: 'Ritaj', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'Sexy', flag: '🇦🇪', status: 'Live', id: 8002025),
-    Host(name: 'Moka', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300', cat: 'Live', tag: 'Pretty', flag: '🇪🇬', status: 'Live', id: 8002026),
+    Host(name: 'PrettyNiki', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Pretty', flag: '🇮🇳', status: 'Online', id: 8002023),
+    Host(name: 'NewSara', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', cat: 'Hot', tag: 'New', flag: '🇮🇳', status: 'Online', id: 8002024),
+    Host(name: 'SexyRitaj', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'Sexy', flag: '🇦🇪', status: 'Live', id: 8002025),
+    Host(name: 'PrettyMoka', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300', cat: 'Live', tag: 'Pretty', flag: '🇪🇬', status: 'Live', id: 8002026),
   ];
 
   final _exactPacks = const [
@@ -894,38 +893,73 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  Widget _buildScreenshotStyleSubFilterPanel() {
+    final filtered = _allHosts.where((h) => h.tag.toLowerCase() == _liveSubFilter.toLowerCase() && h.status == 'Live').toList();
+    return Container(
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: Colors.grey[900]?.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: _liveSubFilters.map((sf) => GestureDetector(
+              onTap: () => setState(() => _liveSubFilter = sf),
+              child: Text(
+                sf,
+                style: TextStyle(color: _liveSubFilter == sf ? Colors.pinkAccent : Colors.white70, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            )).toList(),
+          ),
+          const SizedBox(height: 10),
+          filtered.isEmpty
+              ? const Padding(padding: EdgeInsets.all(12), child: Text('No streamers in this subfolder', style: TextStyle(color: Colors.white54, fontSize: 11)))
+              : SizedBox(
+                  height: 90,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: filtered.length,
+                    itemBuilder: (ctx, i) {
+                      final item = filtered[i];
+                      return GestureDetector(
+                        onTap: () => _handleHostTap(item, filtered),
+                        child: Container(
+                          width: 75,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), image: DecorationImage(image: NetworkImage(item.pic), fit: BoxFit.cover)),
+                          alignment: Alignment.bottomLeft,
+                          padding: const EdgeInsets.all(4),
+                          child: Text(item.name, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCurrentTabContent() {
     switch (_navIndex) {
-      case 0:
-      case 2:
+      case 0: // For You
+      case 1: // Follow
+      case 2: // Game tab
+        if (_navIndex == 2) {
+          return const Center(child: Text('🎮 Games Center (Coming Soon)', style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)));
+        }
         final catName = _cats[_cat];
         final list = _allHosts.where((h) {
-          if (_cat == 1 && h.status != 'Live') return false;
-          if (_cat == 0 && h.status != 'Online') return false;
-          if (_subCat > 0 && h.tag.toLowerCase() != _subCats[_subCat].toLowerCase()) return false;
+          if (_navIndex == 1) return _followedHosts.any((f) => f.id == h.id);
+          if (catName == 'Hot') return h.status == 'Online';
+          if (catName == 'Live') return h.status == 'Live';
           return true;
         }).toList();
 
         return Column(
           children: [
-            if (_cat == 0 || _cat == 1)
-              Container(
-                color: Colors.black87,
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                child: Row(
-                  children: _subCats.asMap().entries.map((e) => Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: ChoiceChip(
-                      label: Text(e.value, style: const TextStyle(fontSize: 11)),
-                      selected: _subCat == e.key,
-                      selectedColor: Colors.pink,
-                      backgroundColor: Colors.grey[900],
-                      labelStyle: TextStyle(color: _subCat == e.key ? Colors.white : Colors.white70),
-                      onSelected: (_) => setState(() => _subCat = e.key),
-                    ),
-                  )).toList(),
-                ),
-              ),
+            if (_cat == 1 && catName == 'Live') _buildScreenshotStyleSubFilterPanel(),
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.82, crossAxisSpacing: 6, mainAxisSpacing: 6),
@@ -952,25 +986,14 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         );
-      case 1:
-        return _followedHosts.isEmpty
-            ? const Center(child: Text('No Followed hosts yet!', style: TextStyle(color: Colors.grey)))
-            : ListView.builder(
-                itemCount: _followedHosts.length,
-                itemBuilder: (ctx, i) => ListTile(
-                  leading: CircleAvatar(backgroundImage: NetworkImage(_followedHosts[i].pic)),
-                  title: Text(_followedHosts[i].name, style: const TextStyle(color: Colors.white)),
-                  trailing: ElevatedButton(onPressed: () => _handleHostTap(_followedHosts[i], _followedHosts), child: const Text('View')),
-                ),
-              );
-      case 3:
+      case 3: // Messages
         return ListView(
           padding: const EdgeInsets.all(12),
           children: const [
             ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Find your match 💖')),
           ],
         );
-      case 4:
+      case 4: // Me
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -997,14 +1020,14 @@ class _DashboardState extends State<Dashboard> {
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: _cats.asMap().entries.map((e) => GestureDetector(
-                  onTap: () => setState(() { _cat = e.key; _subCat = 0; }),
+                  onTap: () => setState(() => _cat = e.key),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70, fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 )).toList(),
               )
-            : Text(_navIndex == 1 ? 'Following' : _navIndex == 3 ? 'Messages' : _navIndex == 4 ? 'Profile' : 'Live', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            : Text(_navIndex == 1 ? 'Following' : _navIndex == 2 ? 'Games' : _navIndex == 3 ? 'Messages' : 'Profile', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         actions: [
           Center(child: Text(_selectedCountry, style: const TextStyle(fontSize: 11, color: Colors.amber))),
           IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {}),
@@ -1054,7 +1077,7 @@ class _DashboardState extends State<Dashboard> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'For You'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'),
-          BottomNavigationBarItem(icon: Icon(Icons.live_tv), label: 'Live'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),
         ],
