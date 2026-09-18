@@ -171,6 +171,7 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
+
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -327,19 +328,79 @@ class HostRank {
   final String name, pic, gems;
   const HostRank({required this.rank, required this.name, required this.pic, required this.gems});
 }
-class LiveStreamPKRoom extends StatefulWidget {
-  final Host host;
-  final bool isPK;
+class LiveStreamSwipeableRoom extends StatefulWidget {
+  final List<Host> liveHosts;
+  final int initialIndex;
   final int gems;
   final Function(int) onGemsUpdate;
   final Function(String) onCloseWithPiP;
-  const LiveStreamPKRoom({super.key, required this.host, required this.isPK, required this.gems, required this.onGemsUpdate, required this.onCloseWithPiP});
+
+  const LiveStreamSwipeableRoom({
+    super.key,
+    required this.liveHosts,
+    required this.initialIndex,
+    required this.gems,
+    required this.onGemsUpdate,
+    required this.onCloseWithPiP,
+  });
 
   @override
-  State<LiveStreamPKRoom> createState() => _LiveStreamPKRoomState();
+  State<LiveStreamSwipeableRoom> createState() => _LiveStreamSwipeableRoomState();
 }
 
-class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
+class _LiveStreamSwipeableRoomState extends State<LiveStreamSwipeableRoom> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView.builder(
+      controller: _pageController,
+      scrollDirection: Axis.vertical,
+      itemCount: widget.liveHosts.length,
+      itemBuilder: (ctx, index) {
+        final host = widget.liveHosts[index];
+        return SingleLiveRoomView(
+          host: host,
+          gems: widget.gems,
+          onGemsUpdate: widget.onGemsUpdate,
+          onCloseWithPiP: widget.onCloseWithPiP,
+        );
+      },
+    );
+  }
+}
+
+class SingleLiveRoomView extends StatefulWidget {
+  final Host host;
+  final int gems;
+  final Function(int) onGemsUpdate;
+  final Function(String) onCloseWithPiP;
+
+  const SingleLiveRoomView({
+    super.key,
+    required this.host,
+    required this.gems,
+    required this.onGemsUpdate,
+    required this.onCloseWithPiP,
+  });
+
+  @override
+  State<SingleLiveRoomView> createState() => _SingleLiveRoomViewState();
+}
+
+class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
   final List<Map<String, String>> _messages = [
     {'user': 'bosi', 'msg': 'mystery too.... Hi!'},
     {'user': 'system', 'msg': 'Rules apply!'},
@@ -349,7 +410,10 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
 
   void _sendMessage() {
     if (_msgCtrl.text.trim().isNotEmpty) {
-      setState(() { _messages.add({'user': 'You', 'msg': _msgCtrl.text.trim()}); _msgCtrl.clear(); });
+      setState(() {
+        _messages.add({'user': 'You', 'msg': _msgCtrl.text.trim()});
+        _msgCtrl.clear();
+      });
     }
   }
 
@@ -359,47 +423,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: widget.isPK
-                ? Column(
-                    children: [
-                      Container(
-                        height: 28,
-                        color: Colors.grey[900],
-                        child: Row(
-                          children: [
-                            Container(width: MediaQuery.of(context).size.width * 0.48, color: Colors.cyan),
-                            Container(padding: const EdgeInsets.symmetric(horizontal: 8), color: Colors.pink, child: const Text('PK 02:00', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
-                            Expanded(child: Container(color: Colors.pink[700])),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.host.pic), fit: BoxFit.cover)),
-                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: Text(widget.host.name, style: const TextStyle(color: Colors.amber, fontSize: 11)))),
-                              ),
-                            ),
-                            Container(width: 2, color: Colors.black),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300'), fit: BoxFit.cover)),
-                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: const Text('An...', style: TextStyle(color: Colors.amber, fontSize: 11)))),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Container(
-                    decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(widget.host.pic), fit: BoxFit.cover)),
-                  ),
-          ),
-          if (widget.isPK) Positioned(top: MediaQuery.of(context).size.height * 0.45, left: 0, right: 0, child: Center(child: CircleAvatar(radius: 24, backgroundColor: Colors.pink.withOpacity(0.8), child: const Text('PK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))))),
+          Positioned.fill(child: Image.network(widget.host.pic, fit: BoxFit.cover)),
           Positioned(
             top: 40, left: 16,
             child: Row(
@@ -431,7 +455,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
                   child: TextField(
                     controller: _msgCtrl,
                     style: const TextStyle(color: Colors.white, fontSize: 12),
-                    decoration: InputDecoration(filled: true, fillColor: Colors.black54, hintText: 'Say something...', hintStyle: const TextStyle(color: Colors.white54, fontSize: 11), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                    decoration: InputDecoration(filled: true, fillColor: Colors.black54, hintText: 'Swipe up/down for next live...', hintStyle: const TextStyle(color: Colors.white54, fontSize: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
                   ),
                 ),
               ],
@@ -571,8 +595,23 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void _openRoom(Host h, {bool isPK = false}) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamPKRoom(host: h, isPK: isPK, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g), onCloseWithPiP: (closed) { setState(() => _hasMiniPlayer = true); _miniStreamerName = closed; _miniStreamerPic = h.pic; })));
+  // ✨ DIRECT TAP FOR LIVE ROOM & SWIPEABLE PAGEVIEW SUPPORT ✨
+  void _openLiveSwipeable(List<Host> liveHosts, int tappedIndex) {
+    if (liveHosts.isEmpty) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LiveStreamSwipeableRoom(
+          liveHosts: liveHosts,
+          initialIndex: tappedIndex,
+          gems: _gems,
+          onGemsUpdate: (g) => setState(() => _gems = g),
+          onCloseWithPiP: (closed) {
+            setState(() { _hasMiniPlayer = true; _miniStreamerName = closed; _miniStreamerPic = liveHosts[tappedIndex].pic; });
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildCurrentTabContent() {
@@ -585,6 +624,10 @@ class _DashboardState extends State<Dashboard> {
           if (_subCat > 0 && h.tag.toLowerCase() != _subCats[_subCat].toLowerCase()) return false;
           return true;
         }).toList();
+
+        // Filter only live ones for swipeable vertical room viewing on tap photo
+        final liveOnlyList = list.where((h) => h.status == 'Live' || h.cat == 'Live' || h.tag == 'FREE' || h.tag == 'Exotic').toList();
+        final effectiveList = liveOnlyList.isNotEmpty ? liveOnlyList : list;
 
         return Column(
           children: [
@@ -614,7 +657,11 @@ class _DashboardState extends State<Dashboard> {
                 itemBuilder: (ctx, i) {
                   final h = list[i];
                   return GestureDetector(
-                    onTap: () => showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g))),
+                    onTap: () {
+                      // Tap photo on Live/Hot tab -> Open Live Room directly (with vertical scroll next screen support)
+                      final tapIdx = effectiveList.indexWhere((item) => item.name == h.name);
+                      _openLiveSwipeable(effectiveList, tapIdx >= 0 ? tapIdx : i);
+                    },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Stack(
@@ -622,7 +669,6 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Image.network(h.pic, fit: BoxFit.cover),
                           Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)), child: Text('${h.flag} ${h.status}', style: const TextStyle(color: Colors.white, fontSize: 9)))),
-                          Positioned(top: 6, right: 6, child: InkWell(onTap: () => _openRoom(h, isPK: true), child: const CircleAvatar(radius: 12, backgroundColor: Colors.amber, child: Text('PK', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black))))),
                           Positioned(bottom: 6, left: 6, child: Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
                         ],
                       ),
