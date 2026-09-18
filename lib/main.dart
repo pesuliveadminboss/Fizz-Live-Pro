@@ -387,7 +387,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300'), fit: BoxFit.cover)),
-                                child: const Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: EdgeInsets.all(4), child: Text('An...', style: TextStyle(color: Colors.amber, fontSize: 11)))),
+                                child: Align(alignment: Alignment.bottomLeft, child: Container(color: Colors.black54, padding: const EdgeInsets.all(4), child: const Text('An...', style: TextStyle(color: Colors.amber, fontSize: 11)))),
                               ),
                             ),
                           ],
