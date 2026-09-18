@@ -162,8 +162,15 @@ class _CallScreenState extends State<CallScreen> {
     _t = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return;
       setState(() => _sec++);
-      if (_sec > 0 && _sec % 60 == 0) { if (_g >= 1800) { setState(() => _g -= 1800); widget.onGems(_g); } else { Navigator.pop(context); } }
+      if (_sec > 0 && _sec % 60 == 0) { if (_g >= 1800) { setState(() => _g -= 1800); widget.onGems(_g); } else { _exitCall(); } }
     });
+  }
+
+  void _exitCall() {
+    _t?.cancel();
+    final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}';
+    Navigator.pop(context);
+    widget.onEnd(dur, _sec);
   }
 
   Future<void> _initZego() async {
@@ -191,7 +198,7 @@ class _CallScreenState extends State<CallScreen> {
         children: [
           Positioned.fill(child: Image.network(widget.pic, fit: BoxFit.cover)),
           Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())),
-          Positioned(bottom: 20, left: 0, right: 0, child: Center(child: IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: () => Navigator.pop(context)))),
+          Positioned(bottom: 20, left: 0, right: 0, child: Center(child: IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall))),
         ],
       ),
     );
@@ -250,7 +257,18 @@ class HostProfileSheet extends StatelessWidget {
                   label: const Text('Video Call • 1800/min', style: TextStyle(fontSize: 12)),
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(host: host.name, pic: host.pic, gems: gems, onGems: onGemsUpdate, onEnd: (_, __, ___) {})));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CallScreen(
+                          host: host.name,
+                          pic: host.pic,
+                          gems: gems,
+                          onGems: onGemsUpdate,
+                          onEnd: (dur, secs) {},
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -297,7 +315,6 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
       body: Stack(
         children: [
           Positioned.fill(child: Image.network(widget.host.pic, fit: BoxFit.cover)),
-          // Top Left Profile & Heart follow icon
           Positioned(
             top: 40, left: 16,
             child: Row(
@@ -310,7 +327,6 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
               ],
             ),
           ),
-          // Top Right Viewer count '5' & Close X
           Positioned(
             top: 40, right: 16,
             child: Row(
@@ -321,9 +337,7 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
               ],
             ),
           ),
-          // Ad placeholder place slot (tiny banner slot top right/mid)
           Positioned(top: 80, right: 16, child: Container(width: 80, height: 35, color: Colors.black45, alignment: Alignment.center, child: const Text('AD SLOT', style: TextStyle(color: Colors.white54, fontSize: 9)))),
-          // Bottom Left Message Input
           Positioned(
             bottom: 20, left: 16, width: MediaQuery.of(context).size.width * 0.52,
             child: Row(
@@ -338,7 +352,6 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
               ],
             ),
           ),
-          // Bottom Right Gift Send + Video Call icon
           Positioned(
             bottom: 20, right: 16,
             child: Row(
@@ -347,7 +360,18 @@ class _LiveStreamPKRoomState extends State<LiveStreamPKRoom> {
                 const SizedBox(width: 8),
                 InkWell(
                   onTap: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => CallScreen(host: widget.host.name, pic: widget.host.pic, gems: widget.gems, onGems: widget.onGemsUpdate, onEnd: (_, __, ___) {})));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CallScreen(
+                          host: widget.host.name,
+                          pic: widget.host.pic,
+                          gems: widget.gems,
+                          onGems: widget.onGemsUpdate,
+                          onEnd: (dur, secs) {},
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -383,9 +407,9 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _navIndex = 0;
   int _cat = 0;
-  int _subCat = 0; // 0=All, 1=Pretty, 2=New, 3=Sexy
+  int _subCat = 0;
   int _gems = 1670;
-  String _selectedCountry = '🇮🇳 India';
+  final String _selectedCountry = '🇮🇳 India';
 
   bool _hasMiniPlayer = false;
   String _miniStreamerName = '';
@@ -445,7 +469,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter hosts by selected category tab & subfolder (Pretty, New, Sexy)
     final catName = _cats[_cat];
     final list = _allHosts.where((h) {
       if (h.cat != catName && catName != 'Live') return true;
@@ -455,7 +478,6 @@ class _DashboardState extends State<Dashboard> {
 
     Widget bodyContent = Column(
       children: [
-        // Sub-categories row (Pretty, New, Sexy) for Hot/Live folders
         if (_cat == 0 || _cat == 1)
           Container(
             color: Colors.black87,
