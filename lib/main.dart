@@ -171,7 +171,6 @@ class _RandomMatchScreenState extends State<RandomMatchScreen> {
     );
   }
 }
-
 class CallScreen extends StatefulWidget {
   final String host, pic;
   final int gems;
@@ -263,7 +262,7 @@ class HostProfileSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [Text(host.name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)), const SizedBox(width: 6), const Text('🇮🇳', style: TextStyle(fontSize: 16))]),
-                  Text('ID: ${host.id}  •  🟢 Active', style: const TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                  Text('ID: ${host.id}  •  🟢 ${host.status}', style: const TextStyle(color: Colors.greenAccent, fontSize: 11)),
                 ],
               ),
             ],
@@ -333,7 +332,7 @@ class LiveStreamSwipeableRoom extends StatefulWidget {
   final int initialIndex;
   final int gems;
   final Function(int) onGemsUpdate;
-  final Function(String) onCloseWithPiP;
+  final Function(String, String) onCloseWithPiP;
 
   const LiveStreamSwipeableRoom({
     super.key,
@@ -386,7 +385,7 @@ class SingleLiveRoomView extends StatefulWidget {
   final Host host;
   final int gems;
   final Function(int) onGemsUpdate;
-  final Function(String) onCloseWithPiP;
+  final Function(String, String) onCloseWithPiP;
 
   const SingleLiveRoomView({
     super.key,
@@ -401,21 +400,8 @@ class SingleLiveRoomView extends StatefulWidget {
 }
 
 class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
-  final List<Map<String, String>> _messages = [
-    {'user': 'bosi', 'msg': 'mystery too.... Hi!'},
-    {'user': 'system', 'msg': 'Rules apply!'},
-  ];
   final _msgCtrl = TextEditingController();
   bool _followed = false;
-
-  void _sendMessage() {
-    if (_msgCtrl.text.trim().isNotEmpty) {
-      setState(() {
-        _messages.add({'user': 'You', 'msg': _msgCtrl.text.trim()});
-        _msgCtrl.clear();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -442,7 +428,13 @@ class _SingleLiveRoomViewState extends State<SingleLiveRoomView> {
               children: [
                 Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10)), child: const Text('👁️ 5', style: TextStyle(color: Colors.white, fontSize: 11))),
                 const SizedBox(width: 8),
-                IconButton(icon: const CircleAvatar(radius: 12, backgroundColor: Colors.black54, child: Icon(Icons.close, color: Colors.white, size: 14)), onPressed: () { widget.onCloseWithPiP(widget.host.name); Navigator.pop(context); }),
+                IconButton(
+                  icon: const CircleAvatar(radius: 12, backgroundColor: Colors.black54, child: Icon(Icons.close, color: Colors.white, size: 14)),
+                  onPressed: () {
+                    widget.onCloseWithPiP(widget.host.name, widget.host.pic);
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             ),
           ),
@@ -517,10 +509,11 @@ class _DashboardState extends State<Dashboard> {
   final List<String> _cats = const ['Hot', 'Live', 'Party', 'Match'];
   final List<String> _subCats = const ['All', 'Pretty', 'New', 'Sexy'];
 
+  // Streamers list (Only logged in active hosts, with Live or Online status)
   final List<Host> _allHosts = const [
-    Host(name: 'AvniHotnessDil', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Exotic', flag: '🇮🇳', status: 'Online', id: 8002023),
-    Host(name: 'Shiny Sanya', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', cat: 'Hot', tag: 'Party', flag: '🇮🇳', status: 'Online', id: 8002024),
-    Host(name: 'Ritaj', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'Exotic', flag: '🇦🇪', status: 'Live', id: 8002025),
+    Host(name: 'AvniHotnessDil', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Pretty', flag: '🇮🇳', status: 'Online', id: 8002023),
+    Host(name: 'Shiny Sanya', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', cat: 'Hot', tag: 'New', flag: '🇮🇳', status: 'Online', id: 8002024),
+    Host(name: 'Ritaj', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'Sexy', flag: '🇦🇪', status: 'Live', id: 8002025),
     Host(name: 'Moka', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300', cat: 'Live', tag: 'Pretty', flag: '🇪🇬', status: 'Live', id: 8002026),
   ];
 
@@ -595,23 +588,35 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  // ✨ DIRECT TAP FOR LIVE ROOM & SWIPEABLE PAGEVIEW SUPPORT ✨
-  void _openLiveSwipeable(List<Host> liveHosts, int tappedIndex) {
-    if (liveHosts.isEmpty) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LiveStreamSwipeableRoom(
-          liveHosts: liveHosts,
-          initialIndex: tappedIndex,
-          gems: _gems,
-          onGemsUpdate: (g) => setState(() => _gems = g),
-          onCloseWithPiP: (closed) {
-            setState(() { _hasMiniPlayer = true; _miniStreamerName = closed; _miniStreamerPic = liveHosts[tappedIndex].pic; });
-          },
+  // ✨ ROUTING LOGIC: If Live -> Open Swipeable Room. If Online -> Open Profile Sheet. ✨
+  void _handleHostTap(Host h, List<Host> currentList) {
+    if (h.status == 'Live') {
+      final liveOnlyList = currentList.where((item) => item.status == 'Live').toList();
+      final tapIdx = liveOnlyList.indexWhere((item) => item.name == h.name);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LiveStreamSwipeableRoom(
+            liveHosts: liveOnlyList.isNotEmpty ? liveOnlyList : currentList,
+            initialIndex: tapIdx >= 0 ? tapIdx : 0,
+            gems: _gems,
+            onGemsUpdate: (g) => setState(() => _gems = g),
+            onCloseWithPiP: (name, pic) {
+              setState(() {
+                _hasMiniPlayer = true;
+                _miniStreamerName = name;
+                _miniStreamerPic = pic;
+              });
+            },
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g)),
+      );
+    }
   }
 
   Widget _buildCurrentTabContent() {
@@ -620,14 +625,11 @@ class _DashboardState extends State<Dashboard> {
       case 2:
         final catName = _cats[_cat];
         final list = _allHosts.where((h) {
-          if (h.cat != catName && catName != 'Live') return true;
+          if (_cat == 1 && h.status != 'Live') return false; // Live tab shows only Live streams
+          if (_cat == 0 && h.status != 'Online') return false; // Hot tab shows Online hosts
           if (_subCat > 0 && h.tag.toLowerCase() != _subCats[_subCat].toLowerCase()) return false;
           return true;
         }).toList();
-
-        // Filter only live ones for swipeable vertical room viewing on tap photo
-        final liveOnlyList = list.where((h) => h.status == 'Live' || h.cat == 'Live' || h.tag == 'FREE' || h.tag == 'Exotic').toList();
-        final effectiveList = liveOnlyList.isNotEmpty ? liveOnlyList : list;
 
         return Column(
           children: [
@@ -657,11 +659,7 @@ class _DashboardState extends State<Dashboard> {
                 itemBuilder: (ctx, i) {
                   final h = list[i];
                   return GestureDetector(
-                    onTap: () {
-                      // Tap photo on Live/Hot tab -> Open Live Room directly (with vertical scroll next screen support)
-                      final tapIdx = effectiveList.indexWhere((item) => item.name == h.name);
-                      _openLiveSwipeable(effectiveList, tapIdx >= 0 ? tapIdx : i);
-                    },
+                    onTap: () => _handleHostTap(h, list),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Stack(
@@ -734,14 +732,26 @@ class _DashboardState extends State<Dashboard> {
             Positioned(
               bottom: 20, right: 20,
               child: GestureDetector(
-                onTap: () { setState(() => _hasMiniPlayer = false); },
+                // Tap center of mini screen to expand back to full screen live
+                onTap: () {
+                  setState(() => _hasMiniPlayer = false);
+                  final matchedHost = _allHosts.firstWhere((h) => h.name == _miniStreamerName, orElse: () => _allHosts.first);
+                  _handleHostTap(matchedHost, _allHosts);
+                },
                 child: Container(
                   width: 110, height: 150,
                   decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.pink, width: 2)),
                   child: Stack(
                     children: [
                       ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(_miniStreamerPic, fit: BoxFit.cover, width: 110, height: 150)),
-                      Positioned(top: 2, right: 2, child: InkWell(onTap: () => setState(() => _hasMiniPlayer = false), child: const CircleAvatar(radius: 9, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 10, color: Colors.white)))),
+                      // Right side corner '×' symbol to close/cut mini player completely
+                      Positioned(
+                        top: 2, right: 2,
+                        child: InkWell(
+                          onTap: () => setState(() => _hasMiniPlayer = false),
+                          child: const CircleAvatar(radius: 9, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 10, color: Colors.white)),
+                        ),
+                      ),
                       Positioned(bottom: 4, left: 4, child: Text('Mini 🎙️\n($_miniStreamerName)', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold))),
                     ],
                   ),
@@ -768,3 +778,4 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 }
+
