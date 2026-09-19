@@ -45,8 +45,6 @@ class PartyRoom {
 final List<PartyRoom> mockPartyRooms = [
   const PartyRoom(title: 'কেমন আছো সবাই 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
   const PartyRoom(title: 'Mahfil a isha 💖', hostName: 'Mahfil', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', membersCount: '10', onlineCount: 13589),
-  const PartyRoom(title: 'super party 💋', hostName: 'Sweet', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', membersCount: '9', onlineCount: 9517),
-  const PartyRoom(title: 'হাসির রানী 💕', hostName: 'Rani', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', membersCount: '6', onlineCount: 4210),
 ];
 
 class Splash extends StatefulWidget {
@@ -278,4 +276,7 @@ class _DashboardState extends State<Dashboard> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: const Color(0xFF1E1428), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
             child: Row(children: [
-              Stack(children: [CircleAvatar(radiu
+              Stack(children: [CircleAvatar(radius: 28, backgroundImage: NetworkImage(r.avatar)), Positioned(bottom: 0, right: 0, child: Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)))]),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                T
