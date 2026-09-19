@@ -45,6 +45,8 @@ class PartyRoom {
 final List<PartyRoom> mockPartyRooms = [
   const PartyRoom(title: 'কেমন আছো সবাই 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
   const PartyRoom(title: 'Mahfil a isha 💖', hostName: 'Mahfil', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', membersCount: '10', onlineCount: 13589),
+  const PartyRoom(title: 'super party 💋', hostName: 'Sweet', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', membersCount: '9', onlineCount: 9517),
+  const PartyRoom(title: 'হাসির রানী 💕', hostName: 'Rani', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', membersCount: '6', onlineCount: 4210),
 ];
 
 class Splash extends StatefulWidget {
@@ -75,7 +77,7 @@ class _PinGateState extends State<PinGate> {
   final _c = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.black, body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Text('Admin PIN (7777)', style: TextStyle(color: Colors.white)), TextField(controller: _c, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber)), ElevatedButton(onPressed: () { if (_c.text.trim() == "7777") Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login())); }, child: const Text('Unlock'))]))));
+    return Scaffold(backgroundColor: Colors.black, body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Text('Admin PIN (7777)', style: TextStyle(color: Colors.white)), TextField(controller: _c, obscureText: true, textAlign: TextAlign.center, style: const TextStyle(color: Colors.amber)), ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), onPressed: () { if (_c.text.trim() == "7777") Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Login())); }, child: const Text('Unlock'))]))));
   }
 }
 
@@ -276,50 +278,4 @@ class _DashboardState extends State<Dashboard> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: const Color(0xFF1E1428), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
             child: Row(children: [
-              Stack(children: [CircleAvatar(radius: 28, backgroundImage: NetworkImage(r.avatar)), Positioned(bottom: 0, right: 0, child: Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)))]),
-              const SizedBox(width: 12),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(r.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 6),
-                Row(children: [
-                  ...List.generate(3, (index) => Padding(padding: const EdgeInsets.only(right: 4), child: CircleAvatar(radius: 9, backgroundImage: NetworkImage(r.avatar)))),
-                  Text(' 🔊 ${r.onlineCount}', style: const TextStyle(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.w600)),
-                ]),
-              ])),
-              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Text('Party', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold))),
-                const SizedBox(height: 4),
-                Text('👥 ${r.membersCount} Seats', style: const TextStyle(color: Colors.white54, fontSize: 10)),
-              ]),
-            ]),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildContent() {
-    if (_navIndex == 2) return const Center(child: Text('🎮 Game Center', style: TextStyle(color: Colors.amber)));
-    final catName = _cats[_cat];
-    if (catName == 'Party') return _buildPartyRoomsList();
-    final list = _allHosts.where((h) => catName == 'Hot' ? h.status == 'Online' : h.status == 'Live').toList();
-    return Column(children: [
-      if (_cat == 1) Container(color: Colors.grey[850], height: 50, child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: _liveSubFilters.map((sf) => TextButton(onPressed: () => setState(() => _liveSubFilter = sf), child: Text(sf, style: TextStyle(color: _liveSubFilter == sf ? Colors.pink : Colors.white)))).toList())),
-      Expanded(child: GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2), itemCount: list.length, itemBuilder: (ctx, i) {
-        final h = list[i];
-        return GestureDetector(onTap: () {
-          if (h.status == 'Live') {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamSwipeableRoom(liveHosts: list.where((x) => x.status == 'Live').toList(), initialIndex: 0, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g), onCloseWithPiP: (n, p) => setState(() { _hasMiniPlayer = true; _miniName = n; _miniPic = p; }), onFollowHost: (_) {}, onOpenProfile: (host) => showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: host, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g))))));
-          } else {
-            showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g)));
-          }
-        }, child: Card(color: Colors.grey[900], child: Column(children: [Expanded(child: Image.network(h.pic, fit: BoxFit.cover)), Text(h.name, style: const TextStyle(color: Colors.white))])));
-      }))
-    ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.black, appBar: AppBar(backgroundColor: Colors.black, title: _navIndex == 0 ? Row(mainAxisSize: MainAxisSize.min, children: _cats.asMap().entries.map((e) => GestureDetector(onTap: () => setState(() => _cat = e.key), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70))))).toList()) : const Text('Dashboard', style: TextStyle(color: Colors.white)), actions: [Center(child: Text(_selectedCountry, style: const TextStyle(fontSize: 11, color: Colors.amber))), IconButton(icon: const Icon(Icons.diamond, color: Colors.amber), onPressed: _showRechargeModal)]), body: Stack(children: [_buildContent(), if (_hasMiniPlayer) Positioned(bottom: 20, right: 20, child: GestureDetector(onTap: () => setState(() => _hasMiniPlayer = false), child: Container(width: 90, height: 120, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.pink)), child: Center(child: Text('Mini 🎙️\n$_miniName', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold))))))]), bottomNavigationBar: BottomNavigationBar(backgroundColor: Colors.black, selectedItemColor: Colors.pink, unselectedItemColor: Colors.white54, currentIndex: _navIndex, type: BottomNavigationBarType.fixed, onTap: (idx) => setState(() => _navIndex = idx), items: const [BottomNavigationBarItem(icon: Icon(Icons.home), label: 'For You'), BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'), BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'), BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'), BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me')]));
-  }
-}
+              Stack(children: [CircleAvatar(radiu
