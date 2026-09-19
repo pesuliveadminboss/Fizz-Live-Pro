@@ -1,12 +1,4 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
-}
 
 class GiftItem {
   final String name, iconUrl, emoji;
@@ -43,11 +35,18 @@ class PartyRoom {
 }
 
 final List<PartyRoom> mockPartyRooms = [
-  const PartyRoom(title: 'কেমন আছো সবাই 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
+  const PartyRoom(title: 'kaiman acho sabai 😍', hostName: 'Beauty', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', membersCount: '12', onlineCount: 9517),
   const PartyRoom(title: 'Mahfil a isha 💖', hostName: 'Mahfil', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', membersCount: '10', onlineCount: 13589),
 ];
 
-// 1. Splash Screen with Fizz Live Pro branding
+class FloatingChatMsg {
+  final String id, user, text;
+  FloatingChatMsg(this.user, this.text) : id = UniqueKey().toString();
+}
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:fizz_live_pro/dashboard_and_main.dart';
+
 class Splash extends StatefulWidget {
   const Splash({super.key});
   @override
@@ -81,7 +80,6 @@ class _SplashState extends State<Splash> {
   }
 }
 
-// 2. Exact Screenshot-style Floating Profile Bubbles + Fast Login Screen (No Pin Gate)
 class CustomLoginScreen extends StatelessWidget {
   const CustomLoginScreen({super.key});
 
@@ -90,8 +88,6 @@ class CustomLoginScreen extends StatelessWidget {
     {'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'top': 30, 'right': 40, 'size': 62},
     {'img': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'top': 180, 'left': 50, 'size': 85},
     {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'top': 195, 'right': 35, 'size': 82},
-    {'img': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200', 'top': 370, 'left': 45, 'size': 76},
-    {'img': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', 'top': 385, 'right': 65, 'size': 68},
   ];
 
   @override
@@ -100,7 +96,6 @@ class CustomLoginScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF0A0713),
       body: Stack(
         children: [
-          Positioned.fill(child: CustomPaint(painter: _AmbientBubblePainter())),
           ..._bubbles.map((b) => Positioned(
             top: (b['top'] as num).toDouble(),
             left: b.containsKey('left') ? (b['left'] as num).toDouble() : null,
@@ -112,7 +107,6 @@ class CustomLoginScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
                 image: DecorationImage(image: NetworkImage(b['img'] as String), fit: BoxFit.cover),
-                boxShadow: [BoxShadow(color: Colors.pink.withOpacity(0.3), blurRadius: 10, spreadRadius: 2)],
               ),
             ),
           )),
@@ -133,7 +127,6 @@ class CustomLoginScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
                       borderRadius: BorderRadius.circular(26),
-                      boxShadow: [BoxShadow(color: Colors.pinkAccent.withOpacity(0.5), blurRadius: 15, offset: const Offset(0, 5))],
                     ),
                     alignment: Alignment.center,
                     child: const Text('Fast Login', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
@@ -151,36 +144,13 @@ class CustomLoginScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white70, width: 2)),
-                      alignment: Alignment.center,
-                      child: Container(width: 8, height: 8, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.pink)),
-                    ),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white60, fontSize: 11), overflow: TextOverflow.ellipsis),
-                    ),
-                  ],
-                ),
+                const Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white60, fontSize: 11)),
                 const SizedBox(height: 14),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.headphones, color: Colors.white54, size: 14),
-                    const SizedBox(width: 6),
-                    const Text('Having login issues? ', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                    GestureDetector(
-                      onTap: () async {
-                        await [Permission.camera, Permission.microphone].request();
-                      },
-                      child: const Text('Find help', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+                GestureDetector(
+                  onTap: () async {
+                    await [Permission.camera, Permission.microphone].request();
+                  },
+                  child: const Text('Having login issues? Find help', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -190,20 +160,11 @@ class CustomLoginScreen extends StatelessWidget {
     );
   }
 }
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
+import 'package:fizz_live_pro/models_and_data.dart';
 
-class _AmbientBubblePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintRed = Paint()..color = Colors.red.withOpacity(0.12)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 35);
-    final paintBlue = Paint()..color = Colors.blue.withOpacity(0.10)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 40);
-    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.15), 45, paintRed);
-    canvas.drawCircle(Offset(size.width * 0.65, size.height * 0.45), 35, paintBlue);
-  }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// 3. Gift Sheet, Call Screen, Host Profile, Party Room, Live Room & Dashboard
 class GiftBottomSheet extends StatefulWidget {
   final int currentGems;
   final Function(int, String) onSendGift;
@@ -227,7 +188,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> with SingleTickerProv
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          TabBar(controller: _tabCtrl, isScrollable: true, labelColor: Colors.pinkAccent, unselectedLabelColor: Colors.white54, tabs: categories.map((c) => Tab(text: c)).toList()),
+          TabBar(controller: _tabCtrl, isScrollable: true, labelColor: Colors.pinkAccent, tabs: categories.map((c) => Tab(text: c)).toList()),
           Expanded(child: TabBarView(controller: _tabCtrl, children: categories.map((cat) {
             final items = giftCategories[cat] ?? [];
             return GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4), itemCount: items.length, itemBuilder: (ctx, i) {
@@ -272,7 +233,7 @@ class _CallScreenState extends State<CallScreen> {
       if (_sec > 0 && _sec % 60 == 0) { if (_g >= 1800) { setState(() => _g -= 1800); widget.onGems(_g); } else { _exitCall(); } }
     });
   }
-  void _exitCall() { _t?.cancel(); final dur = '${_sec ~/ 60}:${(_sec % 60).toString().padLeft(2, '0')}'; Navigator.pop(context); widget.onEnd(dur, _sec); }
+  void _exitCall() { _t?.cancel(); Navigator.pop(context); widget.onEnd('0:00', _sec); }
   Future<void> _initZego() async {
     await ZegoExpressEngine.createEngineWithProfile(ZegoEngineProfile(710176630, ZegoScenario.StandardVideoCall, appSign: '0b8b0f4adab85c101698f21f4e7c7b1aa477c901ac58d80a75e54c17ed05ad8a'));
     await ZegoExpressEngine.instance.enableCamera(true);
@@ -281,7 +242,7 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() => _cam = w);
   }
   @override
-  void dispose() { _t?.cancel(); if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!); ZegoExpressEngine.instance.stopPreview(); ZegoExpressEngine.destroyEngine(); super.dispose(); }
+  void dispose() { _t?.cancel(); if (_vid != null) ZegoExpressEngine.instance.destroyCanvasView(_vid!); ZegoExpressEngine.destroyEngine(); super.dispose(); }
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: Colors.black, body: Stack(children: [Positioned.fill(child: Image.network(widget.pic, fit: BoxFit.cover)), Positioned(top: 40, right: 16, width: 85, height: 115, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: _cam ?? const CircularProgressIndicator())), Positioned(bottom: 20, left: 0, right: 0, child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [IconButton(icon: const Icon(Icons.flip_camera_ios, color: Colors.white), onPressed: () { _frontCam = !_frontCam; ZegoExpressEngine.instance.useFrontCamera(_frontCam); }), IconButton(icon: const Icon(Icons.call_end, color: Colors.red, size: 36), onPressed: _exitCall)]))]));
@@ -309,11 +270,10 @@ class HostProfileSheet extends StatelessWidget {
     );
   }
 }
-
-class FloatingChatMsg {
-  final String id, user, text;
-  FloatingChatMsg(this.user, this.text) : id = UniqueKey().toString();
-}
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:fizz_live_pro/models_and_data.dart';
+import 'package:fizz_live_pro/screens/widgets_and_call.dart';
 
 class FloatingChatOverlay extends StatelessWidget {
   final List<FloatingChatMsg> messages;
@@ -356,10 +316,145 @@ class _PartyAudioRoomScreenState extends State<PartyAudioRoomScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(icon: CircleAvatar(backgroundImage: NetworkImage(widget.room.avatar)), onPressed: () => _openProfileDialog({'name': widget.room.hostName, 'avatar': widget.room.avatar})),
         title: GestureDetector(onTap: () => _openProfileDialog({'name': widget.room.hostName, 'avatar': widget.room.avatar}), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(widget.room.title, style: const TextStyle(fontSize: 13)), Text('Host: ${widget.room.hostName}', style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.65)))] ) ),
-        actions: [IconButton(icon: const Icon(Icons.favorite, color: Colors.pinkAccent), onPressed: () {}), IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context))],
+        actions: [IconButton(icon: const Icon(Icons.favorite, color: Colors.pinkAccent), onPressed: {}), IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context))],
       ),
       body: Stack(children: [
         Column(children: [
           Padding(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), child: GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 0.8), itemCount: 10, itemBuilder: (ctx, i) {
             final memberData = i < _members.length ? _members[i] : null;
-            return GestureDetector(onTap: () { if (memberData != null) _openProfileDialog(memberData); else setState(() => _members.add({'name': 'Use
+            return GestureDetector(onTap: () { if (memberData != null) _openProfileDialog(memberData); else setState(() => _members.add({'name': 'User', 'avatar': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100'})); }, child: Column(children: [CircleAvatar(radius: 18, backgroundImage: NetworkImage(memberData != null ? memberData['avatar']! : widget.room.avatar)), Text(memberData != null ? memberData['name']! : 'Seat ${i+1}', style: const TextStyle(color: Colors.white70, fontSize: 8), overflow: TextOverflow.ellipsis)]));
+          })),
+          const Divider(color: Colors.white24),
+          Expanded(child: Stack(children: [Container(decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF2E123B), Color(0xFF1B082B)])), child: Center(child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.amber.withOpacity(0.3))), child: const Text('SLOTS 🎰\n💎💎💎', textAlign: TextAlign.center, style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold))))), Positioned(bottom: 20, left: 16, right: 16, child: FloatingChatOverlay(messages: _partyMsgs))])),
+          Padding(padding: const EdgeInsets.all(8), child: Row(children: [Expanded(child: TextField(controller: _msgCtrl, style: const TextStyle(color: Colors.white, fontSize: 12), decoration: const InputDecoration(filled: true, fillColor: Colors.black54, hintText: 'Party message...', hintStyle: TextStyle(color: Colors.white54, fontSize: 11)))), IconButton(icon: const Icon(Icons.send, color: Colors.pink), onPressed: () { if (_msgCtrl.text.isNotEmpty) { setState(() => _partyMsgs.add(FloatingChatMsg('You', _msgCtrl.text))); _msgCtrl.clear(); } }), CircleAvatar(backgroundColor: Colors.pink, radius: 18, child: IconButton(padding: EdgeInsets.zero, icon: const Icon(Icons.card_giftcard, size: 18, color: Colors.white), onPressed: () => showModalBottomSheet(context: context, builder: (_) => GiftBottomSheet(currentGems: widget.gems, onSendGift: (c, d) { widget.onGemsUpdate(widget.gems - c); _triggerDiwali(d); }))))]))
+        ]),
+        if (_diwaliEffect) Positioned.fill(child: IgnorePointer(child: Container(color: Colors.orange.withOpacity(0.35), child: Center(child: Text(_banner, style: const TextStyle(color: Colors.amberAccent, fontSize: 20, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.red, blurRadius: 20)]))))))
+      ]),
+    );
+  }
+}
+
+class LiveStreamSwipeableRoom extends StatelessWidget {
+  final List<Host> liveHosts;
+  final int initialIndex;
+  final int gems;
+  final Function(int) onGemsUpdate;
+  final Function(String, String) onCloseWithPiP;
+  final Function(Host) onFollowHost;
+  final Function(Host) onOpenProfile;
+  const LiveStreamSwipeableRoom({super.key, required this.liveHosts, required this.initialIndex, required this.gems, required this.onGemsUpdate, required this.onCloseWithPiP, required this.onFollowHost, required this.onOpenProfile});
+  @override
+  Widget build(BuildContext context) {
+    return PageView.builder(scrollDirection: Axis.vertical, itemCount: liveHosts.length, itemBuilder: (ctx, i) {
+      final h = liveHosts[i];
+      return Scaffold(backgroundColor: Colors.black, body: Stack(children: [Positioned.fill(child: Image.network(h.pic, fit: BoxFit.cover)), Positioned(top: 40, left: 16, child: Row(children: [GestureDetector(onTap: () => onOpenProfile(h), child: CircleAvatar(backgroundImage: NetworkImage(h.pic), radius: 18)), const SizedBox(width: 8), Text(h.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))])), Positioned(top: 40, right: 16, child: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () { onCloseWithPiP(h.name, h.pic); Navigator.pop(context); }))]));
+    });
+  }
+}
+import 'package:flutter/material.dart';
+import 'package:fizz_live_pro/models_and_data.dart';
+import 'package:fizz_live_pro/screens/party_and_live.dart';
+import 'package:fizz_live_pro/screens/widgets_and_call.dart';
+import 'package:fizz_live_pro/screens/splash_and_auth.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
+}
+
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+class _DashboardState extends State<Dashboard> {
+  int _navIndex = 0;
+  int _cat = 0;
+  String _liveSubFilter = 'Pretty';
+  int _gems = 1670;
+  final String _selectedCountry = '🇮🇳 India';
+  final List<String> _cats = const ['Hot', 'Live', 'Party', 'Match'];
+  final List<String> _liveSubFilters = const ['Pretty', 'New', 'Sexy'];
+  final List<Host> _allHosts = const [
+    Host(name: 'PrettyNiki', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', cat: 'Hot', tag: 'Pretty', flag: '🇮🇳', status: 'Online', id: 8002023),
+    Host(name: 'SexyRitaj', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300', cat: 'Live', tag: 'Sexy', flag: '🇦🇪', status: 'Live', id: 8002025),
+  ];
+  bool _hasMiniPlayer = false;
+  String _miniName = '';
+
+  void _showRechargeModal() {
+    showModalBottomSheet(context: context, builder: (_) => Container(height: 220, padding: const EdgeInsets.all(16), child: Column(children: [const Text('Recharge Gems', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), const SizedBox(height: 12), ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.pink), onPressed: () { setState(() => _gems += 4050); Navigator.pop(context); }, child: const Text('Add 4050 Gems (+17% of)'))])));
+  }
+
+  Widget _buildPartyRoomsList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: mockPartyRooms.length,
+      itemBuilder: (ctx, i) {
+        final r = mockPartyRooms[i];
+        return GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PartyAudioRoomScreen(room: r, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g)))),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF1E1428), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
+            child: Row(children: [
+              Stack(children: [CircleAvatar(radius: 28, backgroundImage: NetworkImage(r.avatar)), Positioned(bottom: 0, right: 0, child: Container(width: 12, height: 12, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)))]),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(r.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 6),
+                Row(children: [
+                  ...List.generate(3, (index) => Padding(padding: const EdgeInsets.only(right: 4), child: CircleAvatar(radius: 9, backgroundImage: NetworkImage(r.avatar)))),
+                  Text(' 🔊 ${r.onlineCount}', style: const TextStyle(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.w600)),
+                ]),
+              ])),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.pink.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Text('Party', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold))),
+                const SizedBox(height: 4),
+                Text('👥 ${r.membersCount} Seats', style: const TextStyle(color: Colors.white54, fontSize: 10)),
+              ]),
+            ]),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildContent() {
+    if (_navIndex == 2) return const Center(child: Text('🎮 Game Center', style: TextStyle(color: Colors.amber)));
+    if (_navIndex == 3) {
+      return ListView(padding: const EdgeInsets.all(12), children: const [
+        ListTile(leading: CircleAvatar(backgroundColor: Colors.pink, child: Icon(Icons.favorite)), title: Text('Like Me / Date', style: TextStyle(color: Colors.white)), subtitle: Text('Find your match 💖')),
+      ]);
+    }
+    if (_navIndex == 4) {
+      return ListView(padding: const EdgeInsets.all(16), children: [
+        const Center(child: Column(children: [CircleAvatar(radius: 30, child: Icon(Icons.person)), SizedBox(height: 6), Text('User7789', style: TextStyle(color: Colors.white, fontSize: 16)), Text('VIP Member', style: TextStyle(color: Colors.white54, fontSize: 12))])),
+        const SizedBox(height: 10),
+        Card(color: Colors.grey[850], child: ListTile(leading: const Icon(Icons.account_balance_wallet, color: Colors.greenAccent), title: const Text('Host Earnings: ₹12500', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), trailing: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.green), onPressed: () {}, child: const Text('Payout')))),
+      ]);
+    }
+    final catName = _cats[_cat];
+    if (catName == 'Party') return _buildPartyRoomsList();
+    final list = _allHosts.where((h) => catName == 'Hot' ? h.status == 'Online' : h.status == 'Live').toList();
+    return Column(children: [
+      if (_cat == 1) Container(color: Colors.grey[850], height: 50, child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: _liveSubFilters.map((sf) => TextButton(onPressed: () => setState(() => _liveSubFilter = sf), child: Text(sf, style: TextStyle(color: _liveSubFilter == sf ? Colors.pink : Colors.white)))).toList())),
+      Expanded(child: GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2), itemCount: list.length, itemBuilder: (ctx, i) {
+        final h = list[i];
+        return GestureDetector(onTap: () {
+          if (h.status == 'Live') {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => LiveStreamSwipeableRoom(liveHosts: list.where((x) => x.status == 'Live').toList(), initialIndex: 0, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g), onCloseWithPiP: (n, p) => setState(() { _hasMiniPlayer = true; _miniName = n; }), onFollowHost: (_) {}, onOpenProfile: (host) => showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: host, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g))))));
+          } else {
+            showModalBottomSheet(context: context, builder: (_) => HostProfileSheet(host: h, gems: _gems, onGemsUpdate: (g) => setState(() => _gems = g)));
+          }
+        }, child: Card(color: Colors.grey[900], child: Column(children: [Expanded(child: Image.network(h.pic, fit: BoxFit.cover)), Text(h.name, style: const TextStyle(color: Colors.white))])));
+      }))
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(backgroundColor: Colors.black, appBar: AppBar(backgroundColor: Colors.black, title: _navIndex == 0 ? Row(mainAxisSize: MainAxisSize.min, children: _cats.asMap().entries.map((e) => GestureDetector(onTap: () => setState(() => _cat = e.key), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 6), child: Text(e.value, style: TextStyle(color: _cat == e.key ? Colors.pink : Colors.white70))))).toList()) : const Text('Dashboard', style: TextStyle(color: Colors.white)), actions: [Center(child: Text(_selectedCountry, style: const TextStyle(fontSize: 11, color: Colors.amber))), IconButton(icon: const Icon(Icons.diamond, color: Colors.amber), onPressed: _showRechargeModal)]), body: Stack(children: [_buildContent(), if (_hasMiniPlayer) Positioned(bottom: 20, right: 20, child: GestureDetector(onTap: () => setState(() => _hasMiniPlayer = false), child: Container(width: 90, height: 120, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.pink)), child: Center(child: Text('Mini 🎙️\n$_miniName', style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold))))))]), bottomNavigationBar: BottomNavigationBar(backgroundColor: Colors.black, selectedItemColor: Colors.pink, unselectedItemColor: Colors.white54, currentIndex: _navIndex, type: BottomNavigationBarType.fixed, onTap: (idx) => setState(() => _navIndex = idx), items: const [BottomNavigationBarItem(icon: Icon(Icons.home), label: 'For You'), BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Follow'), BottomNavigationBarItem(icon: Icon(Icons.sports_esports), label: 'Game'), BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'), BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me')]));
+  }
+}
