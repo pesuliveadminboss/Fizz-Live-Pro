@@ -118,7 +118,7 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
   void initState() {
     super.initState();
     seats[0] = 'Host_Alpha';
-    seats = 'Guest_01';
+    seats = 'Guest_01'; // Fixed list index assignment
   }
 
   void _tapSeat(int index) {
