@@ -119,7 +119,7 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
   void initState() {
     super.initState();
     seats[0] = 'Host_Alpha';
-    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe'; // Fixed index assignment
+    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe';
   }
 
   void _tapSeat(int index) {
@@ -286,4 +286,3 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
     ),
   );
 }
-
