@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 import '../5_dashboard/post_login_popups.dart';
-
-class StreamerItem {
-  final String id8Digit;
-  final String name;
-  final String country;
-  final String imageUrl;
-  final String status;
-  final String tag;
-
-  const StreamerItem({
-    required this.id8Digit,
-    required this.name,
-    required this.country,
-    required this.imageUrl,
-    required this.status,
-    required this.tag,
-  });
-}
+import 'streamer_model.dart';
+import 'streamer_profile_sheet.dart';
 
 class DiscoveryFeedView extends StatefulWidget {
   const DiscoveryFeedView({super.key});
@@ -31,71 +15,23 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
   int selectedTabIndex = 0; // 0: Hot, 1: Live, 2: Party, 3: Match
   final List<String> tabTitles = ['Hot', 'Live', 'Party', 'Match'];
   String selectedCountry = 'All';
-  final List<String> countries = ['All', 'India', 'America', 'China', 'Bangladesh', 'Russia'];
+  final List<String> countries = ['All', 'India', 'Egypt', 'America', 'China', 'Bangladesh', 'Russia'];
 
-  final List<StreamerItem> allStreamers = const [
-    StreamerItem(id8Digit: '84920183', name: 'AvniHotnessDil', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400', status: 'live', tag: 'Hot'),
-    StreamerItem(id8Digit: '73920194', name: 'ShinySanya', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400', status: 'online', tag: 'Party'),
-    StreamerItem(id8Digit: '91827364', name: 'ExoticModel', country: 'America', imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', status: 'live', tag: 'Exotic'),
-    StreamerItem(id8Digit: '55443322', name: 'ChinaStar', country: 'China', imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', status: 'offline', tag: 'Match'),
-  ];
+  List<StreamerItemData> _getCurrentFilteredList() {
+    // Hot page strictly excludes offline streamers
+    var baseList = globalHotStreamers.where((s) => s.status != 'offline').toList();
 
-  void _openSearchByIdDialog() {
-    final searchCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('Search 8-Digit ID', style: TextStyle(color: Colors.white, fontSize: 16)),
-        content: TextField(
-          controller: searchCtrl,
-          keyboardType: TextInputType.number,
-          maxLength: 8,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Enter 8-digit ID (e.g. 84920183)',
-            hintStyle: TextStyle(color: Colors.white54),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink),
-            onPressed: () {
-              final query = searchCtrl.text.trim();
-              Navigator.pop(ctx);
-              final found = allStreamers.where((s) => s.id8Digit == query).toList();
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: AppTheme.cardDark,
-                builder: (_) => Container(
-                  padding: const EdgeInsets.all(20),
-                  height: 250,
-                  child: found.isNotEmpty
-                      ? Column(
-                          children: [
-                            CircleAvatar(radius: 40, backgroundImage: NetworkImage(found.first.imageUrl)),
-                            const SizedBox(height: 10),
-                            Text(found.first.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text('ID: ${found.first.id8Digit} | Country: ${found.first.country}', style: const TextStyle(color: Colors.amber)),
-                            Text('Status: ${found.first.status.toUpperCase()}', style: TextStyle(color: found.first.status == 'live' ? Colors.green : Colors.white70)),
-                            const Spacer(),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Connect / View Profile'),
-                            )
-                          ],
-                        )
-                      : const Center(child: Text('User/Streamer not found for this 8-digit ID', style: TextStyle(color: Colors.white70))),
-                ),
-              );
-            },
-            child: const Text('Search'),
-          ),
-        ],
-      ),
-    );
+    var countryFiltered = baseList.where((s) {
+      if (selectedCountry == 'All') return true;
+      return s.country.toLowerCase() == selectedCountry.toLowerCase();
+    }).toList();
+
+    if (selectedTabIndex == 1) {
+      return countryFiltered.where((s) => s.status == 'live').toList();
+    } else if (selectedTabIndex == 2) {
+      return countryFiltered.where((s) => s.status == 'party').toList();
+    }
+    return countryFiltered;
   }
 
   void _openCountryFilterDialog() {
@@ -125,23 +61,44 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
     );
   }
 
-  List<StreamerItem> _getCurrentFilteredList(List<StreamerItem> baseList) {
-    var countryFiltered = baseList.where((s) {
-      if (selectedCountry == 'All') return true;
-      return s.country.toLowerCase() == selectedCountry.toLowerCase();
-    }).toList();
-
-    if (selectedTabIndex == 1) {
-      return countryFiltered.where((s) => s.status == 'live').toList();
-    } else if (selectedTabIndex == 2) {
-      return countryFiltered.where((s) => s.tag == 'Party' || s.tag == 'Hot').toList();
-    }
-    return countryFiltered;
+  void _openSearchByIdDialog() {
+    final searchCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: const Text('Search 8-Digit ID (90001001...)', style: TextStyle(color: Colors.white, fontSize: 15)),
+        content: TextField(
+          controller: searchCtrl,
+          keyboardType: TextInputType.number,
+          maxLength: 8,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(hintText: 'Enter 8-digit ID', hintStyle: TextStyle(color: Colors.white54)),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink),
+            onPressed: () {
+              final query = searchCtrl.text.trim();
+              Navigator.pop(ctx);
+              final found = globalHotStreamers.where((s) => s.id8Digit == query).toList();
+              if (found.isNotEmpty) {
+                showStreamerProfileModal(context, found.first);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Streamer not found')));
+              }
+            },
+            child: const Text('Search'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(context) {
-    final currentList = _getCurrentFilteredList(allStreamers);
+    final currentList = _getCurrentFilteredList();
 
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
@@ -150,7 +107,7 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
           children: [
             Column(
               children: [
-                // Non-sliding static top row tabs + search + world icon
+                // Top static header row matching screenshot
                 Container(
                   color: Colors.black,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -175,11 +132,7 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Container(
-                                    height: 2,
-                                    width: isSelected ? 24 : 0,
-                                    color: Colors.amber,
-                                  ),
+                                  Container(height: 2, width: isSelected ? 24 : 0, color: Colors.amber),
                                 ],
                               ),
                             ),
@@ -187,14 +140,8 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                         }),
                       ),
                       const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.search, color: Colors.white70),
-                        onPressed: _openSearchByIdDialog,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.public, color: Colors.white70),
-                        onPressed: _openCountryFilterDialog,
-                      ),
+                      IconButton(icon: const Icon(Icons.search, color: Colors.white70), onPressed: _openSearchByIdDialog),
+                      IconButton(icon: const Icon(Icons.public, color: Colors.white70), onPressed: _openCountryFilterDialog),
                     ],
                   ),
                 ),
@@ -214,20 +161,133 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                     ),
                   ),
                 Expanded(
-                  child: _buildStreamerGrid(currentList),
+                  child: currentList.isEmpty
+                      ? const Center(child: Text('No streamers found', style: TextStyle(color: Colors.white54)))
+                      : GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                          itemCount: currentList.length,
+                          itemBuilder: (_, index) {
+                            final item = currentList[index];
+                            return GestureDetector(
+                              onTap: () {
+                                if (item.status == 'party') {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Opening ${item.name} Party Room...')));
+                                } else if (item.status == 'live') {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Opening ${item.name} Live page...')));
+                                } else {
+                                  showStreamerProfileModal(context, item);
+                                }
+                              },
+                              child: Card(
+                                clipBehavior: Clip.antiAlias,
+                                color: AppTheme.cardDark,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Image.network(item.imageUrl, fit: BoxFit.cover),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
+                                        ),
+                                      ),
+                                    ),
+                                    // Top left green/colored status tag
+                                    Positioned(
+                                      top: 8, left: 8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10)),
+                                        child: Row(
+                                          children: [
+                                            Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)),
+                                            const SizedBox(width: 4),
+                                            Text(item.status.toUpperCase(), style: const TextStyle(color: Colors.greenAccent, fontSize: 9, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    // Top right "Your Follow" badge if followed
+                                    if (item.isFollowed)
+                                      Positioned(
+                                        top: 8, right: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(color: Colors.pinkAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(8)),
+                                          child: const Text('Your Follow', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                                        ),
+                                      ),
+                                    // Bottom left name, country, age
+                                    Positioned(
+                                      bottom: 8, left: 8, right: 50,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                          Text('${item.country} • ${item.age}y', style: const TextStyle(color: Colors.amber, fontSize: 11)),
+                                        ],
+                                      ),
+                                    ),
+                                    // Bottom right video call button & heart follow toggle
+                                    Positioned(
+                                      bottom: 8, right: 8,
+                                      child: Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                item.isFollowed = !item.isFollowed;
+                                              });
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(item.isFollowed ? 'Following' : 'Unfollowing'),
+                                                  duration: const Duration(seconds: 2),
+                                                ),
+                                              );
+                                            },
+                                            child: Icon(
+                                              item.isFollowed ? Icons.favorite : Icons.favorite_border,
+                                              color: item.isFollowed ? Colors.white : Colors.pinkAccent,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: () {
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Calling video to ${item.name}...')));
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pinkAccent.withOpacity(0.8)),
+                                              child: const Icon(Icons.video_call, color: Colors.white, size: 16),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
+            // Floating FREE Gift Box
             Positioned(
-              bottom: 20,
-              left: 16,
+              bottom: 20, left: 16,
               child: GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => const DailyRewardsDialog(),
-                  );
-                },
+                onTap: () => showDialog(context: context, builder: (ctx) => const DailyRewardsDialog()),
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -250,62 +310,4 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
       ),
     );
   }
-
-  Widget _buildStreamerGrid(List<StreamerItem> list) {
-    if (list.isEmpty) {
-      return const Center(child: Text('No streamers found for this filter', style: TextStyle(color: Colors.white54)));
-    }
-    return GridView.builder(
-      padding: const EdgeInsets.all(8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: list.length,
-      itemBuilder: (_, index) {
-        final item = list[index];
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          color: AppTheme.cardDark,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.network(item.imageUrl, fit: BoxFit.cover),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 8, left: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10)),
-                  child: Text('ID: ${item.id8Digit.substring(0, 4)}...', style: const TextStyle(color: Colors.white70, fontSize: 10)),
-                ),
-              ),
-              Positioned(
-                bottom: 8, left: 8, right: 8,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                    Text('${item.country} • ${item.status}', style: const TextStyle(color: Colors.amber, fontSize: 11)),
-                  ],
-                ),
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
-
