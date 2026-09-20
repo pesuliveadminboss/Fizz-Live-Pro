@@ -9,8 +9,8 @@ import '../4_interactions/call_and_party_screens.dart';
 
 class LiveStreamRoomScreen extends StatefulWidget {
   final StreamerItemData streamer;
-  final VoidCallback onDismissTotal; // Full cut / close room
-  final Function(StreamerItemData) onMinimizePIP; // Minimize to floating mini player
+  final VoidCallback onDismissTotal;
+  final Function(StreamerItemData) onMinimizePIP;
 
   const LiveStreamRoomScreen({
     super.key,
@@ -101,7 +101,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Full screen video/image feed with safe error fallback
+          // Full screen feed video/image with safe fallback
           Image.network(
             widget.streamer.imageUrl,
             fit: BoxFit.cover,
@@ -116,7 +116,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Top Bar: Streamer Profile round badge + name + follow heart + Viewer count badge + Minimize (x)
+          // Top Bar
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -171,7 +171,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Mini Vertical Rotating Ad Ticker (5 ads per sec rotating)
+          // AdMob Monetized Ticker
           Positioned(
             bottom: 120, right: 16,
             child: Container(
@@ -186,7 +186,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Live Chat Ticker (auto scroll up, scrollable touch fallback)
+          // Live Chat Ticker
           Positioned(
             bottom: 70, left: 16, right: 100, height: 160,
             child: ShaderMask(
@@ -238,7 +238,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Bottom chat input with SEND BUTTON & Gift/VideoCall action row
+          // Bottom Chat Input + Send Icon + Gifts/Call
           Positioned(
             bottom: 12, left: 12, right: 12,
             child: Row(
@@ -296,7 +296,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   }
 }
 
-// Draggable Floating PIP Wrapper with inner Close (x) and Expand center tap
+// Draggable Floating PIP Wrapper
 class DraggableLivePIPWrapper extends StatefulWidget {
   final StreamerItemData streamer;
   final VoidCallback onDismissTotal;
@@ -323,7 +323,7 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
         ),
         childWhenDragging: const SizedBox.shrink(),
         onDragEnd: (details) {
-          setState(( ) {
+          setState(() {
             position = Offset(details.offset.dx.clamp(0.0, 240.0), details.offset.dy.clamp(40.0, 500.0));
           });
         },
@@ -373,4 +373,3 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
     );
   }
 }
-
