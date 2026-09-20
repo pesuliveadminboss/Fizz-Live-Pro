@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 import '../3_discovery/discovery_feed.dart';
 import '../4_interactions/call_and_party_screens.dart';
+import '../wallet/wallet_screen.dart';
 
 class DashboardShell extends StatefulWidget {
   const DashboardShell({super.key});
@@ -15,7 +16,7 @@ class _DashboardShellState extends State<DashboardShell> {
     const DiscoveryFeedView(), 
     const PartyRoomGridWidget(), 
     const Center(child: Text('Messages', style: TextStyle(color: Colors.white))), 
-    const Center(child: Text('Me / Wallet', style: TextStyle(color: Colors.white)))
+    const WalletScreen()
   ];
 
   @override
@@ -55,3 +56,4 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 }
+  
