@@ -27,8 +27,9 @@ class DiscoveryFeedView extends StatefulWidget {
   State<DiscoveryFeedView> createState() => _DiscoveryFeedViewState();
 }
 
-class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
+  int selectedTabIndex = 0; // 0: Hot, 1: Live, 2: Party, 3: Match
+  final List<String> tabTitles = ['Hot', 'Live', 'Party', 'Match'];
   String selectedCountry = 'All';
   final List<String> countries = ['All', 'India', 'America', 'China', 'Bangladesh', 'Russia'];
 
@@ -38,18 +39,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
     StreamerItem(id8Digit: '91827364', name: 'ExoticModel', country: 'America', imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', status: 'live', tag: 'Exotic'),
     StreamerItem(id8Digit: '55443322', name: 'ChinaStar', country: 'China', imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', status: 'offline', tag: 'Match'),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   void _openSearchByIdDialog() {
     final searchCtrl = TextEditingController();
@@ -136,12 +125,23 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
     );
   }
 
-  @override
-  Widget build(context) {
-    final filteredStreamers = allStreamers.where((s) {
+  List<StreamerItem> _getCurrentFilteredList(List<StreamerItem> baseList) {
+    var countryFiltered = baseList.where((s) {
       if (selectedCountry == 'All') return true;
       return s.country.toLowerCase() == selectedCountry.toLowerCase();
     }).toList();
+
+    if (selectedTabIndex == 1) {
+      return countryFiltered.where((s) => s.status == 'live').toList();
+    } else if (selectedTabIndex == 2) {
+      return countryFiltered.where((s) => s.tag == 'Party' || s.tag == 'Hot').toList();
+    }
+    return countryFiltered;
+  }
+
+  @override
+  Widget build(context) {
+    final currentList = _getCurrentFilteredList(allStreamers);
 
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
@@ -150,26 +150,43 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
           children: [
             Column(
               children: [
+                // Non-sliding static top row tabs + search + world icon
                 Container(
                   color: Colors.black,
-                  padding: const EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: TabBar(
-                          controller: _tabController,
-                          isScrollable: true,
-                          labelColor: Colors.amber,
-                          unselectedLabelColor: Colors.white.withOpacity(0.64),
-                          indicatorColor: Colors.amber,
-                          tabs: const [
-                            Tab(text: 'Hot'),
-                            Tab(text: 'Live'),
-                            Tab(text: 'Party'),
-                            Tab(text: 'Match'),
-                          ],
-                        ),
+                      Row(
+                        children: List.generate(tabTitles.length, (index) {
+                          final isSelected = selectedTabIndex == index;
+                          return GestureDetector(
+                            onTap: () => setState(() => selectedTabIndex = index),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    tabTitles[index],
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.amber : Colors.white.withOpacity(0.64),
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    height: 2,
+                                    width: isSelected ? 24 : 0,
+                                    color: Colors.amber,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
                       ),
+                      const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.search, color: Colors.white70),
                         onPressed: _openSearchByIdDialog,
@@ -197,15 +214,7 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
                     ),
                   ),
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildStreamerGrid(filteredStreamers),
-                      _buildStreamerGrid(filteredStreamers.where((s) => s.status == 'live').toList()),
-                      _buildStreamerGrid(filteredStreamers.where((s) => s.tag == 'Party' || s.tag == 'Hot').toList()),
-                      _buildStreamerGrid(filteredStreamers),
-                    ],
-                  ),
+                  child: _buildStreamerGrid(currentList),
                 ),
               ],
             ),
