@@ -17,7 +17,6 @@ class WalletScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Balance card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -33,7 +32,7 @@ class WalletScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Total Balance', style: TextStyle(color: Colors.white6urator, fontSize: 13), style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const Text('Total Balance', style: TextStyle(color: Colors.white70, fontSize: 13)),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,7 +67,6 @@ class WalletScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            // Quick action tiles
             ListTile(
               tileColor: AppTheme.cardDark,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -105,4 +103,3 @@ class WalletScreen extends StatelessWidget {
     );
   }
 }
-
