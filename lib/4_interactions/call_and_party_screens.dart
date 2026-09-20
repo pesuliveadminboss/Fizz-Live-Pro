@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
+import '../2_auth/user_profile_model.dart';
 
 class ZegoVideoCallScreen extends StatefulWidget {
   final String streamerName;
@@ -112,19 +113,20 @@ class PartyRoomGridWidget extends StatefulWidget {
 }
 
 class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
-  final List<String?> seats = List.filled(9, null);
+  late final List<String?> seats;
 
   @override
   void initState() {
     super.initState();
+    seats = List.filled(9, null);
     seats[0] = 'Host_Alpha';
-    seats = 'Guest_01'; // Fixed list index assignment
+    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe';
   }
 
   void _tapSeat(int index) {
     setState(() {
       if (seats[index] == null) {
-        seats[index] = 'Me (You)';
+        seats[index] = userProfile.username.isNotEmpty ? userProfile.username : 'Me (You)';
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Joined seat #${index + 1}')));
       } else {
         seats[index] = null;
@@ -190,6 +192,7 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
                           occupant ?? 'Seat ${index + 1}\nTap to Sit',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: occupant != null ? Colors.white : Colors.white54, fontSize: 10, fontWeight: occupant != null ? FontWeight.bold : FontWeight.normal),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
