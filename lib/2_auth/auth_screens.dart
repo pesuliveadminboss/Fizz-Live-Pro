@@ -1,68 +1,40 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 import '../5_dashboard/dashboard_shell.dart';
 import 'user_profile_model.dart';
 
-class AgeGateAndAuthScreen extends StatefulWidget {
-  const AgeGateAndAuthScreen({super.key});
+// Splash Screen matching FIZZ LIVE PRO intro requirement
+class SplashLoginScreen extends StatefulWidget {
+  const SplashLoginScreen({super.key});
   @override
-  State<AgeGateAndAuthScreen> createState() => _AgeGateAndAuthScreenState();
+  State<SplashLoginScreen> createState() => _SplashLoginScreenState();
 }
 
-class _AgeGateAndAuthScreenState extends State<AgeGateAndAuthScreen> {
-  bool is18Plus = false;
-  String selectedAuthMethod = 'Guest';
-
-  void _proceedToNext() {
-    if (!is18Plus) return;
-    if (!userProfile.isProfileCompleted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProfileSetupScreen()));
-    } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardShell()));
-    }
+class _SplashLoginScreenState extends State<SplashLoginScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CustomLoginBubbleScreen()));
+      }
+    });
   }
 
   @override
   Widget build(context) {
-    return Scaffold(
-      backgroundColor: AppTheme.bgDark,
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.verified_user, size: 70, color: AppTheme.accentAmber),
-            const SizedBox(height: 16),
-            const Text('FIZZ LIVE PRO — 18+', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Live • Connect • Vibe. Confirm 18+ age to continue.', style: TextStyle(color: Colors.white54, fontSize: 13), textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            SwitchListTile(
-              title: const Text('I confirm I am 18+ years old & agree to Terms/Privacy', style: TextStyle(color: Colors.white, fontSize: 13)),
-              value: is18Plus,
-              activeColor: AppTheme.primaryPink,
-              onChanged: (val) => setState(() => is18Plus = val),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: ['Guest', 'Phone OTP', 'Google'].map((m) {
-                return ChoiceChip(
-                  label: Text(m),
-                  selected: selectedAuthMethod == m,
-                  onSelected: (_) => setState(() => selectedAuthMethod = m),
-                  selectedColor: AppTheme.primaryPink,
-                  labelStyle: const TextStyle(color: Colors.white),
-                  backgroundColor: AppTheme.cardDark,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: is18Plus ? AppTheme.primaryPink : Colors.grey, minimumSize: const Size(double.infinity, 50)),
-              onPressed: is18Plus ? _proceedToNext : null,
-              child: Text('Continue with $selectedAuthMethod', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
+            Icon(Icons.live_tv, size: 75, color: Colors.pinkAccent),
+            SizedBox(height: 14),
+            Text('FIZZ LIVE PRO', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.amber, letterSpacing: 1.5)),
+            SizedBox(height: 6),
+            Text('Live Stream • 18+ Mature Vibe', style: TextStyle(fontSize: 12, color: Colors.white54)),
           ],
         ),
       ),
@@ -70,23 +42,244 @@ class _AgeGateAndAuthScreenState extends State<AgeGateAndAuthScreen> {
   }
 }
 
+// Screenshot Reference Floating Bubble Login Screen
+class CustomLoginBubbleScreen extends StatefulWidget {
+  const CustomLoginBubbleScreen({super.key});
+  @override
+  State<CustomLoginBubbleScreen> createState() => _CustomLoginBubbleScreenState();
+}
+
+class _CustomLoginBubbleScreenState extends State<CustomLoginBubbleScreen> {
+  bool agreedToPolicy = false;
+
+  final List<Map<String, dynamic>> _bubbles = const [
+    {'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'top': 60, 'left': 30, 'size': 75},
+    {'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'top': 50, 'right': 40, 'size': 68},
+    {'img': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'top': 210, 'left': 45, 'size': 90},
+    {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?top=225', 'top': 225, 'right': 35, 'size': 85},
+    {'img': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', 'top': 380, 'left': 120, 'size': 80},
+  ];
+
+  void _handleFastLogin() {
+    if (!agreedToPolicy) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please agree to User Agreement and Privacy Policy first!')));
+      return;
+    }
+    _navigateBasedOnProfile();
+  }
+
+  void _navigateBasedOnProfile() {
+    if (!userProfile.isProfileCompleted) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileSetupScreen(isNewUser: true)));
+    } else {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardShell()));
+    }
+  }
+
+  void _openLoginBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.cardDark,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Login to Fizz Live Pro', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.g_mobiledata, color: Colors.amber, size: 36),
+              title: const Text('Continue with Gmail', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Auto-fill name, DOB & gender from Google', style: TextStyle(color: Colors.white54, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                userProfile.username = 'GoogleUser_Live';
+                userProfile.gender = 'Female';
+                userProfile.dob = '12/05/2001';
+                _navigateBasedOnProfile();
+              },
+            ),
+            const Divider(color: Colors.white24),
+            ListTile(
+              leading: const Icon(Icons.phone, color: Colors.pinkAccent),
+              title: const Text('Continue with Phone OTP', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Verify mobile number with OTP', style: TextStyle(color: Colors.white54, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const PhoneOtpScreen()));
+              },
+            ),
+            const Divider(color: Colors.white24),
+            ListTile(
+              leading: const Icon(Icons.person_outline, color: Colors.white70),
+              title: const Text('Guest Mode', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _navigateBasedOnProfile();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0713),
+      body: Stack(
+        children: [
+          ..._bubbles.map((b) => Positioned(
+            top: (b['top'] as num).toDouble(),
+            left: b.containsKey('left') ? (b['left'] as num).toDouble() : null,
+            right: b.containsKey('right') ? (b['right'] as num).toDouble() : null,
+            child: Container(
+              width: (b['size'] as num).toDouble(),
+              height: (b['size'] as num).toDouble(),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                image: DecorationImage(image: NetworkImage(b['img'] as String), fit: BoxFit.cover),
+              ),
+            ),
+          )),
+          Positioned(
+            bottom: 30, left: 24, right: 24,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: _handleFastLogin,
+                  child: Container(
+                    width: double.infinity, height: 52,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('Fast Login', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Already a member? ', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                    GestureDetector(
+                      onTap: _openLoginBottomSheet,
+                      child: const Text('Login', style: TextStyle(color: Colors.pinkAccent, fontSize: 13, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: agreedToPolicy,
+                      activeColor: Colors.pinkAccent,
+                      onChanged: (v) => setState(() => agreedToPolicy = v ?? false),
+                    ),
+                    const Expanded(
+                      child: Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.headset_mic, size: 14, color: Colors.amber),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Support helpline: support@fizzlivepro.com')));
+                      },
+                      child: const Text('Having login issues? Find help', style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Phone OTP verification flow screen
+class PhoneOtpScreen extends StatefulWidget {
+  const PhoneOtpScreen({super.key});
+  @override
+  State<PhoneOtpScreen> createState() => _PhoneOtpScreenState();
+}
+
+class _PhoneOtpScreenState extends State<PhoneOtpScreen> {
+  final phoneCtrl = TextEditingController();
+  final otpCtrl = TextEditingController();
+  bool otpSent = false;
+
+  void _verifyOtp() {
+    userProfile.username = 'PhoneUser_${DateTime.now().second}';
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => userProfile.isProfileCompleted ? const DashboardShell() : const ProfileSetupScreen(isNewUser: true)),
+      (_) => false,
+    );
+  }
+
+  @override
+  Widget build(context) {
+    return Scaffold(
+      backgroundColor: AppTheme.bgDark,
+      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Phone OTP Login', style: TextStyle(color: Colors.white))),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter Mobile Number', labelStyle: TextStyle(color: Colors.white54))),
+            const SizedBox(height: 16),
+            if (otpSent) ...[
+              TextField(controller: otpCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter 6-Digit OTP', labelStyle: TextStyle(color: Colors.white54))),
+              const SizedBox(height: 24),
+              ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink), onPressed: _verifyOtp, child: const Text('Verify & Continue')),
+            ] else ...[
+              const SizedBox(height: 24),
+              ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink), onPressed: () => setState(() => otpSent = true), child: const Text('Generate OTP')),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Complete Profile Setup Screen (Name, DOB, Gender, Photo, 18+ verification)
 class ProfileSetupScreen extends StatefulWidget {
-  const ProfileSetupScreen({super.key});
+  final bool isNewUser;
+  const ProfileSetupScreen({super.key, this.isNewUser = true});
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
-  final nameCtrl = TextEditingController(text: 'FizzUser_${DateTime.now().second}');
+  final nameCtrl = TextEditingController();
   final dobCtrl = TextEditingController(text: '10/10/2004');
   String gender = 'Female';
-  String lang = 'Tamil';
+  bool is18PlusConfirmed = true;
 
   void _saveProfile() {
+    if (nameCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter username')));
+      return;
+    }
     userProfile.username = nameCtrl.text.trim();
     userProfile.dob = dobCtrl.text.trim();
     userProfile.gender = gender;
-    userProfile.language = lang;
     userProfile.isProfileCompleted = true;
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardShell()));
   }
@@ -95,13 +288,20 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(context) {
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
-      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Profile Onboarding', style: TextStyle(color: Colors.white))),
+      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Complete Profile (18+)', style: TextStyle(color: Colors.white))),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: ListView(
           children: [
-            const Center(child: CircleAvatar(radius: 45, backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, size: 50, color: Colors.white))),
-            const SizedBox(height: 20),
+            const Center(
+              child: CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.pinkAccent,
+                child: Icon(Icons.add_a_photo, size: 36, color: Colors.white),
+              ),
+            ),
+            const Center(child: Text('Tap to set Profile Photo', style: TextStyle(color: Colors.white54, fontSize: 11, height: 2))),
+            const SizedBox(height: 16),
             TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Username', labelStyle: TextStyle(color: Colors.white54), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)))),
             const SizedBox(height: 16),
             TextField(controller: dobCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Date of Birth (DD/MM/YYYY)', labelStyle: TextStyle(color: Colors.white54), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)))),
@@ -114,11 +314,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               items: ['Female', 'Male', 'Non-Binary'].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
               onChanged: (v) => setState(() => gender = v ?? 'Female'),
             ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('I confirm I am 18+ years old', style: TextStyle(color: Colors.white, fontSize: 13)),
+              value: is18PlusConfirmed,
+              activeColor: AppTheme.primaryPink,
+              onChanged: (val) => setState(() => is18PlusConfirmed = val),
+            ),
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink, minimumSize: const Size(double.infinity, 50)),
               onPressed: _saveProfile,
-              child: const Text('Save & Enter Home', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text('Save & Enter App', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -126,4 +333,3 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
   }
 }
-
