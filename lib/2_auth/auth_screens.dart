@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 import '../5_dashboard/dashboard_shell.dart';
 import 'user_profile_model.dart';
+import 'legal_sheet.dart';
 
 // Splash Screen matching FIZZ LIVE PRO intro requirement
 class SplashLoginScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class _CustomLoginBubbleScreenState extends State<CustomLoginBubbleScreen> {
     {'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'top': 60, 'left': 30, 'size': 75},
     {'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'top': 50, 'right': 40, 'size': 68},
     {'img': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'top': 210, 'left': 45, 'size': 90},
-    {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?top=225', 'top': 225, 'right': 35, 'size': 85},
+    {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'top': 225, 'right': 35, 'size': 85},
     {'img': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', 'top': 380, 'left': 120, 'size': 80},
   ];
 
@@ -183,8 +184,21 @@ class _CustomLoginBubbleScreenState extends State<CustomLoginBubbleScreen> {
                       activeColor: Colors.pinkAccent,
                       onChanged: (v) => setState(() => agreedToPolicy = v ?? false),
                     ),
-                    const Expanded(
-                      child: Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    Expanded(
+                      child: Wrap(
+                        children: [
+                          const Text('Agree to ', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                          GestureDetector(
+                            onTap: () => showLegalModal(context, 'User Agreement', userAgreementText),
+                            child: const Text('User Agreement', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
+                          const Text(' and ', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                          GestureDetector(
+                            onTap: () => showLegalModal(context, 'Privacy Policy', privacyPolicyText),
+                            child: const Text('Privacy Policy', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -211,7 +225,7 @@ class _CustomLoginBubbleScreenState extends State<CustomLoginBubbleScreen> {
   }
 }
 
-// Phone OTP verification flow screen
+// Phone OTP verification flow screen with mock bypass support
 class PhoneOtpScreen extends StatefulWidget {
   const PhoneOtpScreen({super.key});
   @override
@@ -241,15 +255,22 @@ class _PhoneOtpScreenState extends State<PhoneOtpScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter Mobile Number', labelStyle: TextStyle(color: Colors.white54))),
+            TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter Mobile Number (+91...)', labelStyle: TextStyle(color: Colors.white54))),
             const SizedBox(height: 16),
             if (otpSent) ...[
-              TextField(controller: otpCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter 6-Digit OTP', labelStyle: TextStyle(color: Colors.white54))),
+              TextField(controller: otpCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Enter OTP (Tip: enter any 6 digits for instant test)', labelStyle: TextStyle(color: Colors.white54))),
               const SizedBox(height: 24),
               ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink), onPressed: _verifyOtp, child: const Text('Verify & Continue')),
             ] else ...[
               const SizedBox(height: 24),
-              ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink), onPressed: () => setState(() => otpSent = true), child: const Text('Generate OTP')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPink), 
+                onPressed: () {
+                  setState(() => otpSent = true);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mock OTP generated: Use any 6 digits (e.g. 123456) to verify.')));
+                }, 
+                child: const Text('Generate OTP'),
+              ),
             ]
           ],
         ),
