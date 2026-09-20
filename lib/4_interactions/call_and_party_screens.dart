@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 
-// --- 1. ZegoCloud 1-to-1 Video/Audio Call Screen UI ---
 class ZegoVideoCallScreen extends StatefulWidget {
   final String streamerName;
   final String streamerId;
@@ -105,7 +104,6 @@ class _ZegoVideoCallScreenState extends State<ZegoVideoCallScreen> {
   }
 }
 
-// --- 2. Party Room 9-Seat Interactive Layout ---
 class PartyRoomGridWidget extends StatefulWidget {
   const PartyRoomGridWidget({super.key});
 
@@ -206,7 +204,6 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
   }
 }
 
-// --- 3. Gift Sending & Coin Deduct Animation Sheet ---
 class GiftItem {
   final String name;
   final int gemPrice;
