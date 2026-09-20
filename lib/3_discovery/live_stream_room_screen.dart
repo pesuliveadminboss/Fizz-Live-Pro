@@ -9,9 +9,15 @@ import '../4_interactions/call_and_party_screens.dart';
 
 class LiveStreamRoomScreen extends StatefulWidget {
   final StreamerItemData streamer;
-  final VoidCallback onDismissPIP;
+  final VoidCallback onDismissTotal; // Full cut / close room
+  final Function(StreamerItemData) onMinimizePIP; // Minimize to floating mini player
 
-  const LiveStreamRoomScreen({super.key, required this.streamer, required this.onDismissPIP});
+  const LiveStreamRoomScreen({
+    super.key,
+    required this.streamer,
+    required this.onDismissTotal,
+    required this.onMinimizePIP,
+  });
 
   @override
   State<LiveStreamRoomScreen> createState() => _LiveStreamRoomScreenState();
@@ -50,7 +56,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
     final text = customText ?? chatCtrl.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      chatMessages.add(LiveChatMessage(senderName: userProfile.username, text: text));
+      chatMessages.add(LiveChatMessage(senderName: userProfile.username.isNotEmpty ? userProfile.username : 'You', text: text));
     });
     if (customText == null) chatCtrl.clear();
   }
@@ -95,7 +101,12 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.network(widget.streamer.imageUrl, fit: BoxFit.cover),
+          // Full screen video/image feed with safe error fallback
+          Image.network(
+            widget.streamer.imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: const Color(0xFF1F1A24), child: const Center(child: Icon(Icons.person, size: 100, color: Colors.white24))),
+          ),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -105,6 +116,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
+          // Top Bar: Streamer Profile round badge + name + follow heart + Viewer count badge + Minimize (x)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -150,12 +162,16 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: widget.onDismissPIP,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      widget.onMinimizePIP(widget.streamer);
+                    },
                   ),
                 ],
               ),
             ),
           ),
+          // Mini Vertical Rotating Ad Ticker (5 ads per sec rotating)
           Positioned(
             bottom: 120, right: 16,
             child: Container(
@@ -170,6 +186,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
+          // Live Chat Ticker (auto scroll up, scrollable touch fallback)
           Positioned(
             bottom: 70, left: 16, right: 100, height: 160,
             child: ShaderMask(
@@ -221,19 +238,28 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
+          // Bottom chat input with SEND BUTTON & Gift/VideoCall action row
           Positioned(
             bottom: 12, left: 12, right: 12,
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white24)),
+                    height: 44,
+                    padding: const EdgeInsets.only(left: 14, right: 4),
+                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white24)),
                     child: TextField(
                       controller: chatCtrl,
                       style: const TextStyle(color: Colors.white, fontSize: 13),
-                      decoration: const InputDecoration(hintText: 'Say something...', hintStyle: TextStyle(color: Colors.white54), border: InputBorder.none),
+                      decoration: InputDecoration(
+                        hintText: 'Say something...',
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        border: InputBorder.none,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.send_rounded, color: Colors.pinkAccent, size: 20),
+                          onPressed: () => _sendChatMessage(),
+                        ),
+                      ),
                       onSubmitted: (_) => _sendChatMessage(),
                     ),
                   ),
@@ -270,19 +296,20 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   }
 }
 
+// Draggable Floating PIP Wrapper with inner Close (x) and Expand center tap
 class DraggableLivePIPWrapper extends StatefulWidget {
   final StreamerItemData streamer;
-  final VoidCallback onDismissPIP;
+  final VoidCallback onDismissTotal;
   final VoidCallback onExpandFull;
 
-  const DraggableLivePIPWrapper({super.key, required this.streamer, required this.onDismissPIP, required this.onExpandFull});
+  const DraggableLivePIPWrapper({super.key, required this.streamer, required this.onDismissTotal, required this.onExpandFull});
 
   @override
   State<DraggableLivePIPWrapper> createState() => _DraggableLivePIPWrapperState();
 }
 
 class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
-  Offset position = const Offset(20, 80);
+  Offset position = const Offset(20, 100);
 
   @override
   Widget build(context) {
@@ -296,8 +323,8 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
         ),
         childWhenDragging: const SizedBox.shrink(),
         onDragEnd: (details) {
-          setState(() {
-            position = Offset(details.offset.dx.clamp(0.0, 250.0), details.offset.dy.clamp(40.0, 500.0));
+          setState(( ) {
+            position = Offset(details.offset.dx.clamp(0.0, 240.0), details.offset.dy.clamp(40.0, 500.0));
           });
         },
         child: GestureDetector(
@@ -321,13 +348,17 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.network(widget.streamer.imageUrl, fit: BoxFit.cover),
+          Image.network(
+            widget.streamer.imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: Colors.black87),
+          ),
           Positioned(
             top: 4, right: 4,
             child: GestureDetector(
-              onTap: widget.onDismissPIP,
+              onTap: widget.onDismissTotal,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(5),
                 decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
                 child: const Icon(Icons.close, color: Colors.white, size: 14),
               ),
@@ -342,3 +373,4 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
     );
   }
 }
+
