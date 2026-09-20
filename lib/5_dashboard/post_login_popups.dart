@@ -202,7 +202,7 @@ void _showTimelyAlerts(BuildContext context) {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(ctx); // Fixed context pop for close button
                   _showCallReminders(context);
                 },
                 child: const Icon(Icons.close, color: Colors.grey),
@@ -220,7 +220,8 @@ void _showTimelyAlerts(BuildContext context) {
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(ctx); // Close timely alerts dialog properly
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification Permission Enabled!')));
                 _showCallReminders(context);
               },
               child: Container(
@@ -337,3 +338,4 @@ class _CallRemindersDialogState extends State<CallRemindersDialog> {
     );
   }
 }
+
