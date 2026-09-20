@@ -70,7 +70,22 @@ class _CustomCallScreenState extends State<CustomCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          const Center(child: Icon(Icons.videocam, size: 80, color: Colors.white24)),
+          // Zego / Live Stream Video Surface placeholder (Updated Step A)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black87,
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.videocam_rounded, size: 64, color: Colors.pinkAccent),
+                    SizedBox(height: 8),
+                    Text('Zego RTC Live Stream Connected', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           Positioned(
             top: 50, left: 20, right: 20,
             child: Row(
@@ -130,4 +145,3 @@ class PartyRoomGridWidget extends StatelessWidget {
     );
   }
 }
-
