@@ -30,20 +30,18 @@ class _ZegoVideoCallScreenState extends State<ZegoVideoCallScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Mock Zego Cloud Remote Video Feed Background
           Container(
             color: const Color(0xFF1F1A24),
             child: const Center(
               child: Icon(Icons.person, size: 120, color: Colors.white24),
             ),
           ),
-          // Top Bar info
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
-                  CircleAvatar(backgroundColor: Colors.black45, child: const Icon(Icons.shield, color: Colors.amber, size: 18)),
+                  const CircleAvatar(backgroundColor: Colors.black45, child: Icon(Icons.shield, color: Colors.amber, size: 18)),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +61,6 @@ class _ZegoVideoCallScreenState extends State<ZegoVideoCallScreen> {
               ),
             ),
           ),
-          // Bottom Control Actions
           Positioned(
             bottom: 40, left: 24, right: 24,
             child: Row(
@@ -89,7 +86,7 @@ class _ZegoVideoCallScreenState extends State<ZegoVideoCallScreen> {
                 ),
                 FloatingActionButton(
                   heroTag: 'gift_call',
-                  backgroundColor: Colors.purple.withOpacity(0.6),
+                  backgroundColor: Colors.purple,
                   onPressed: () => showGiftSendingSheet(context, 'VideoCallUser'),
                   child: const Icon(Icons.card_giftcard, color: Colors.amber),
                 ),
@@ -265,7 +262,7 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                   } else {
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Insufficient gems! Please recharge.'))),
+                      const SnackBar(content: Text('Insufficient gems! Please recharge.')),
                     );
                   }
                 },
@@ -290,4 +287,3 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
     ),
   );
 }
-
