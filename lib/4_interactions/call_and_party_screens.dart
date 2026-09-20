@@ -119,14 +119,14 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
   void initState() {
     super.initState();
     seats[0] = 'Host_Alpha';
-    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe';
   }
 
   void _tapSeat(int index) {
     setState(() {
+      final myName = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe';
       if (seats[index] == null) {
-        seats[index] = userProfile.username.isNotEmpty ? userProfile.username : 'Me (You)';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Joined seat #${index + 1}')));
+        seats[index] = myName;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Joined seat #${index + 1} ($myName)')));
       } else {
         seats[index] = null;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Left seat #${index + 1}')));
