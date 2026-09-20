@@ -3,6 +3,8 @@ import '../1_core/core_data.dart';
 import '../5_dashboard/post_login_popups.dart';
 import 'streamer_model.dart';
 import 'streamer_profile_sheet.dart';
+import 'live_stream_room_screen.dart';
+import '../4_interactions/call_and_party_screens.dart';
 
 class DiscoveryFeedView extends StatefulWidget {
   const DiscoveryFeedView({super.key});
@@ -16,11 +18,10 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
   final List<String> tabTitles = ['Hot', 'Live', 'Party', 'Match'];
   String selectedCountry = 'All';
   final List<String> countries = ['All', 'India', 'Egypt', 'America', 'China', 'Bangladesh', 'Russia'];
+  StreamerItemData? pipActiveStreamer;
 
   List<StreamerItemData> _getCurrentFilteredList() {
-    // Hot page strictly excludes offline streamers
     var baseList = globalHotStreamers.where((s) => s.status != 'offline').toList();
-
     var countryFiltered = baseList.where((s) {
       if (selectedCountry == 'All') return true;
       return s.country.toLowerCase() == selectedCountry.toLowerCase();
@@ -176,10 +177,28 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                             final item = currentList[index];
                             return GestureDetector(
                               onTap: () {
-                                if (item.status == 'party') {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Opening ${item.name} Party Room...')));
-                                } else if (item.status == 'live') {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Opening ${item.name} Live page...')));
+                                if (item.status == 'live') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LiveStreamRoomScreen(
+                                        streamer: item,
+                                        onDismissPIP: () {
+                                          Navigator.pop(context);
+                                          setState(() => pipActiveStreamer = null);
+                                        },
+                                      ),
+                                    ),
+                                  ).then((_) {
+                                    // Option to convert to PIP if popped via system back
+                                  });
+                                } else if (item.status == 'party') {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: const Color(0xFF140D26),
+                                    builder: (_) => const SizedBox(height: 500, child: PartyRoomGridWidget()),
+                                  );
                                 } else {
                                   showStreamerProfileModal(context, item);
                                 }
@@ -201,7 +220,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                         ),
                                       ),
                                     ),
-                                    // Top left green/colored status tag
                                     Positioned(
                                       top: 8, left: 8,
                                       child: Container(
@@ -216,7 +234,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                         ),
                                       ),
                                     ),
-                                    // Top right "Your Follow" badge if followed
                                     if (item.isFollowed)
                                       Positioned(
                                         top: 8, right: 8,
@@ -226,7 +243,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                           child: const Text('Your Follow', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
                                         ),
                                       ),
-                                    // Bottom left name, country, age
                                     Positioned(
                                       bottom: 8, left: 8, right: 50,
                                       child: Column(
@@ -237,7 +253,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                         ],
                                       ),
                                     ),
-                                    // Bottom right video call button & heart follow toggle
                                     Positioned(
                                       bottom: 8, right: 8,
                                       child: Row(
@@ -262,9 +277,12 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                                           ),
                                           const SizedBox(width: 8),
                                           GestureDetector(
-                                            onTap: () {
-                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Calling video to ${item.name}...')));
-                                            },
+                                            onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ZegoVideoCallScreen(streamerName: item.name, streamerId: item.id8Digit),
+                                              ),
+                                            ),
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
                                               decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pinkAccent.withOpacity(0.8)),
@@ -305,9 +323,26 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
                 ),
               ),
             ),
+            // Active draggable PIP overlay if live mini window active
+            if (pipActiveStreamer != null)
+              DraggableLivePIPWrapper(
+                streamer: pipActiveStreamer!,
+                onDismissPIP: () => setState(() => pipActiveStreamer = null),
+                onExpandFull: () {
+                  final s = pipActiveStreamer!;
+                  setState(() => pipActiveStreamer = null);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LiveStreamRoomScreen(streamer: s, onDismissPIP: () => Navigator.pop(context)),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
     );
   }
 }
+
