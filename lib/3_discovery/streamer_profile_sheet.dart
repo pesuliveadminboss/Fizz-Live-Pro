@@ -19,7 +19,6 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header banner image
               Stack(
                 children: [
                   Image.network(streamer.imageUrl, width: double.infinity, height: 260, fit: BoxFit.cover),
@@ -36,10 +35,10 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
                       child: Row(
-                        children: [
+                        children: const [
                           Icon(Icons.diamond, color: Colors.amber, size: 14),
-                          const SizedBox(width: 4),
-                          const Text('3', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          SizedBox(width: 4),
+                          Text('3', style: TextStyle(color: Colors.white, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -51,14 +50,18 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile round thumbnail row + name/id/status/country/age + heart toggle
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundImage: NetworkImage(streamer.imageUrl),
-                          border: Border.all(color: Colors.amber, width: 2),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.amber, width: 2),
+                          ),
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundImage: NetworkImage(streamer.imageUrl),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -112,7 +115,6 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    // Close friends 0/3 section
                     Row(
                       children: [
                         const Text('Close Friends (0/3)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
@@ -137,7 +139,6 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                       )),
                     ),
                     const SizedBox(height: 24),
-                    // Introduction
                     const Text('Introduction', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 8),
                     Container(
@@ -150,7 +151,6 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                       child: Text(streamer.introduction, style: const TextStyle(color: Colors.white, fontSize: 13)),
                     ),
                     const SizedBox(height: 24),
-                    // Speaking language
                     const Text('Speaking language', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 8),
                     Wrap(
@@ -162,12 +162,11 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                       )).toList(),
                     ),
                     const SizedBox(height: 32),
-                    // Bottom Video Call Action Bar inside profile modal
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.white12, shape: BoxShape.circle),
+                          decoration: const BoxDecoration(color: Colors.white12, shape: BoxShape.circle),
                           child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
@@ -204,6 +203,7 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+    }
+    
