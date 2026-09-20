@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
+import '../2_auth/user_profile_model.dart';
 import 'streamer_model.dart';
 import 'streamer_profile_sheet.dart';
 import 'live_stream_model.dart';
-import '../4_interactions/call_and_party_screens.dart';
+import '../4_interactions/interactive_hub.dart';
 
 class LiveStreamRoomScreen extends StatefulWidget {
   final StreamerItemData streamer;
@@ -94,7 +95,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Live Video feed background image
           Image.network(widget.streamer.imageUrl, fit: BoxFit.cover),
           Container(
             decoration: BoxDecoration(
@@ -105,7 +105,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Top Bar: Streamer Profile round badge + name + follow heart + Viewer count badge + Close (x)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -157,7 +156,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Mini Vertical Rotating Ad Ticker (5 ads per sec rotating) positioned above bottom/video call
           Positioned(
             bottom: 120, right: 16,
             child: Container(
@@ -172,7 +170,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Live Chat Ticker (auto scroll up, scrollable touch fallback)
           Positioned(
             bottom: 70, left: 16, right: 100, height: 160,
             child: ShaderMask(
@@ -224,7 +221,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-          // Bottom chat input & Gift/VideoCall action row
           Positioned(
             bottom: 12, left: 12, right: 12,
             child: Row(
@@ -274,7 +270,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   }
 }
 
-// Draggable Floating PIP Wrapper for Live Stream
 class DraggableLivePIPWrapper extends StatefulWidget {
   final StreamerItemData streamer;
   final VoidCallback onDismissPIP;
@@ -327,7 +322,7 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
         fit: StackFit.expand,
         children: [
           Image.network(widget.streamer.imageUrl, fit: BoxFit.cover),
-          Positioned(
+          Positions(
             top: 4, right: 4,
             child: GestureDetector(
               onTap: widget.onDismissPIP,
@@ -337,10 +332,6 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
                 child: const Icon(Icons.close, color: Colors.white, size: 14),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 6, left: 6, right: 6,
-            child: Text(widget.streamer.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10), maxLines: 1),
           ),
         ],
       ),
