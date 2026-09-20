@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../1_core/core_data.dart';
 import '../3_discovery/discovery_feed.dart';
-import '../4_interactions/call_and_party_screens.dart';
 import '../wallet/wallet_screen.dart';
 import 'post_login_popups.dart';
 
@@ -14,11 +13,11 @@ class DashboardShell extends StatefulWidget {
 class _DashboardShellState extends State<DashboardShell> {
   int idx = 0;
   final pages = [
-    const DiscoveryFeedView(), // For You (Hot, Live, Party, Match tabs + search + world + gift box)
+    const DiscoveryFeedView(), // For You
     const Center(child: Text('Follow Streamers Feed', style: TextStyle(color: Colors.white))), // Follow
     const Center(child: Text('Games Hub', style: TextStyle(color: Colors.white))), // Game
     const Center(child: Text('Messages Inbox', style: TextStyle(color: Colors.white))), // Messages
-    const WalletScreen(), // Me / Wallet & Profile
+    const WalletScreen(), // Me
   ];
 
   @override
