@@ -3,6 +3,7 @@ import '../1_core/core_data.dart';
 import '../3_discovery/discovery_feed.dart';
 import '../4_interactions/call_and_party_screens.dart';
 import '../wallet/wallet_screen.dart';
+import 'post_login_popups.dart'; // import this
 
 class DashboardShell extends StatefulWidget {
   const DashboardShell({super.key});
@@ -18,6 +19,14 @@ class _DashboardShellState extends State<DashboardShell> {
     const Center(child: Text('Messages', style: TextStyle(color: Colors.white))), 
     const WalletScreen()
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PostLoginPopupManager.showSequentialPopups(context);
+    });
+  }
 
   @override
   Widget build(context) {
@@ -56,4 +65,3 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 }
-  
