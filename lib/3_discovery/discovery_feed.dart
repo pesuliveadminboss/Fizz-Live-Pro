@@ -145,97 +145,99 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
 
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                color: Colors.black,
-                padding: const EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TabBar(
-                        controller: _tabController,
-                        isScrollable: true,
-                        labelColor: Colors.amber,
-                        unselectedLabelColor: Colors.white.withOpacity(0.64),
-                        indicatorColor: Colors.amber,
-                        tabs: const [
-                          Tab(text: 'Hot'),
-                          Tab(text: 'Live'),
-                          Tab(text: 'Party'),
-                          Tab(text: 'Match'),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.search, color: Colors.white70),
-                      onPressed: _openSearchByIdDialog,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.public, color: Colors.white70),
-                      onPressed: _openCountryFilterDialog,
-                    ),
-                  ],
-                ),
-              ),
-              if (selectedCountry != 'All')
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
                 Container(
-                  color: Colors.black87,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  color: Colors.black,
+                  padding: const EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 12),
                   child: Row(
                     children: [
-                      Text('Country Filter: $selectedCountry', style: const TextStyle(color: Colors.amber, fontSize: 12)),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () => setState(() => selectedCountry = 'All'),
-                        child: const Text('Reset', style: TextStyle(color: Colors.pinkAccent, fontSize: 12)),
-                      )
+                      Expanded(
+                        child: TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          labelColor: Colors.amber,
+                          unselectedLabelColor: Colors.white.withOpacity(0.64),
+                          indicatorColor: Colors.amber,
+                          tabs: const [
+                            Tab(text: 'Hot'),
+                            Tab(text: 'Live'),
+                            Tab(text: 'Party'),
+                            Tab(text: 'Match'),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white70),
+                        onPressed: _openSearchByIdDialog,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.public, color: Colors.white70),
+                        onPressed: _openCountryFilterDialog,
+                      ),
                     ],
                   ),
                 ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildStreamerGrid(filteredStreamers),
-                    _buildStreamerGrid(filteredStreamers.where((s) => s.status == 'live').toList()),
-                    _buildStreamerGrid(filteredStreamers.where((s) => s.tag == 'Party' || s.tag == 'Hot').toList()),
-                    _buildStreamerGrid(filteredStreamers),
-                  ],
+                if (selectedCountry != 'All')
+                  Container(
+                    color: Colors.black87,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        Text('Country Filter: $selectedCountry', style: const TextStyle(color: Colors.amber, fontSize: 12)),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => setState(() => selectedCountry = 'All'),
+                          child: const Text('Reset', style: TextStyle(color: Colors.pinkAccent, fontSize: 12)),
+                        )
+                      ],
+                    ),
+                  ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildStreamerGrid(filteredStreamers),
+                      _buildStreamerGrid(filteredStreamers.where((s) => s.status == 'live').toList()),
+                      _buildStreamerGrid(filteredStreamers.where((s) => s.tag == 'Party' || s.tag == 'Hot').toList()),
+                      _buildStreamerGrid(filteredStreamers),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 20,
-            left: 16,
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => const DailyRewardsDialog(),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 8)],
-                ),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.card_giftcard, color: Colors.amber, size: 28),
-                    Text('FREE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
-                  ],
+              ],
+            ),
+            Positioned(
+              bottom: 20,
+              left: 16,
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => const DailyRewardsDialog(),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                    shape: BoxShape.circle,
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 8)],
+                  ),
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.card_giftcard, color: Colors.amber, size: 28),
+                      Text('FREE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
