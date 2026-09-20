@@ -4,14 +4,14 @@ import 'streamer_profile_sheet.dart';
 import 'live_stream_room_screen.dart';
 import '../4_interactions/call_and_party_screens.dart';
 
-class DiscoveryFeedScreen extends StatefulWidget {
-  const DiscoveryFeedScreen({super.key});
+class DiscoveryFeedView extends StatefulWidget {
+  const DiscoveryFeedView({super.key});
 
   @override
-  State<DiscoveryFeedScreen> createState() => _DiscoveryFeedScreenState();
+  State<DiscoveryFeedView> createState() => _DiscoveryFeedViewState();
 }
 
-class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
+class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
   StreamerItemData? pipActiveStreamer;
 
   @override
@@ -21,7 +21,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Main Discovery Grid Feed
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,8 +127,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
               ],
             ),
           ),
-
-          // Floating Draggable Floating PIP Overlay if minimized
           if (pipActiveStreamer != null)
             DraggableLivePIPWrapper(
               streamer: pipActiveStreamer!,
