@@ -113,14 +113,13 @@ class PartyRoomGridWidget extends StatefulWidget {
 }
 
 class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
-  late final List<String?> seats;
+  final List<String?> seats = List.filled(9, null);
 
   @override
   void initState() {
     super.initState();
-    seats = List.filled(9, null);
     seats[0] = 'Host_Alpha';
-    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe';
+    seats = userProfile.username.isNotEmpty ? userProfile.username : 'Guest_Vibe'; // Fixed index assignment
   }
 
   void _tapSeat(int index) {
@@ -287,3 +286,4 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
     ),
   );
 }
+
