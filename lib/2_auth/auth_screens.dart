@@ -55,7 +55,7 @@ class _CustomLoginBubbleScreenState extends State<CustomLoginBubbleScreen> {
     {'img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', 'top': 60, 'left': 30, 'size': 75},
     {'img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', 'top': 50, 'right': 40, 'size': 68},
     {'img': 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200', 'top': 210, 'left': 45, 'size': 90},
-    {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?top=225', 'top': 225, 'right': 35, 'size': 85},
+    {'img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', 'top': 225, 'right': 35, 'size': 85},
     {'img': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', 'top': 380, 'left': 120, 'size': 80},
   ];
 
@@ -416,4 +416,3 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
   }
 }
-
