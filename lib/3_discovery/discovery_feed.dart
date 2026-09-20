@@ -7,10 +7,10 @@ class StreamerItem {
   final String name;
   final String country;
   final String imageUrl;
-  final String status; // 'live', 'online', 'offline'
+  final String status;
   final String tag;
 
-  StreamerItem({
+  const StreamerItem({
     required this.id8Digit,
     required this.name,
     required this.country,
@@ -32,11 +32,11 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
   String selectedCountry = 'All';
   final List<String> countries = ['All', 'India', 'America', 'China', 'Bangladesh', 'Russia'];
 
-  final List<StreamerItem> allStreamers = [
-    StreamerItem(id8digit: '84920183', name: 'AvniHotnessDil', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400', status: 'live', tag: 'Hot'),
-    StreamerItem(id8digit: '73920194', name: 'ShinySanya', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400', status: 'online', tag: 'Party'),
-    StreamerItem(id8digit: '91827364', name: 'ExoticModel', country: 'America', imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', status: 'live', tag: 'Exotic'),
-    StreamerItem(id8digit: '55443322', name: 'ChinaStar', country: 'China', imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', status: 'offline', tag: 'Match'),
+  final List<StreamerItem> allStreamers = const [
+    StreamerItem(id8Digit: '84920183', name: 'AvniHotnessDil', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400', status: 'live', tag: 'Hot'),
+    StreamerItem(id8Digit: '73920194', name: 'ShinySanya', country: 'India', imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400', status: 'online', tag: 'Party'),
+    StreamerItem(id8Digit: '91827364', name: 'ExoticModel', country: 'America', imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400', status: 'live', tag: 'Exotic'),
+    StreamerItem(id8Digit: '55443322', name: 'ChinaStar', country: 'China', imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', status: 'offline', tag: 'Match'),
   ];
 
   @override
@@ -149,7 +149,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
         children: [
           Column(
             children: [
-              // Top Bar with 4 tabs (Hot, Live, Party, Match) + Search & World Icons
               Container(
                 color: Colors.black,
                 padding: const EdgeInsets.only(top: 8, bottom: 8, right: 12, left: 12),
@@ -160,7 +159,7 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
                         controller: _tabController,
                         isScrollable: true,
                         labelColor: Colors.amber,
-                        unselectedLabelColor: Colors.white64,
+                        unselectedLabelColor: Colors.white.withOpacity(0.64),
                         indicatorColor: Colors.amber,
                         tabs: const [
                           Tab(text: 'Hot'),
@@ -181,7 +180,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
                   ],
                 ),
               ),
-              // Filter indicator chip if country selected
               if (selectedCountry != 'All')
                 Container(
                   color: Colors.black87,
@@ -197,7 +195,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
                     ],
                   ),
                 ),
-              // Tab Views content grid
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
@@ -211,7 +208,6 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
               ),
             ],
           ),
-          // Floating FREE Gift Box above For You / Bottom Area
           Positioned(
             bottom: 20,
             left: 16,
@@ -301,3 +297,4 @@ class _DiscoveryFeedViewState extends State<DiscoveryFeedView> with SingleTicker
     );
   }
 }
+
