@@ -116,10 +116,10 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
                     ),
                     const SizedBox(height: 24),
                     Row(
-                      children: [
-                        const Text('Close Friends (0/3)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                        const Spacer(),
-                        const Icon(Icons.info_outline, color: Colors.white54, size: 16),
+                      children: const [
+                        Text('Close Friends (0/3)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                        Spacer(),
+                        Icon(Icons.info_outline, color: Colors.white54, size: 16),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -203,7 +203,7 @@ void showStreamerProfileModal(BuildContext context, StreamerItemData streamer) {
           ),
         ),
       ),
-    );
-  }
-    }
-    
+    ),
+  );
+}
+
