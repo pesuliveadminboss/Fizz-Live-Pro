@@ -5,7 +5,7 @@ import '../2_auth/user_profile_model.dart';
 import 'streamer_model.dart';
 import 'streamer_profile_sheet.dart';
 import 'live_stream_model.dart';
-import '../4_interactions/interactive_hub.dart';
+import '../4_interactions/call_and_party_screens.dart';
 
 class LiveStreamRoomScreen extends StatefulWidget {
   final StreamerItemData streamer;
@@ -322,7 +322,7 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
         fit: StackFit.expand,
         children: [
           Image.network(widget.streamer.imageUrl, fit: BoxFit.cover),
-          Positions(
+          Positioned(
             top: 4, right: 4,
             child: GestureDetector(
               onTap: widget.onDismissPIP,
@@ -332,6 +332,10 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
                 child: const Icon(Icons.close, color: Colors.white, size: 14),
               ),
             ),
+          ),
+          Positioned(
+            bottom: 6, left: 6, right: 6,
+            child: Text(widget.streamer.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10), maxLines: 1),
           ),
         ],
       ),
