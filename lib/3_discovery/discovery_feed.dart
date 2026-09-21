@@ -1,150 +1,155 @@
 import 'package:flutter/material.dart';
 import 'streamer_model.dart';
-import 'streamer_profile_sheet.dart';
 import 'live_stream_room_screen.dart';
-import '../4_interactions/call_and_party_screens.dart';
+import '../4_interactions/call_screen.dart';
+import '../4_interactions/gift_sheet.dart';
+import '../4_interactions/party_room_widget.dart';
 
-class DiscoveryFeedView extends StatefulWidget {
-  const DiscoveryFeedView({super.key});
+class DiscoveryFeedScreen extends StatefulWidget {
+  const DiscoveryFeedScreen({super.key});
 
   @override
-  State<DiscoveryFeedView> createState() => _DiscoveryFeedViewState();
+  State<DiscoveryFeedScreen> createState() => _DiscoveryFeedScreenState();
 }
 
-class _DiscoveryFeedViewState extends State<DiscoveryFeedView> {
-  StreamerItemData? pipActiveStreamer;
+class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
+  StreamerItemData? activePiPStreamer;
+  List<StreamerItemData> streamers = [
+    StreamerItemData(id: 's1', name: 'Ayesha_Live', idDigit: '99011', type: 'video'),
+    StreamerItemData(id: 's2', name: 'Party_King_99', idDigit: '901', type: 'party'),
+    StreamerItemData(id: 's3', name: 'Nisha_Vibe', idDigit: '88421', type: 'video'),
+  ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF110B22),
+      backgroundColor: const Color(0xFF0F0B1E),
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Text(
-                    'Discovery Feed',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          GridView.builder(
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: streamers.length,
+            itemBuilder: (_, index) {
+              final item = streamers[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LiveStreamRoomScreen(
+                        streamer: item,
+                        onDismissTotal: () => Navigator.pop(context),
+                        onMinimizePIP: (streamerData) {
+                          Navigator.pop(context);
+                          setState(() {
+                            activePiPStreamer = streamerData;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F1A24),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Icon(
+                          item.type == 'party' ? Icons.group : Icons.person,
+                          size: 50,
+                          color: Colors.white24,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 8,
+                        left: 8,
+                        right: 8,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.name,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min',
+                              style: const TextStyle(color: Colors.amber, fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemCount: globalHotStreamers.length,
-                    itemBuilder: (_, index) {
-                      final item = globalHotStreamers[index];
-                      return GestureDetector(
-                        onTap: () {
-                          if (item.status == 'live') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => LiveStreamRoomScreen(
-                                  streamer: item,
-                                  onMinimizePIP: (s) => setState(() => pipActiveStreamer = s),
-                                  onDismissTotal: () => setState(() => pipActiveStreamer = null),
-                                ),
-                              ),
-                            );
-                          } else if (item.status == 'party') {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: const Color(0xFF140D26),
-                              builder: (_) => const SizedBox(height: 500, child: PartyRoomGridWidget()),
-                            );
-                          } else {
-                            showStreamerProfileModal(context, item);
-                          }
+              );
+            },
+          ),
+          if (activePiPStreamer != null)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: () {
+                  final currentPiP = activePiPStreamer!;
+                  setState(() => activePiPStreamer = null);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LiveStreamRoomScreen(
+                        streamer: currentPiP,
+                        onDismissTotal: () => Navigator.pop(context),
+                        onMinimizePIP: (streamerData) {
+                          Navigator.pop(context);
+                          setState(() {
+                            activePiPStreamer = streamerData;
+                          });
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.white.withOpacity(0.05),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Image.network(
-                                item.imageUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(color: Colors.white12, child: const Icon(Icons.person, color: Colors.white24)),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [Colors.transparent, Colors.black87],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 10,
-                                left: 10,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: item.status == 'live' ? Colors.redAccent : Colors.purpleAccent,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    item.status.toUpperCase(),
-                                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 10,
-                                left: 10,
-                                right: 10,
-                                child: Text(
-                                  item.name,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 120,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.pinkAccent, width: 2),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Icon(
+                          activePiPStreamer!.type == 'party' ? Icons.group : Icons.person,
+                          color: Colors.white54,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () => setState(() => activePiPStreamer = null),
+                          child: const CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.black54,
+                            child: Icon(Icons.close, size: 12, color: Colors.white),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          if (pipActiveStreamer != null)
-            DraggableLivePIPWrapper(
-              streamer: pipActiveStreamer!,
-              onDismissTotal: () => setState(() => pipActiveStreamer = null),
-              onExpandFull: () {
-                final target = pipActiveStreamer!;
-                setState(() => pipActiveStreamer = null);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LiveStreamRoomScreen(
-                      streamer: target,
-                      onMinimizePIP: (s) => setState(() => pipActiveStreamer = s),
-                      onDismissTotal: () => setState(() => pipActiveStreamer = null),
-                    ),
-                  ),
-                );
-              },
+              ),
             ),
         ],
       ),
