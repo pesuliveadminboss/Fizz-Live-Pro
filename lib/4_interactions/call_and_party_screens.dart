@@ -291,7 +291,7 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
     backgroundColor: const Color(0xFF19112E),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (ctx) => StatefulBuilder(
-      builder: (context, setStateModal) {
+      builder: (BuildContext modalCtx, StateSetter setStateModal) {
         final categories = ['Hot', 'Lucky', 'Svip', 'Intimacy', 'Wealth', 'Festival', 'Bag'];
         final displayedGifts = selectedCategory == 'Bag'
             ? appGiftCatalog.where((g) => g.isBackpackFree).toList()
@@ -458,4 +458,4 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                       if (selectedGift == null) return;
                       final totalCost = selectedGift!.gemPrice * selectedQuantity;
 
-                      if (selecte
+       
