@@ -98,28 +98,35 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   Widget build(context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Full screen feed video/image with safe fallback
-          Image.network(
-            widget.streamer.imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(color: const Color(0xFF1F1A24), child: const Center(child: Icon(Icons.person, size: 100, color: Colors.white24))),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.black54, Colors.transparent, Colors.black87],
+      resizeToAvoidBottomInset: false,
+      body: SizedBox.expand(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Force 100% full screen background feed
+            Positioned.fill(
+              child: Image.network(
+                widget.streamer.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(color: const Color(0xFF1F1A24), child: const Center(child: Icon(Icons.person, size: 100, color: Colors.white24))),
               ),
             ),
-          ),
-          // Top Bar
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black54, Colors.transparent, Colors.black87],
+                  ),
+                ),
+              ),
+            ),
+            // Top Bar
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 8,
+              left: 16,
+              right: 16,
               child: Row(
                 children: [
                   GestureDetector(
@@ -170,133 +177,132 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
                 ],
               ),
             ),
-          ),
-          // AdMob Monetized Ticker
-          Positioned(
-            bottom: 120, right: 16,
-            child: Container(
-              width: 130, padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white24)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('AdMob Monetized', style: TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold)),
-                  Text(miniAds[adIndex], style: const TextStyle(color: Colors.white, fontSize: 10), maxLines: 1),
-                ],
+            // AdMob Monetized Ticker
+            Positioned(
+              bottom: 120, right: 16,
+              child: Container(
+                width: 130, padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white24)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('AdMob Monetized', style: TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold)),
+                    Text(miniAds[adIndex], style: const TextStyle(color: Colors.white, fontSize: 10), maxLines: 1),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Live Chat Ticker
-          Positioned(
-            bottom: 70, left: 16, right: 100, height: 160,
-            child: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.white],
-                stops: [0.0, 0.3],
-              ).createShader(bounds),
-              blendMode: BlendMode.dstIn,
-              child: ListView.builder(
-                reverse: true,
-                itemCount: chatMessages.length,
-                itemBuilder: (_, index) {
-                  final msg = chatMessages[chatMessages.length - 1 - index];
-                  if (msg.isJoinEvent) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 3),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
+            // Live Chat Ticker
+            Positioned(
+              bottom: 70, left: 16, right: 100, height: 160,
+              child: ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.white],
+                  stops: [0.0, 0.3],
+                ).createShader(bounds),
+                blendMode: BlendMode.dstIn,
+                child: ListView.builder(
+                  reverse: true,
+                  itemCount: chatMessages.length,
+                  itemBuilder: (_, index) {
+                    final msg = chatMessages[chatMessages.length - 1 - index];
+                    if (msg.isJoinEvent) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.blue.withOpacity(0.3), borderRadius: BorderRadius.circular(14)),
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(text: '${msg.senderName} : ', style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 11)),
+                              TextSpan(text: msg.text, style: const TextStyle(color: Colors.white, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
                       child: RichText(
                         text: TextSpan(
                           children: [
-                            TextSpan(text: '${msg.senderName} : ', style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 11)),
-                            TextSpan(text: msg.text, style: const TextStyle(color: Colors.white, fontSize: 11)),
+                            TextSpan(
+                              text: '${msg.senderName} : ',
+                              style: TextStyle(
+                                color: msg.isStreamer ? Colors.redAccent : Colors.amber,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            TextSpan(text: msg.text, style: const TextStyle(color: Colors.white, fontSize: 12)),
                           ],
                         ),
                       ),
                     );
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '${msg.senderName} : ',
-                            style: TextStyle(
-                              color: msg.isStreamer ? Colors.redAccent : Colors.amber,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          TextSpan(text: msg.text, style: const TextStyle(color: Colors.white, fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
             ),
-          ),
-          // Bottom Chat Input + Send Icon + Gifts/Call
-          Positioned(
-            bottom: 12, left: 12, right: 12,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 44,
-                    padding: const EdgeInsets.only(left: 14, right: 4),
-                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white24)),
-                    child: TextField(
-                      controller: chatCtrl,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'Say something...',
-                        hintStyle: const TextStyle(color: Colors.white54),
-                        border: InputBorder.none,
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.send_rounded, color: Colors.pinkAccent, size: 20),
-                          onPressed: () => _sendChatMessage(),
+            // Bottom Chat Input + Send Icon + Gifts/Call
+            Positioned(
+              bottom: 12, left: 12, right: 12,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 44,
+                      padding: const EdgeInsets.only(left: 14, right: 4),
+                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white24)),
+                      child: TextField(
+                        controller: chatCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: 'Say something...',
+                          hintStyle: const TextStyle(color: Colors.white54),
+                          border: InputBorder.none,
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.send_rounded, color: Colors.pinkAccent, size: 20),
+                            onPressed: () => _sendChatMessage(),
+                          ),
                         ),
+                        onSubmitted: (_) => _sendChatMessage(),
                       ),
-                      onSubmitted: (_) => _sendChatMessage(),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => showGiftSendingSheet(context, widget.streamer.name),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.pinkAccent.withOpacity(0.8), shape: BoxShape.circle),
-                    child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ZegoVideoCallScreen(streamerName: widget.streamer.name, streamerId: widget.streamer.id8Digit),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => showGiftSendingSheet(context, widget.streamer.name),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.pinkAccent.withOpacity(0.8), shape: BoxShape.circle),
+                      child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
                     ),
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]), shape: BoxShape.circle),
-                    child: const Icon(Icons.video_call, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ZegoVideoCallScreen(streamerName: widget.streamer.name, streamerId: widget.streamer.id8Digit),
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]), shape: BoxShape.circle),
+                      child: const Icon(Icons.video_call, color: Colors.white, size: 18),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// Draggable Floating PIP Wrapper
 class DraggableLivePIPWrapper extends StatefulWidget {
   final StreamerItemData streamer;
   final VoidCallback onDismissTotal;
@@ -373,3 +379,4 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
     );
   }
 }
+
