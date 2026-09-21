@@ -210,79 +210,250 @@ class GiftItem {
   final String name;
   final int gemPrice;
   final String emoji;
+  final bool isBackpackFree;
 
-  const GiftItem({required this.name, required this.gemPrice, required this.emoji});
+  const GiftItem({
+    required this.name,
+    required this.gemPrice,
+    required this.emoji,
+    this.isBackpackFree = false,
+  });
 }
 
+// Global backpack inventory tracking matching screenshot inventory counts
+final Map<String, int> userBackpackInventory = {
+  'Linked Ring': 2,
+  'RosePerfume': 144,
+  'LoveCrown': 144,
+  'Fluttering...': 28,
+  'Voting': 3,
+};
+
 final List<GiftItem> appGiftCatalog = [
-  const GiftItem(name: 'Rose', gemPrice: 20, emoji: '🌹'),
-  const GiftItem(name: 'Diamond Ring', gemPrice: 150, emoji: '💍'),
-  const GiftItem(name: 'Love Heart', gemPrice: 80, emoji: '💖'),
-  const GiftItem(name: 'Super Sports Car', gemPrice: 999, emoji: '🏎️'),
+  // Bag / Backpack tab screenshot gifts (2 rows x 4 cols layout visual alignment)
+  const GiftItem(name: 'Linked Ring', gemPrice: 2, emoji: '💍', isBackpackFree: true),
+  const GiftItem(name: 'RosePerfume', gemPrice: 2, emoji: '🌹', isBackpackFree: true),
+  const GiftItem(name: 'LoveCrown', gemPrice: 2, emoji: '👑', isBackpackFree: true),
+  const GiftItem(name: 'Fluttering...', gemPrice: 2, emoji: '🦋', isBackpackFree: true),
+  const GiftItem(name: 'Voting', gemPrice: 10, emoji: '📜', isBackpackFree: true),
+  // Festival / Intimacy / Wealth standard paid items matching screenshot rows
+  const GiftItem(name: 'Cute Love', gemPrice: 890, emoji: '💌'),
+  const GiftItem(name: 'Flower Heart', gemPrice: 3990, emoji: '💐'),
+  const GiftItem(name: 'Love Gala...', gemPrice: 17000, emoji: '💖'),
+  const GiftItem(name: 'Valentine...', gemPrice: 57000, emoji: '🌹'),
+  const GiftItem(name: 'Eid Blessing', gemPrice: 770, emoji: '🌙'),
+  const GiftItem(name: 'Eid Night', gemPrice: 27770, emoji: '🕌'),
+  const GiftItem(name: 'Eid Feast', gemPrice: 50770, emoji: '✨'),
+  const GiftItem(name: 'Wealth Ca...', gemPrice: 995800, emoji: '🏆'),
 ];
 
-void showGiftSendingSheet(BuildContext context, String targetName) {
-  showModalBottomSheet(
+void showRechargeModal(BuildContext context) {
+  showDialog(
     context: context,
-    backgroundColor: const Color(0xFF19112E),
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-    builder: (ctx) => Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: const Color(0xFF1F1A24),
+      title: const Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Send Gift to $targetName', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              ValueListenableBuilder<int>(
-                valueListenable: globalWallet,
-                builder: (_, val, __) => Text('💎 $val', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 10, mainAxisSpacing: 10),
-            itemCount: appGiftCatalog.length,
-            itemBuilder: (_, index) {
-              final gift = appGiftCatalog[index];
-              return GestureDetector(
-                onTap: () {
-                  if (globalWallet.value >= gift.gemPrice) {
-                    globalWallet.value -= gift.gemPrice;
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Sent ${gift.name} ${gift.emoji} (-${gift.gemPrice} gems)!')),
-                    );
-                  } else {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Insufficient gems! Please recharge.')),
-                    );
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(gift.emoji, style: const TextStyle(fontSize: 26)),
-                      const SizedBox(height: 4),
-                      Text(gift.name, style: const TextStyle(color: Colors.white70, fontSize: 9), overflow: TextOverflow.ellipsis),
-                      Text('💎 ${gift.gemPrice}', style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+          Icon(Icons.diamond, color: Colors.amber),
+          SizedBox(width: 8),
+          Text('Insufficient Gems', style: TextStyle(color: Colors.white, fontSize: 16)),
         ],
       ),
+      content: const Text(
+        'Your gem balance is empty or insufficient for this gift/action!',
+        style: TextStyle(color: Colors.white75, fontSize: 13),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
+          onPressed: () {
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Recharge Now opened! 💎 Bonus 50% active.'), duration: Duration(seconds: 3)),
+            );
+          },
+          child: const Text('Recharge Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+      ],
     ),
   );
 }
+
+void showGiftSendingSheet(BuildContext context, String targetName) {
+  String selectedCategory = 'Bag'; // Default Backpack tab matching screenshot selector
+  int selectedQuantity = 1;
+  final List<int> quantOptions =;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: const Color(0xFF19112E),
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (ctx) => StatefulBuilder(
+      builder: (context, setStateModal) {
+        final categories = ['Hot', 'Lucky', 'Svip', 'Intimacy', 'Wealth', 'Festival', 'Bag'];
+        // Filter catalog exact row items by tab category
+        final displayedGifts = selectedCategory == 'Bag'
+            ? appGiftCatalog.where((g) => g.isBackpackFree).toList()
+            : appGiftCatalog.where((g) => !g.isBackpackFree).toList();
+
+        GiftItem? selectedGift = displayedGifts.isNotEmpty ? displayedGifts.first : null;
+
+        return Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Target header + Wallet + Subtitle info
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Send to $targetName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                  ValueListenableBuilder<int>(
+                    valueListenable: globalWallet,
+                    builder: (_, val, __) => Row(
+                      children: [
+                        const Icon(Icons.diamond, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text('$val', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (selectedCategory == 'Bag')
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Text('The gifts in the backpack are free', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                ),
+              const SizedBox(height: 10),
+
+              // Horizontal Category Tabs (Hot, Lucky, Svip, Intimacy, Wealth, Festival, Bag)
+              SizedBox(
+                height: 32,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: categories.map((cat) {
+                    final isSelected = selectedCategory == cat;
+                    return GestureDetector(
+                      onTap: () => setStateModal(() => selectedCategory = cat),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 14),
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(
+                          border: isSelected ? const Border(bottom: BorderSide(color: Colors.white, width: 2)) : null,
+                        ),
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.white65,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Exact Row-wise 2x4 grid matching screenshot visual representation
+              SizedBox(
+                height: 210,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: displayedGifts.length,
+                  itemBuilder: (_, index) {
+                    final gift = displayedGifts[index];
+                    final isSelected = selectedGift?.name == gift.name;
+                    final backpackCount = userBackpackInventory[gift.name] ?? 0;
+
+                    return GestureDetector(
+                      onTap: () => setStateModal(() => selectedGift = gift),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.pinkAccent.withOpacity(0.25) : Colors.white.withOpacity(0.06),
+                          border: Border.all(color: isSelected ? Colors.pinkAccent : Colors.white12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        child: Stack(
+                          children: [
+                            if (gift.isBackpackFree && backpackCount > 0)
+                              Positioned(
+                                top: 0, right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                  decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(8)),
+                                  child: Text('$backpackCount', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(gift.emoji, style: const TextStyle(fontSize: 24)),
+                                  const SizedBox(height: 4),
+                                  Text(gift.name, style: const TextStyle(color: Colors.white, fontSize: 9), overflow: TextOverflow.ellipsis),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.diamond, color: Colors.amber, size: 9),
+                                      const SizedBox(width: 2),
+                                      Text('${gift.gemPrice}', style: const TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Row dots indicator matching screenshot dot pagination below grid
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (dotIdx) => Container(
+                  width: dotIdx == 0 ? 12 : 5,
+                  height: 5,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: dotIdx == 0 ? Colors.white : Colors.white24,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                )),
+              ),
+              const SizedBox(height: 12),
+
+              // Multipliers row (1, 17, 37, 57) + Send Button matching screenshot
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: quantOptions.map((qty) {
+                      final isSelected = selectedQuantity == qty;
+                      return GestureDetector(
+                        onTap: () => setStateModal(() => selectedQuantity = qty),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text('$qty', style: TextStyle(color: Colors.white, fontSi
