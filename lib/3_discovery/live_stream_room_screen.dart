@@ -47,7 +47,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   void initState() {
     super.initState();
     chatMessages = [
-      'Welcome to ${widget.streamer.name}'s room!',
+      "Welcome to ${widget.streamer.name}'s room!",
       'Say hi to the host 👋',
     ];
     adTimer = Timer.periodic(const Duration(seconds: 4), (_) {
@@ -69,37 +69,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       chatMessages.add('${userProfile.username.isNotEmpty ? userProfile.username : 'Guest'}: $text');
     });
     if (customText == null) chatCtrl.clear();
-  }
-
-  void _showViewersModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xFF19112E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Live Viewers (142)', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (_, i) => ListTile(
-                  leading: CircleAvatar(backgroundColor: Colors.pink.withOpacity(0.3), child: const Icon(Icons.person, color: Colors.white)),
-                  title: Text('Viewer #$i', style: const TextStyle(color: Colors.white)),
-                  subtitle: const Text('Level 12 • 💎 450', style: TextStyle(color: Colors.white60, fontSize: 12)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -219,4 +188,3 @@ class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
     );
   }
 }
-
