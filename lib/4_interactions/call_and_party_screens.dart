@@ -183,7 +183,7 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          backgroundColor: occupant != null ? Colors.amber.withOpacity(0.2) : Colors.white12,
+                          final List<int> quantOptions =;
                           child: Icon(occupant != null ? Icons.mic : Icons.add, color: occupant != null ? Colors.amber : Colors.white54),
                         ),
                         const SizedBox(height: 6),
