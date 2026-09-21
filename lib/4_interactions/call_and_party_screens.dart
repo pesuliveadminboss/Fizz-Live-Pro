@@ -258,7 +258,7 @@ void showRechargeModal(BuildContext context) {
       ),
       content: const Text(
         'Your gem balance is empty or insufficient for this gift/action!',
-        style: TextStyle(color: Colors.white75, fontSize: 13),
+        style: TextStyle(color: Colors.white70, fontSize: 13),
       ),
       actions: [
         TextButton(
@@ -344,7 +344,7 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                         child: Text(
                           cat,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white65,
+                            color: isSelected ? Colors.white : Colors.white.withOpacity(0.65),
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             fontSize: 13,
                           ),
@@ -458,4 +458,4 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                       if (selectedGift == null) return;
                       final totalCost = selectedGift!.gemPrice * selectedQuantity;
 
-                      if (selectedGift!.isBackpac
+                      if (selecte
