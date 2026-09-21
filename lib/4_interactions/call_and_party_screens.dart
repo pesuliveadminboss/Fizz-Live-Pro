@@ -220,7 +220,6 @@ class GiftItem {
   });
 }
 
-// Global backpack inventory tracking matching screenshot inventory counts
 final Map<String, int> userBackpackInventory = {
   'Linked Ring': 2,
   'RosePerfume': 144,
@@ -230,13 +229,11 @@ final Map<String, int> userBackpackInventory = {
 };
 
 final List<GiftItem> appGiftCatalog = [
-  // Bag / Backpack tab screenshot gifts (2 rows x 4 cols layout visual alignment)
   const GiftItem(name: 'Linked Ring', gemPrice: 2, emoji: '💍', isBackpackFree: true),
   const GiftItem(name: 'RosePerfume', gemPrice: 2, emoji: '🌹', isBackpackFree: true),
   const GiftItem(name: 'LoveCrown', gemPrice: 2, emoji: '👑', isBackpackFree: true),
   const GiftItem(name: 'Fluttering...', gemPrice: 2, emoji: '🦋', isBackpackFree: true),
   const GiftItem(name: 'Voting', gemPrice: 10, emoji: '📜', isBackpackFree: true),
-  // Festival / Intimacy / Wealth standard paid items matching screenshot rows
   const GiftItem(name: 'Cute Love', gemPrice: 890, emoji: '💌'),
   const GiftItem(name: 'Flower Heart', gemPrice: 3990, emoji: '💐'),
   const GiftItem(name: 'Love Gala...', gemPrice: 17000, emoji: '💖'),
@@ -284,7 +281,7 @@ void showRechargeModal(BuildContext context) {
 }
 
 void showGiftSendingSheet(BuildContext context, String targetName) {
-  String selectedCategory = 'Bag'; // Default Backpack tab matching screenshot selector
+  String selectedCategory = 'Bag';
   int selectedQuantity = 1;
   final List<int> quantOptions =;
 
@@ -296,7 +293,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
     builder: (ctx) => StatefulBuilder(
       builder: (context, setStateModal) {
         final categories = ['Hot', 'Lucky', 'Svip', 'Intimacy', 'Wealth', 'Festival', 'Bag'];
-        // Filter catalog exact row items by tab category
         final displayedGifts = selectedCategory == 'Bag'
             ? appGiftCatalog.where((g) => g.isBackpackFree).toList()
             : appGiftCatalog.where((g) => !g.isBackpackFree).toList();
@@ -309,7 +305,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Target header + Wallet + Subtitle info
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -332,8 +327,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                   child: Text('The gifts in the backpack are free', style: TextStyle(color: Colors.white60, fontSize: 11)),
                 ),
               const SizedBox(height: 10),
-
-              // Horizontal Category Tabs (Hot, Lucky, Svip, Intimacy, Wealth, Festival, Bag)
               SizedBox(
                 height: 32,
                 child: ListView(
@@ -362,8 +355,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                 ),
               ),
               const SizedBox(height: 14),
-
-              // Exact Row-wise 2x4 grid matching screenshot visual representation
               SizedBox(
                 height: 210,
                 child: GridView.builder(
@@ -424,8 +415,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                   },
                 ),
               ),
-
-              // Row dots indicator matching screenshot dot pagination below grid
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (dotIdx) => Container(
@@ -439,8 +428,6 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                 )),
               ),
               const SizedBox(height: 12),
-
-              // Multipliers row (1, 17, 37, 57) + Send Button matching screenshot
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -456,4 +443,19 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                             color: isSelected ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: Text('$qty', style: TextStyle(color: Colors.white, fontSi
+                          child: Text('$qty', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
+                    ),
+                    onPressed: () {
+                      if (selectedGift == null) return;
+                      final totalCost = selectedGift!.gemPrice * selectedQuantity;
+
+                      if (selectedGift!.isBackpac
