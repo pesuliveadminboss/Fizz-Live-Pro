@@ -183,7 +183,7 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          final List<int> quantOptions =;
+                          backgroundColor: occupant != null ? Colors.amber.withOpacity(0.2) : Colors.white12,
                           child: Icon(occupant != null ? Icons.mic : Icons.add, color: occupant != null ? Colors.amber : Colors.white54),
                         ),
                         const SizedBox(height: 6),
@@ -284,15 +284,13 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
   String selectedCategory = 'Bag';
   int selectedQuantity = 1;
   final List<int> quantOptions =;
-  
-  
 
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: const Color(0xFF19112E),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-    
+    builder: (ctx) {
       return StatefulBuilder(
         builder: (BuildContext modalCtx, StateSetter setStateModal) {
           final categories = ['Hot', 'Lucky', 'Svip', 'Intimacy', 'Wealth', 'Festival', 'Bag'];
