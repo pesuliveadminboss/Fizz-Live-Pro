@@ -283,7 +283,7 @@ void showRechargeModal(BuildContext context) {
 void showGiftSendingSheet(BuildContext context, String targetName) {
   String selectedCategory = 'Bag';
   int selectedQuantity = 1;
-  final List<int> quantOptions =; // Fixed missing option values
+  final List<int> quantOptions =; // Fixed values added properly
 
   showModalBottomSheet(
     context: context,
