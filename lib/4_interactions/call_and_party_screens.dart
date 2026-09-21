@@ -205,7 +205,6 @@ class _PartyRoomGridWidgetState extends State<PartyRoomGridWidget> {
     );
   }
 }
-
 class GiftItem {
   final String name;
   final int gemPrice;
@@ -279,11 +278,10 @@ void showRechargeModal(BuildContext context) {
     ),
   );
 }
-
 void showGiftSendingSheet(BuildContext context, String targetName) {
   String selectedCategory = 'Bag';
   int selectedQuantity = 1;
-  final List<int> quantOptions =; // Fixed values added properly
+  final List<int> quantOptions =;
 
   showModalBottomSheet(
     context: context,
@@ -452,4 +450,55 @@ void showGiftSendingSheet(BuildContext context, String targetName) {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,
-                        shape: R
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
+                      ),
+                      onPressed: () {
+                        if (selectedGift == null) return;
+                        final totalCost = selectedGift!.gemPrice * selectedQuantity;
+
+                        if (selectedGift!.isBackpackFree) {
+                          final currentBagCount = userBackpackInventory[selectedGift!.name] ?? 0;
+                          if (currentBagCount >= selectedQuantity) {
+                            userBackpackInventory[selectedGift!.name] = currentBagCount - selectedQuantity;
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Sent free backpack ${selectedGift!.name} x$selectedQuantity to $targetName!')),
+                            );
+                          } else {
+                            if (globalWallet.value >= totalCost) {
+                              globalWallet.value -= totalCost;
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Sent ${selectedGift!.name} x$selectedQuantity (-$totalCost gems)')),
+                              );
+                            } else {
+                              Navigator.pop(ctx);
+                              showRechargeModal(context);
+                            }
+                          }
+                        } else {
+                          if (globalWallet.value <= 0 || globalWallet.value < totalCost) {
+                            Navigator.pop(ctx);
+                            showRechargeModal(context);
+                          } else {
+                            globalWallet.value -= totalCost;
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Sent ${selectedGift!.name} x$selectedQuantity to $targetName (-$totalCost gems)!')),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Send', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
