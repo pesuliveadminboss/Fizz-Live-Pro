@@ -79,7 +79,7 @@ void showRechargeModal(BuildContext context) {
 void showGiftSendingSheet(BuildContext context, String targetName) {
   String selectedCategory = 'Bag';
   int selectedQuantity = 1;
-  const List<int> quantOptions
+  const List<int> quantOptions =;
 
   showModalBottomSheet(
     context: context,
