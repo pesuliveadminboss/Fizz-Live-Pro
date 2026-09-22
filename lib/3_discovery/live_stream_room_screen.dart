@@ -147,7 +147,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
                   return ListTile(
                     leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white)),
                     title: Text(v['name']!, style: const TextStyle(color: Colors.yellow, fontSize: 13)),
-                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: TextStyle(color: Color(0xBFFFFFFF), fontSize: 10)),
+                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: TextStyle(color: const Color(0xBFFFFFFF), fontSize: 10)),
                   );
                 },
               ),
