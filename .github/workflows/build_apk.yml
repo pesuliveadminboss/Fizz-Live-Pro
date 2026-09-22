@@ -1,45 +1,63 @@
+
+---
+
+### **3. 📋 Complete / Final `.github/workflows/build_apk.yml` (Itha copy panni replace pannu)**
+
+```yaml
 name: Build Release APK
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+push:
+  branches: [ main ]
+pull_request:
+  branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+build:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'adopt'
-          java-version: '17'
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: '17'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
 
-      - name: Fix Package Name Case for Dart Rules
-        run: |
-          sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
+    - name: Fix Package Name Case for Dart Rules
+      run: |
+        sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
 
-      - name: Clean Build Cache
-        run: |
-          rm -rf android/.gradle build
-          flutter clean
-          flutter pub get
+    - name: Force Safe Gradle Wrapper & Compatibility Fix
+      run: |
+        mkdir -p android/gradle/wrapper
+        cat << 'EOF' > android/gradle/wrapper/gradle-wrapper.properties
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
+        EOF
+        if [ -f "android/gradle.properties" ]; then
+          grep -q "org.gradle.jvmargs" android/gradle.properties || echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> android/gradle.properties
+        fi
 
-      - name: Build Release APK
-        run: flutter build apk --release --no-pub
+    - name: Get Dependencies
+      run: flutter pub get
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+    - name: Build Release APK
+      run: flutter build apk --release --no-pub --no-version-check
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+        
