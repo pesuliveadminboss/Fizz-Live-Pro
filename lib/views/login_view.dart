@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/fizz_core_controller.dart';
+import '../controllers/user_profile_controller.dart';
 import 'profile_onboarding_view.dart';
+import 'home_feed_view.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -11,6 +13,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   bool agreeChecked = true;
   final FizzCoreController core = Get.find<FizzCoreController>();
+  final UserProfileController uController = Get.put(UserProfileController());
 
   final List<Map<String, dynamic>> avatarData = [
     {"top": 60, "left": 40, "size": 65, "img": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"},
@@ -77,7 +80,7 @@ class _LoginViewState extends State<LoginView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _socialRoundIcon(Icons.g_mobiledata, "Google", () => _handleAuthAction('google')),
+                    _socialRoundIcon(Icons.g_mobiledata, "Google", () => _handleGoogleAuthClick()),
                     SizedBox(width: 35),
                     _socialRoundIcon(Icons.phone_android, "Phone", () => _handleAuthAction('phone')),
                     SizedBox(width: 35),
@@ -162,15 +165,63 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  void _handleGoogleAuthClick() {
+    if (!agreeChecked) {
+      Get.snackbar("Notice", "Please agree to User Agreement and Privacy Policy first!");
+      return;
+    }
+    // Show device email picker sheet per your requirement
+    Get.bottomSheet(
+      Container(
+        color: Color(0xFF1E0B36),
+        padding: EdgeInsets.all(20),
+        child: Wrap(
+          children: [
+            Text("Select Google Account", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
+            ...uController.mockExistingGoogleEmails.map((email) => ListTile(
+              leading: CircleAvatar(backgroundColor: Colors.pink, child: Text(email[0].toUpperCase(), style: TextStyle(color: Colors.white))),
+              title: Text(email, style: TextStyle(color: Colors.white)),
+              subtitle: Text("Google Account", style: TextStyle(color: Colors.white54, fontSize: 11)),
+              onTap: () {
+                Get.back();
+                uController.fillFromGoogleAccount(email);
+                if (uController.isRegistered.value) {
+                  // Existing user -> direct app ula poiranum
+                  Get.offAll(() => HomeFeedView());
+                } else {
+                  // New user -> auto-fill and go onboarding/setup
+                  Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: email));
+                }
+              },
+            )).toList(),
+            ListTile(
+              leading: Icon(Icons.add, color: Colors.white),
+              title: Text("Use another account", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Get.back();
+                uController.fillFromGoogleAccount('new.streamer@gmail.com');
+                Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: 'new.streamer@gmail.com'));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _handleAuthAction(String mode) {
     if (!agreeChecked) {
       Get.snackbar("Notice", "Please agree to User Agreement and Privacy Policy first!");
       return;
     }
-    // Route to profile onboarding setup flow per your rules
-    if (mode == 'google') {
-      Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: 'streamer.fizz@gmail.com'));
+
+    // Existing user check condition simulator or state check
+    if (uController.isRegistered.value) {
+      // Already user -> Direct app kulla poiranum!
+      Get.offAll(() => HomeFeedView());
     } else {
+      // New user entry -> Onboarding profile flow
       Get.to(() => ProfileOnboardingView(mode: mode));
     }
   }
