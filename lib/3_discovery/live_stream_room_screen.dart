@@ -60,7 +60,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   }
 
   void _showGiftComboSheet() {
-    final combos =;
+    const combos =;
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1F1A24),
@@ -350,4 +350,3 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
     );
   }
 }
-
