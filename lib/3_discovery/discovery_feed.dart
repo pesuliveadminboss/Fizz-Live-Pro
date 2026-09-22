@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'streamer_model.dart';
-import 'live_stream_room_screen.dart';
+import 'live_stream_room_screen.dart' hide StreamerItemData;
 import '../4_interactions/call_screen.dart';
 import '../4_interactions/gift_sheet.dart';
 import '../4_interactions/party_room_widget.dart';
@@ -156,4 +156,3 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
     );
   }
 }
-
