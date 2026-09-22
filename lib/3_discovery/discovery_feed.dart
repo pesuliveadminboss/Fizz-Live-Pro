@@ -43,18 +43,15 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: room.StreamerItemData(
-                          id: item.name,
-                          name: item.name,
-                          idDigit: '101',
-                          type: item.name.toLowerCase().contains('party') ? 'party' : 'video',
-                          
-                        ),
-                        onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (room.StreamerItemData streamerData) {
-                          Navigator.pop(context);
-                          setState(() {
-                            activePiPStreamer = StreamerItemData(
+                        streamer: activePiPStreamer,
+                          onDismissTotal: () => Navigator.pop(context),
+                           onMinimizePIP: (dynamic streamerData) {
+                            Navigator.pop(context);
+                            setState(() {
+                            activePiPStreamer = streamerData;
+                            });
+                            },
+                            ),                      
                               id: streamerData.id,
                               name: streamerData.name,
                               idDigit: streamerData.idDigit,
