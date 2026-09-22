@@ -21,7 +21,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     model.StreamerItemData(name: 'Ayesha_Live', type: 'live', isFollowed: true),
     model.StreamerItemData(name: 'Party_King_99', type: 'party'),
     model.StreamerItemData(name: 'Nisha_Vibe', type: 'online'),
-    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'), // Hot-la vara koodadhu
+    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'),
   ];
 
   @override
@@ -102,6 +102,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               top: pipPosition.dy,
               child: Draggable(
                 feedback: _buildPiPBox(),
+                childWhenDragging: const SizedBox.shrink(),
                 onDragEnd: (details) {
                   setState(() {
                     pipPosition = Offset(
