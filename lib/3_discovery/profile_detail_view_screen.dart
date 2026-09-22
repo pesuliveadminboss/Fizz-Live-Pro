@@ -12,7 +12,7 @@ class ProfileDetailViewScreen extends StatelessWidget {
     final sIdDigit = streamer is model.StreamerItemData ? streamer.idDigit : '8002023';
     final sCountry = streamer is model.StreamerItemData ? streamer.country : 'Delhi';
     final sInduction = streamer is model.StreamerItemData ? streamer.induction : 'main tumhen chaahati hoon. aap kitane hot hain. mere hothon ko chhuuo, aao aur mere pyaas bujhao';
-    final sLang = streamer is model.StreamerItemData ? streamer.language : 'English, Hindi';
+    const sLang = 'English, Hindi';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0B1E),
@@ -46,11 +46,11 @@ class ProfileDetailViewScreen extends StatelessWidget {
                   ),
                   const Row(
                     children: [
-                      Icon(Icons.volume_up, color: Colors.white75, size: 18),
+                      Icon(Icons.volume_up, color: Color(0xBFFFFFFF), size: 18),
                       SizedBox(width: 14),
-                      Icon(Icons.person_add, color: Colors.white75, size: 18),
+                      Icon(Icons.person_add, color: Color(0xBFFFFFFF), size: 18),
                       SizedBox(width: 14),
-                      Icon(Icons.more_horiz, color: Colors.white75, size: 18),
+                      Icon(Icons.more_horiz, color: Color(0xBFFFFFFF), size: 18),
                     ],
                   ),
                 ],
@@ -88,18 +88,18 @@ class ProfileDetailViewScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              const Row(
                                 children: [
                                   Text(
-                                    sName,
-                                    style: const TextStyle(
+                                    'Jocelyn Kidmat',
+                                    style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
                                   ),
-                                  const Spacer(),
-                                  const Icon(Icons.favorite_border, color: Colors.white75, size: 22),
+                                  Spacer(),
+                                  Icon(Icons.favorite_border, color: Color(0xBFFFFFFF), size: 22),
                                 ],
                               ),
                               const SizedBox(height: 4),
@@ -259,3 +259,4 @@ class ProfileDetailViewScreen extends StatelessWidget {
     );
   }
 }
+
