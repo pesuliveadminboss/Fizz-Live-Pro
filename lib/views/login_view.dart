@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/fizz_core_controller.dart';
-import 'home_feed_view.dart';
+import 'profile_onboarding_view.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -68,7 +68,7 @@ class _LoginViewState extends State<LoginView> {
                       "Fast Login",
                       style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    onPressed: () => _proceedToApp(),
+                    onPressed: () => _handleAuthAction('fast'),
                   ),
                 ),
                 SizedBox(height: 18),
@@ -77,11 +77,11 @@ class _LoginViewState extends State<LoginView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _socialRoundIcon(Icons.g_mobiledata, "Google", () => _proceedToApp()),
+                    _socialRoundIcon(Icons.g_mobiledata, "Google", () => _handleAuthAction('google')),
                     SizedBox(width: 35),
-                    _socialRoundIcon(Icons.phone_android, "Phone", () => _proceedToApp()),
+                    _socialRoundIcon(Icons.phone_android, "Phone", () => _handleAuthAction('phone')),
                     SizedBox(width: 35),
-                    _socialRoundIcon(Icons.person_outline, "Guest", () => _proceedToApp()),
+                    _socialRoundIcon(Icons.person_outline, "Guest", () => _handleAuthAction('guest')),
                   ],
                 ),
                 SizedBox(height: 25),
@@ -162,11 +162,16 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  void _proceedToApp() {
+  void _handleAuthAction(String mode) {
     if (!agreeChecked) {
       Get.snackbar("Notice", "Please agree to User Agreement and Privacy Policy first!");
       return;
     }
-    Get.off(() => HomeFeedView());
+    // Route to profile onboarding setup flow per your rules
+    if (mode == 'google') {
+      Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: 'streamer.fizz@gmail.com'));
+    } else {
+      Get.to(() => ProfileOnboardingView(mode: mode));
+    }
   }
 }
