@@ -46,7 +46,6 @@ class _CallScreenState extends State<CallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Remote video or avatar placeholder
           Positioned.fill(
             child: isCameraOff
                 ? const Center(
@@ -55,7 +54,7 @@ class _CallScreenState extends State<CallScreen> {
                       children: [
                         CircleAvatar(radius: 50, backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, size: 60, color: Colors.white)),
                         SizedBox(height: 12),
-                        Text('Voice / Camera Off Call', style: TextStyle(color: Colors.white75, fontSize: 14)),
+                        Text('Voice / Camera Off Call', style: TextStyle(color: Color(0xBFFFFFFF), fontSize: 14)),
                       ],
                     ),
                   )
@@ -66,7 +65,6 @@ class _CallScreenState extends State<CallScreen> {
                     ),
                   ),
           ),
-          // Top Bar (Peer info, duration, coin burn rate)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -95,7 +93,6 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
           ),
-          // Picture-in-picture local preview (if video call)
           if (widget.callType == 'Video' && !isCameraOff)
             Positioned(
               top: 80,
@@ -111,7 +108,6 @@ class _CallScreenState extends State<CallScreen> {
                 child: const Center(child: Text('You', style: TextStyle(color: Colors.white54, fontSize: 10))),
               ),
             ),
-          // Bottom Control Dock (Mic, Camera, Speaker, Flip, End Call)
           Positioned(
             bottom: 40,
             left: 20,
@@ -160,4 +156,3 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 }
-
