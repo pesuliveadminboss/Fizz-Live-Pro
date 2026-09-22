@@ -18,11 +18,13 @@ class LiveStreamRoomScreen extends StatefulWidget {
   State<LiveStreamRoomScreen> createState() => _LiveStreamRoomScreenState();
 }
 
-class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
+class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with SingleTickerProviderStateMixin {
   int userCount = 3;
+  int userWalletCoins = 5000;
   final TextEditingController _msgController = TextEditingController();
   final List<Map<String, dynamic>> messages = [];
   bool isFollowed = false;
+  String? activeGiftAnimationText;
 
   final List<Map<String, String>> viewersList = [
     {'name': 'user-0001', 'id': '90001001', 'age': '24', 'country': 'IN 🇮🇳'},
@@ -59,22 +61,52 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
     });
   }
 
+  void _sendGiftCombo(int count) {
+    const costPerGift = 10;
+    final totalCost = count * costPerGift;
+    if (userWalletCoins < totalCost) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Not enough coins! Top-up required.', style: TextStyle(fontSize: 12))),
+      );
+      return;
+    }
+
+    setState(() {
+      userWalletCoins -= totalCost;
+      activeGiftAnimationText = '🎁 Sent x$count Combo Special Gift!';
+      messages.add({'type': 'chat', 'user': 'streamer', 'msg': 'Received x$count combo! Thank you! 💎'});
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() => activeGiftAnimationText = null);
+      }
+    });
+  }
+
   void _showGiftComboSheet() {
-    const combos = [1,7,177,777];
+    const List<int> combos = [1,77,177,777];
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1F1A24),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Container(
         padding: const EdgeInsets.all(16),
-        height: 220,
+        height: 250,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Send Combo Gift 🎁', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Send Combo Gift 🎁', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Wallet: 💎 $userWalletCoins', style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
             const SizedBox(height: 16),
             Wrap(
               spacing: 12,
+              runSpacing: 12,
               children: combos.map((cnt) => ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.pinkAccent,
@@ -82,9 +114,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
                 ),
                 onPressed: () {
                   Navigator.pop(context);
-                  setState(() {
-                    messages.add({'type': 'chat', 'user': 'streamer', 'msg': 'Received x$cnt special gift! Thank you!'});
-                  });
+                  _sendGiftCombo(cnt);
                 },
                 child: Text('x$cnt Combo'),
               )).toList(),
@@ -164,6 +194,18 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       body: Stack(
         children: [
           const Center(child: Icon(Icons.live_tv, size: 80, color: Colors.white12)),
+          if (activeGiftAnimationText != null)
+            Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.pinkAccent.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(activeGiftAnimationText!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+            ),
           Positioned(
             top: 40,
             left: 12,
