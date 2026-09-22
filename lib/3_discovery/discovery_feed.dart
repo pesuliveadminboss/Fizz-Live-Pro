@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'streamer_model.dart';
-import 'live_stream_room_screen.dart' hide StreamerItemData;
+import 'live_stream_room_screen.dart' as room;
 import '../4_interactions/call_screen.dart';
 import '../4_interactions/gift_sheet.dart';
 import '../4_interactions/party_room_widget.dart';
@@ -42,7 +42,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => LiveStreamRoomScreen(
+                      builder: (_) => room.LiveStreamRoomScreen(
                         streamer: item,
                         onDismissTotal: () => Navigator.pop(context),
                         onMinimizePIP: (streamerData) {
@@ -105,7 +105,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => LiveStreamRoomScreen(
+                      builder: (_) => room.LiveStreamRoomScreen(
                         streamer: currentPiP,
                         onDismissTotal: () => Navigator.pop(context),
                         onMinimizePIP: (streamerData) {
@@ -156,3 +156,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
     );
   }
 }
+
