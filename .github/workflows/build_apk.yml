@@ -29,12 +29,12 @@ jobs:
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
 
-      - name: Strip Legacy v1 Embedding Meta-data Safely
+      - name: Upgrade Android Embedding to v2 Safely
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if [ -f "$MANIFEST" ]; then
-            sed -i '/flutterEmbedding/d' "$MANIFEST" || true
-            sed -i '/android:name="flutterEmbedding"/d' "$MANIFEST" || true
+            sed -i 's/android:value="1"/android:value="2"/g' "$MANIFEST" || true
+            sed -i '/flutterEmbedding/c\        <meta-data\n            android:name="flutterEmbedding"\n            android:value="2" \/>' "$MANIFEST" || true
           fi
 
       - name: Force Safe Gradle Wrapper & Compatibility Fix
