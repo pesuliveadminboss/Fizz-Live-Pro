@@ -6,7 +6,7 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final seats = [
+    final List<Map<String, dynamic>> seats = [
       {'name': 'Beauty', 'diamond': '0', 'isOccupied': true},
       {'name': 'Ms.Maee', 'diamond': '30', 'isOccupied': true},
       {'name': 'Sweet...', 'diamond': '1.54k', 'isOccupied': true},
@@ -104,6 +104,8 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
                       itemBuilder: (_, index) {
                         final seat = seats[index];
                         final occupied = seat['isOccupied'] as bool;
+                        final seatName = seat['name'] as String;
+                        final seatDiamond = seat['diamond'] as String;
                         return Column(
                           children: [
                             Stack(
@@ -128,12 +130,12 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              seat['name']!,
+                              seatName,
                               style: const TextStyle(color: Colors.white, fontSize: 10),
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              '💎 ${seat['diamond']}',
+                              '💎 $seatDiamond',
                               style: const TextStyle(color: Colors.amber, fontSize: 9),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -193,7 +195,7 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          const Text('Loading...', style: TextStyle(color: Colors.white75, fontSize: 11)),
+                          const Text('Loading...', style: TextStyle(color: Color(0xBFFFFFFF), fontSize: 11)),
                         ],
                       ),
                     ],
@@ -233,3 +235,4 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
     );
   }
 }
+
