@@ -22,11 +22,12 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.22.0'
           channel: 'stable'
 
-      - name: Fix Package Name Case for Dart Rules
+      - name: Fix Package Name First in Pubspec
         run: |
+          sed -i 's/name: Fizz-Live-Pro/name: fizz_live_pro/g' pubspec.yaml || true
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
 
       - name: Rebuild Android Platform Bridge Safely
