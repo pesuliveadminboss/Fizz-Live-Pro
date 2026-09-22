@@ -19,21 +19,15 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Setup Flutter
+      - name: Setup Flutter (Compatible SDK)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.19.6'
           channel: 'stable'
 
       - name: Fix Package Name Case for Dart Rules
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
-
-      - name: Fix Android Gradle Properties URL
-        run: |
-          if [ -f "android/gradle/wrapper/gradle-wrapper.properties" ]; then
-            sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.4-bin.zip|g' android/gradle/wrapper/gradle-wrapper.properties
-          fi
 
       - name: Get Dependencies
         run: flutter pub get
