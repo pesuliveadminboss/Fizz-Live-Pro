@@ -30,8 +30,8 @@ class AppStateController extends ChangeNotifier {
   AppStateController._internal();
 
   final List<UserProfileItem> allUsers = [
-    UserProfileItem(idDigit: '8002023', name: 'Jocelyn Kidmat', status: 'online', country: 'Delhi', age: 34, induction: 'main tumhen chaahati hoon.', language: 'English, Hindi'),
-    UserProfileItem(idDigit: '90001001', name: 'Ayesha_Live', status: 'live', country: 'IN', age: 24, induction: 'Live vibe check', language: 'Tamil, English'),
+    UserProfileItem(idDigit: '8002023', name: 'Jocelyn Kidmat', status: 'online', country: 'Delhi', age: 34, induction: 'main tumhen chaahati hoon.', language: 'English, Hindi', isFollowed: true),
+    UserProfileItem(idDigit: '90001001', name: 'Ayesha_Live', status: 'live', country: 'IN', age: 24, induction: 'Live vibe check', language: 'Tamil, English', isFollowed: true),
     UserProfileItem(idDigit: '90001002', name: 'Party_King_99', status: 'party', country: 'IN', age: 27, induction: 'Party all night', language: 'Hindi, English'),
     UserProfileItem(idDigit: '90001003', name: 'Offline_Guy', status: 'offline', country: 'UK', age: 30, induction: 'Busy offline', language: 'English'),
   ];
