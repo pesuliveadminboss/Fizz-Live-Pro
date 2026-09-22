@@ -29,6 +29,14 @@ jobs:
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
 
+      - name: Strip Legacy v1 Embedding Meta-data Safely
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i '/flutterEmbedding/d' "$MANIFEST" || true
+            sed -i '/android:name="flutterEmbedding"/d' "$MANIFEST" || true
+          fi
+
       - name: Force Safe Gradle Wrapper & Compatibility Fix
         run: |
           mkdir -p android/gradle/wrapper
