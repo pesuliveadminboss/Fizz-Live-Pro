@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'streamer_model.dart' as model;
 import '../4_interactions/call_screen.dart';
+import 'profile_detail_view_screen.dart';
 
 class LiveStreamRoomScreen extends StatefulWidget {
   final dynamic streamer;
@@ -85,7 +86,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
   }
 
   void _showGiftComboSheet() {
-    const List<int> combos = [1,77,177,777];
+    const List<int> combos =;
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1F1A24),
@@ -146,40 +147,13 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
                   return ListTile(
                     leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white)),
                     title: Text(v['name']!, style: const TextStyle(color: Colors.yellow, fontSize: 13)),
-                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: TextStyle(color: Color(0xBFFFFFFF), fontSize: 10)),
                   );
                 },
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showStreamerProfile() {
-    final sName = widget.streamer is model.StreamerItemData ? widget.streamer.name : 'Streamer';
-    final sIdDigit = widget.streamer is model.StreamerItemData ? widget.streamer.idDigit : '101';
-    final sCountry = widget.streamer is model.StreamerItemData ? widget.streamer.country : 'IN 🇮🇳';
-    final sInduction = widget.streamer is model.StreamerItemData ? widget.streamer.induction : 'Welcome!';
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1F1A24),
-        title: Text(sName, style: const TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('ID: $sIdDigit', style: const TextStyle(color: Colors.yellow)),
-            Text('Country: $sCountry', style: TextStyle(color: Colors.white.withOpacity(0.7))),
-            Text('Induction: $sInduction', style: TextStyle(color: Colors.white.withOpacity(0.7))),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close', style: TextStyle(color: Colors.pinkAccent))),
-        ],
       ),
     );
   }
@@ -214,7 +188,14 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: _showStreamerProfile,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileDetailViewScreen(streamer: widget.streamer),
+                      ),
+                    );
+                  },
                   child: Row(
                     children: [
                       const CircleAvatar(radius: 18, backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, size: 20)),
@@ -239,14 +220,14 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
                                     children: [
                                       Icon(isFollowed ? Icons.favorite : Icons.favorite_border, size: 10, color: Colors.white),
                                       const SizedBox(width: 2),
-                                      Text(isFollowed ? 'black' : 'follow', style: const TextStyle(color: Colors.white, fontSize: 8)),
+                                      Text(isFollowed ? 'followed' : 'follow', style: const TextStyle(color: Colors.white, fontSize: 8)),
                                     ],
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          Text('ID: $sIdDigit • 💎 40/min', style: const TextStyle(color: Colors.yellow, fontSize: 9)),
+                          Text('ID: $sIdDigit • 💎 40/min', style: const TextStyle(color: Colors.amber, fontSize: 9)),
                         ],
                       ),
                     ],
@@ -352,7 +333,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> with Single
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                       decoration: const InputDecoration(
                         hintText: 'Say something...',
-                        hintStyle: TextStyle(color: Colors.white60, fontSize: 11),
+                        hintStyle: TextStyle(color: Color(0x99FFFFFF), fontSize: 11),
                         border: InputBorder.none,
                       ),
                       onSubmitted: (_) => _sendMessage(),
