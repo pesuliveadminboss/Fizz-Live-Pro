@@ -33,12 +33,10 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   @override
   void initState() {
     super.initState();
-    // Simulate initial join messages
     messages.add({'type': 'join', 'text': 'user-0001 : join the stream'});
     messages.add({'type': 'chat', 'user': 'user-0002', 'msg': 'hii good morning'});
     isFollowed = widget.streamer is model.StreamerItemData ? widget.streamer.isFollowed : false;
 
-    // Simulate auto user count fluctuate / join pill
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         setState(() {
@@ -59,6 +57,42 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       });
       _msgController.clear();
     });
+  }
+
+  void _showGiftComboSheet() {
+    final combos =;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1F1A24),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(16),
+        height: 220,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Send Combo Gift 🎁', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              children: combos.map((cnt) => ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pinkAccent,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    messages.add({'type': 'chat', 'user': 'streamer', 'msg': 'Received x$cnt special gift! Thank you!'});
+                  });
+                },
+                child: Text('x$cnt Combo'),
+              )).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showViewersModal() {
@@ -94,18 +128,23 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
   }
 
   void _showStreamerProfile() {
+    final sName = widget.streamer is model.StreamerItemData ? widget.streamer.name : 'Streamer';
+    final sIdDigit = widget.streamer is model.StreamerItemData ? widget.streamer.idDigit : '101';
+    final sCountry = widget.streamer is model.StreamerItemData ? widget.streamer.country : 'IN 🇮🇳';
+    final sInduction = widget.streamer is model.StreamerItemData ? widget.streamer.induction : 'Welcome!';
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1F1A24),
-        title: Text(widget.streamer.name, style: const TextStyle(color: Colors.white)),
+        title: Text(sName, style: const TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ID: ${widget.streamer.idDigit}', style: const TextStyle(color: Colors.yellow)),
-            Text('Country: ${widget.streamer.country}', style: const TextStyle(color: Colors.white75)),
-            Text('Induction: ${widget.streamer.induction}', style: const TextStyle(color: Colors.white75)),
+            Text('ID: $sIdDigit', style: const TextStyle(color: Colors.yellow)),
+            Text('Country: $sCountry', style: const TextStyle(color: Colors.white75)),
+            Text('Induction: $sInduction', style: const TextStyle(color: Colors.white75)),
           ],
         ),
         actions: [
@@ -124,10 +163,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Simulated live stream background canvas
           const Center(child: Icon(Icons.live_tv, size: 80, color: Colors.white12)),
-
-          // Top Header (Profile touch -> profile dialog, user count touch -> viewers modal, X -> PiP mini screen)
           Positioned(
             top: 40,
             left: 12,
@@ -194,8 +230,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ],
             ),
           ),
-
-          // 3 Mini Ad Rotation Boxes near video call / top section
           Positioned(
             top: 95,
             right: 12,
@@ -212,8 +246,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               )),
             ),
           ),
-
-          // Bottom Left: Color-coded chat + join pill queue (auto scroll / 1-inch fade feel)
           Positioned(
             bottom: 75,
             left: 12,
@@ -262,8 +294,6 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
               ),
             ),
           ),
-
-          // Bottom Bar: Chat input + Gift icon with pink heart + follow + 1-to-1 video call button
           Positioned(
             bottom: 20,
             left: 12,
@@ -293,21 +323,16 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
                   child: const CircleAvatar(radius: 18, backgroundColor: Colors.pinkAccent, child: Icon(Icons.send, size: 14, color: Colors.white)),
                 ),
                 const SizedBox(width: 6),
-                Stack(
+                const Stack(
                   alignment: Alignment.center,
                   children: [
-                    const Icon(Icons.favorite, color: Colors.pinkAccent, size: 32),
-                    const Text('follow', style: TextStyle(color: Colors.white, fontSize: 6, fontWeight: FontWeight.bold)),
+                    Icon(Icons.favorite, color: Colors.pinkAccent, size: 32),
+                    Text('follow', style: TextStyle(color: Colors.white, fontSize: 6, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(width: 6),
                 GestureDetector(
-                  onTap: () {
-                    // Streamer reply simulator or gift action
-                    setState(() {
-                      messages.add({'type': 'chat', 'user': 'streamer', 'msg': 'Thank you for support!'});
-                    });
-                  },
+                  onTap: _showGiftComboSheet,
                   child: const CircleAvatar(radius: 18, backgroundColor: Colors.amber, child: Icon(Icons.card_giftcard, size: 16, color: Colors.black)),
                 ),
                 const SizedBox(width: 6),
