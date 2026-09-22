@@ -1,29 +1,58 @@
-class LiveViewerItem {
+class StreamerItemData {
+  static int _idCounter = 90001001;
+  
   final String id;
   final String name;
-  final String avatarUrl;
-  final String age;
+  final String idDigit;
+  final String type; // 'online', 'live', 'party', 'offline'
   final String country;
+  final DateTime dateOfBirth;
+  final String induction;
+  final String language;
+  int closeFriendsCount;
+  final int closeFriendsMax = 3;
+  bool isFollowed;
 
-  const LiveViewerItem({required this.id, required this.name, required this.avatarUrl, required this.age, required this.country});
+  StreamerItemData({
+    String? id,
+    required this.name,
+    String? idDigit,
+    required this.type,
+    this.country = 'IN 🇮🇳',
+    DateTime? dateOfBirth,
+    this.induction = 'Welcome to my live/party vibe!',
+    this.language = 'Tamil, English',
+    this.closeFriendsCount = 1,
+    this.isFollowed = false,
+  }) : id = id ?? 's_${_idCounter}',
+       idDigit = idDigit ?? (_idCounter++).toString(),
+       dateOfBirth = dateOfBirth ?? DateTime(1999, 8, 14);
+
+  int get age {
+    final now = DateTime.now();
+    int a = now.year - dateOfBirth.year;
+    if (now.month < dateOfBirth.month || (now.month == dateOfBirth.month && now.day < dateOfBirth.day)) {
+      a--;
+    }
+    return a;
+  }
+
+  StreamerItemData copyWith({
+    bool? isFollowed,
+    int? closeFriendsCount,
+    String? type,
+  }) {
+    return StreamerItemData(
+      id: id,
+      name: name,
+      idDigit: idDigit,
+      type: type ?? this.type,
+      country: country,
+      dateOfBirth: dateOfBirth,
+      induction: induction,
+      language: language,
+      closeFriendsCount: closeFriendsCount ?? this.closeFriendsCount,
+      isFollowed: isFollowed ?? this.isFollowed,
+    );
+  }
 }
-
-class LiveChatMessage {
-  final String senderName;
-  final String text;
-  final bool isStreamer;
-  final bool isJoinEvent;
-
-  const LiveChatMessage({required this.senderName, required this.text, this.isStreamer = false, this.isJoinEvent = false});
-}
-
-final List<LiveViewerItem> mockLiveViewers = [
-  const LiveViewerItem(id: '90002001', name: 'user_0001', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200', age: '24', country: 'India'),
-  const LiveViewerItem(id: '90002002', name: 'vibe_master', avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200', age: '26', country: 'Russia'),
-];
-
-List<LiveChatMessage> getInitialLiveChat() => [
-  const LiveChatMessage(senderName: 'System', text: 'Pornographic, vulgar, violent and under age is forbidden to appear in the live.', isStreamer: true),
-  const LiveChatMessage(senderName: 'Kamyla', text: 'Hello 👋 Stay and enjoy the live with me!'),
-  const LiveChatMessage(senderName: 'user_0001', text: 'joined the stream', isJoinEvent: true),
-];
