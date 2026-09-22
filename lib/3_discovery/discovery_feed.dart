@@ -16,10 +16,10 @@ class DiscoveryFeedScreen extends StatefulWidget {
 
 class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
   dynamic activePiPStreamer;
-  List<model.StreamerItemData> streamers = [
-    model.StreamerItemData('s1', 'Ayesha_Live', '99011', 'video'),
-    model.StreamerItemData('s2', 'Party_King_99', '901', 'party'),
-    model.StreamerItemData('s3', 'Nisha_Vibe', '88421', 'video'),
+  List<Map<String, dynamic>> streamers = [
+    {'name': 'Ayesha_Live', 'type': 'video'},
+    {'name': 'Party_King_99', 'type': 'party'},
+    {'name': 'Nisha_Vibe', 'type': 'video'},
   ];
 
   @override
@@ -39,14 +39,15 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
             itemCount: streamers.length,
             itemBuilder: (_, index) {
               final item = streamers[index];
-              final isParty = item.name.toLowerCase().contains('party') || item.name == 'Party_King_99';
+              final nameVal = item['name'] as String;
+              final isParty = nameVal.toLowerCase().contains('party') || item['type'] == 'party';
               return GestureDetector(
                 onTap: () {
                   final roomStreamer = activePiPStreamer is room.StreamerItemData
                       ? activePiPStreamer
                       : room.StreamerItemData(
-                          id: item.name,
-                          name: item.name,
+                          id: nameVal,
+                          name: nameVal,
                           idDigit: '101',
                           type: isParty ? 'party' : 'video',
                         );
@@ -88,7 +89,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.name,
+                              nameVal,
                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -176,3 +177,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
     );
   }
 }
+
