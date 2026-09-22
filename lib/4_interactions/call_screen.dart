@@ -30,15 +30,11 @@ class _CallScreenState extends State<CallScreen> {
       if (mounted) {
         setState(() {
           secondsElapsed++;
-          // 1800 gems per minute burn rate (~30 gems per second)
+          // 1800 gems per min (~30 gems/sec burn)
           if (secondsElapsed % 2 == 0 && remainingGems > 0) {
             remainingGems = (remainingGems - 30).clamp(0, 999999);
           }
-          // Low gem warning threshold (< 2000 gems remaining triggers recharge modal prompt check)
         });
-        if (remainingGems < 2000 && secondsElapsed % 10 == 0) {
-          // Trigger low balance warning cue
-        }
       }
     });
   }
