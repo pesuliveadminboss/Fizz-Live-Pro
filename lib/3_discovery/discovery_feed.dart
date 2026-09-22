@@ -5,6 +5,8 @@ import '../4_interactions/call_screen.dart';
 import 'profile_detail_view_screen.dart';
 import 'party_multi_seat_room_screen.dart';
 import 'match_screen.dart';
+import 'follow_tab_screen.dart';
+import '../controllers/app_state_controller.dart';
 
 typedef DiscoveryFeedView = DiscoveryFeedScreen;
 
@@ -35,7 +37,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -55,35 +57,73 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 
-  void _showSearchDialog() {
+  void _showSearchIdDialog() {
     final TextEditingController searchCtrl = TextEditingController();
+    UserProfileItem? result;
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1F1A24),
-        title: const Text('Search by 8-Digit ID', style: TextStyle(color: Colors.white, fontSize: 14)),
-        content: TextField(
-          controller: searchCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'e.g. 90001001',
-            hintStyle: TextStyle(color: Colors.white54),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: const Color(0xFF1F1A24),
+          title: const Text('Search by 8-Digit ID', style: TextStyle(color: Colors.white, fontSize: 14)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: searchCtrl,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'e.g. 8002023 or 90001001',
+                  hintStyle: TextStyle(color: Colors.white54),
+                ),
+                onChanged: (val) {
+                  setDialogState(() {
+                    result = AppStateController.instance.searchById(val);
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              if (result != null)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileDetailViewScreen(streamer: result!),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(result!.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              Text('ID: ${result!.idDigit} | ${result!.status}', style: const TextStyle(color: Colors.amber, fontSize: 10)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white70),
+                      ],
+                    ),
+                  ),
+                )
+              else if (searchCtrl.text.isNotEmpty)
+                const Text('No user found', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+            ],
           ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close', style: TextStyle(color: Colors.white54))),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
-            onPressed: () {
-              Navigator.pop(context);
-              _showBottomToast('Searching ID: ${searchCtrl.text}');
-            },
-            child: const Text('Search'),
-          ),
-        ],
       ),
     );
   }
@@ -147,19 +187,20 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                   indicatorWeight: 3,
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white54,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   labelPadding: EdgeInsets.zero,
                   tabs: const [
                     Tab(text: 'Hot'),
                     Tab(text: 'Live'),
                     Tab(text: 'Party'),
+                    Tab(text: 'Follow'),
                     Tab(text: 'Match'),
                   ],
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.search, color: Colors.white, size: 20),
-                onPressed: _showSearchDialog,
+                onPressed: _showSearchIdDialog,
               ),
               IconButton(
                 icon: const Icon(Icons.language, color: Colors.white, size: 20),
@@ -177,6 +218,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               _buildGrid(filter: 'hot'),
               _buildGrid(filter: 'live'),
               _buildGrid(filter: 'party'),
+              const FollowTabScreen(),
               const MatchScreen(),
             ],
           ),
@@ -463,3 +505,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 }
+
