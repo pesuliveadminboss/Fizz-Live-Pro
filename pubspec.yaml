@@ -1,5 +1,5 @@
 name: fizz_live_pro
-description: A new Flutter project for Pesu Live / Fizz Live.
+description: Pesu Live app from scratch
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,9 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_lints: ^5.0.0
   cupertino_icons: ^1.0.6
-  # unga existing dependencies inga irukkum (zegocloud, etc.)
+  flutter_lints: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -19,6 +18,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # assets:
-  #   - assets/
   
