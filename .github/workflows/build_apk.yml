@@ -31,12 +31,14 @@ jobs:
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
           sed -i "s/sdk: .*/sdk: '>=3.5.0 <4.0.0'/g" pubspec.yaml || true
 
-      - name: Patch Android v2 Embedding
+      - name: Regenerate Clean Android Project (Safe for lib code)
         run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          if [ -f "$MANIFEST" ]; then
-            sed -i 's/android:value="1"/android:value="2"/g' "$MANIFEST" || true
-          fi
+          mkdir -p /tmp/android_backup
+          cp -f android/app/google-services.json /tmp/android_backup/ 2>/dev/null || true
+          rm -rf android
+          flutter create --platforms=android . --project-name=fizz_live_pro
+          mkdir -p android/app
+          cp -f /tmp/android_backup/google-services.json android/app/ 2>/dev/null || true
 
       - name: Get Dependencies
         run: flutter pub get
