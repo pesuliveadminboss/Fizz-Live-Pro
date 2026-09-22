@@ -21,7 +21,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     model.StreamerItemData(name: 'Ayesha_Live', type: 'live', isFollowed: true),
     model.StreamerItemData(name: 'Party_King_99', type: 'party'),
     model.StreamerItemData(name: 'Nisha_Vibe', type: 'online'),
-    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'), // Hot la vara koodadhu
+    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'), // Hot-la vara koodadhu
   ];
 
   @override
@@ -47,12 +47,12 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 
-  void _toggleFollow(int index, String tabType) {
+  void _toggleFollow(int index, String filter) {
     setState(() {
-      final targetList = tabType == 'hot' 
+      final list = filter == 'hot'
           ? streamers.where((s) => s.type != 'offline').toList()
-          : streamers.where((s) => s.type == tabType).toList();
-      final item = targetList[index];
+          : streamers.where((s) => s.type == filter).toList();
+      final item = list[index];
       item.isFollowed = !item.isFollowed;
       _showBottomToast(item.isFollowed ? 'following' : 'unfollowing');
     });
@@ -101,8 +101,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               left: pipPosition.dx,
               top: pipPosition.dy,
               child: Draggable(
-                feedback: _buildPiPBox(isDragging: true),
-                childWhenDragging: const SizedBox.shrink(({}), if(false) const SizedBox()),
+                feedback: _buildPiPBox(),
                 onDragEnd: (details) {
                   setState(() {
                     pipPosition = Offset(
@@ -113,7 +112,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                 },
                 child: GestureDetector(
                   onTap: () {
-                    // Center tap opens full live screen
                     final currentPiP = activePiPStreamer;
                     setState(() => activePiPStreamer = null);
                     Navigator.push(
@@ -139,7 +137,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 
-  Widget _buildPiPBox({bool isDragging = false}) {
+  Widget _buildPiPBox() {
     return Container(
       width: 120,
       height: 180,
@@ -169,12 +167,9 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   }
 
   Widget _buildGrid({required String filter}) {
-    List<model.StreamerItemData> list;
-    if (filter == 'hot') {
-      list = streamers.where((s) => s.type != 'offline').toList();
-    } else {
-      list = streamers.where((s) => s.type == filter).toList();
-    }
+    List<model.StreamerItemData> list = filter == 'hot'
+        ? streamers.where((s) => s.type != 'offline').toList()
+        : streamers.where((s) => s.type == filter).toList();
 
     return GridView.builder(
       padding: const EdgeInsets.all(12),
@@ -223,39 +218,24 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
             child: Stack(
               children: [
                 Center(
-                  child: Icon(
-                    item.type == 'party' ? Icons.group : Icons.person,
-                    size: 50,
-                    color: Colors.white24,
-                  ),
+                  child: Icon(item.type == 'party' ? Icons.group : Icons.person, size: 50, color: Colors.white24),
                 ),
-                // Status badge left top corner
                 Positioned(
                   top: 8,
                   left: 8,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      item.type.toUpperCase(),
-                      style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                    ),
+                    decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(8)),
+                    child: Text(item.type.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                // If followed badge
                 if (item.isFollowed)
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.pinkAccent.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
+                      decoration: BoxDecoration(color: Colors.pinkAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(6)),
                       child: const Text('your follow', style: TextStyle(color: Colors.white, fontSize: 7)),
                     ),
                   ),
@@ -290,10 +270,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min',
-                            style: const TextStyle(color: Colors.amber, fontSize: 9),
-                          ),
+                          Text(item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min', style: const TextStyle(color: Colors.amber, fontSize: 9)),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen()));
@@ -313,4 +290,3 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 }
-
