@@ -4,7 +4,7 @@ class StreamerItemData {
   final String id;
   final String name;
   final String idDigit;
-  final String type;
+  final String type; // 'online', 'live', 'party', 'offline'
   final String country;
   final DateTime dateOfBirth;
   final String induction;
@@ -35,5 +35,24 @@ class StreamerItemData {
       a--;
     }
     return a;
+  }
+
+  StreamerItemData copyWith({
+    bool? isFollowed,
+    int? closeFriendsCount,
+    String? type,
+  }) {
+    return StreamerItemData(
+      id: id,
+      name: name,
+      idDigit: idDigit,
+      type: type ?? this.type,
+      country: country,
+      dateOfBirth: dateOfBirth,
+      induction: induction,
+      language: language,
+      closeFriendsCount: closeFriendsCount ?? this.closeFriendsCount,
+      isFollowed: isFollowed ?? this.isFollowed,
+    );
   }
 }
