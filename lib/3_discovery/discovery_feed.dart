@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'streamer_model.dart';
+import 'streamer_model.dart' as model;
 import 'live_stream_room_screen.dart' as room;
 import '../4_interactions/call_screen.dart';
 import '../4_interactions/gift_sheet.dart';
@@ -14,10 +14,10 @@ class DiscoveryFeedScreen extends StatefulWidget {
 
 class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
   dynamic activePiPStreamer;
-  List<StreamerItemData> streamers = [
-    StreamerItemData(id: 's1', name: 'Ayesha_Live', idDigit: '99011', type: 'video'),
-    StreamerItemData(id: 's2', name: 'Party_King_99', idDigit: '901', type: 'party'),
-    StreamerItemData(id: 's3', name: 'Nisha_Vibe', idDigit: '88421', type: 'video'),
+  List<model.StreamerItemData> streamers = [
+    model.StreamerItemData(id: 's1', name: 'Ayesha_Live', idDigit: '99011', type: 'video'),
+    model.StreamerItemData(id: 's2', name: 'Party_King_99', idDigit: '901', type: 'party'),
+    model.StreamerItemData(id: 's3', name: 'Nisha_Vibe', idDigit: '88421', type: 'video'),
   ];
 
   @override
@@ -37,26 +37,27 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
             itemCount: streamers.length,
             itemBuilder: (_, index) {
               final item = streamers[index];
+              final isParty = item.name.toLowerCase().contains('party') || item.name == 'Party_King_99';
               return GestureDetector(
                 onTap: () {
+                  final roomStreamer = activePiPStreamer is room.StreamerItemData
+                      ? activePiPStreamer
+                      : room.StreamerItemData(
+                          id: item.name,
+                          name: item.name,
+                          idDigit: '101',
+                          type: isParty ? 'party' : 'video',
+                        );
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: activePiPStreamer,
-                          onDismissTotal: () => Navigator.pop(context),
-                           onMinimizePIP: (dynamic streamerData) {
-                            Navigator.pop(context);
-                            setState(() {
+                        streamer: roomStreamer,
+                        onDismissTotal: () => Navigator.pop(context),
+                        onMinimizePIP: (dynamic streamerData) {
+                          Navigator.pop(context);
+                          setState(() {
                             activePiPStreamer = streamerData;
-                            });
-                            },
-                            ),                      
-                              id: streamerData.id,
-                              name: streamerData.name,
-                              idDigit: streamerData.idDigit,
-                              type: streamerData.type,
-                            );
                           });
                         },
                       ),
@@ -72,7 +73,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     children: [
                       Center(
                         child: Icon(
-                          item.name.toLowerCase().contains('party') ? Icons.group : Icons.person,
+                          isParty ? Icons.group : Icons.person,
                           size: 50,
                           color: Colors.white24,
                         ),
@@ -90,7 +91,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              item.name.toLowerCase().contains('party') ? 'Party Room' : 'Video Call • 💎 40/min',
+                              isParty ? 'Party Room' : 'Video Call • 💎 40/min',
                               style: const TextStyle(color: Colors.amber, fontSize: 10),
                             ),
                           ],
@@ -102,13 +103,20 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
               );
             },
           ),
-                    if (activePiPStreamer != null)
+          if (activePiPStreamer != null)
             Positioned(
               bottom: 20,
               right: 20,
               child: GestureDetector(
                 onTap: () {
-                  final currentPiP = activePiPStreamer;
+                  final currentPiP = activePiPStreamer is room.StreamerItemData
+                      ? activePiPStreamer
+                      : room.StreamerItemData(
+                          id: 'live_pip',
+                          name: activePiPStreamer?.name?.toString() ?? 'Live',
+                          idDigit: '101',
+                          type: 'video',
+                        );
                   setState(() => activePiPStreamer = null);
                   Navigator.push(
                     context,
@@ -161,4 +169,8 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                 ),
               ),
             ),
-          
+        ],
+      ),
+    );
+  }
+}
