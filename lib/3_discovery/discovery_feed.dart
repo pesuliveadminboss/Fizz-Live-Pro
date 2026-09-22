@@ -137,31 +137,36 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
           backgroundColor: const Color(0xFF0F0B1E),
           elevation: 0,
           titleSpacing: 0,
-          title: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicatorColor: Colors.pinkAccent,
-            indicatorWeight: 3,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white54,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            tabs: const [
-              Tab(text: 'Hot'),
-              Tab(text: 'Live'),
-              Tab(text: 'Party'),
-              Tab(text: 'Match'),
+          title: Row(
+            children: [
+              Expanded(
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: false,
+                  indicatorColor: Colors.pinkAccent,
+                  indicatorWeight: 3,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white54,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  labelPadding: EdgeInsets.zero,
+                  tabs: const [
+                    Tab(text: 'Hot'),
+                    Tab(text: 'Live'),
+                    Tab(text: 'Party'),
+                    Tab(text: 'Match'),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search, color: Colors.white, size: 20),
+                onPressed: _showSearchDialog,
+              ),
+              IconButton(
+                icon: const Icon(Icons.language, color: Colors.white, size: 20),
+                onPressed: _showLanguageFilterSheet,
+              ),
             ],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.white, size: 20),
-              onPressed: _showSearchDialog,
-            ),
-            IconButton(
-              icon: const Icon(Icons.language, color: Colors.white, size: 20),
-              onPressed: _showLanguageFilterSheet,
-            ),
-          ],
         ),
       ),
       body: Stack(
@@ -175,7 +180,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               const MatchScreen(),
             ],
           ),
-          // Live Video PiP
           if (activePiPStreamer != null)
             Positioned(
               left: pipPosition.dx,
@@ -213,7 +217,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                 ),
               ),
             ),
-          // Party Audio Mini PiP
           if (activePartyPiPStreamer != null)
             Positioned(
               left: partyPiPPosition.dx,
