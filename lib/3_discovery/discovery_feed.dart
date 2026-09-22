@@ -19,6 +19,10 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   late TabController _tabController;
   dynamic activePiPStreamer;
   Offset pipPosition = const Offset(20, 400);
+
+  dynamic activePartyPiPStreamer;
+  Offset partyPiPPosition = const Offset(20, 520);
+
   String selectedLanguageFilter = 'All';
 
   List<model.StreamerItemData> streamers = [
@@ -171,6 +175,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               const MatchScreen(),
             ],
           ),
+          // Live Video PiP
           if (activePiPStreamer != null)
             Positioned(
               left: pipPosition.dx,
@@ -208,6 +213,43 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                 ),
               ),
             ),
+          // Party Audio Mini PiP
+          if (activePartyPiPStreamer != null)
+            Positioned(
+              left: partyPiPPosition.dx,
+              top: partyPiPPosition.dy,
+              child: Draggable(
+                feedback: _buildMiniPartyPiPBox(),
+                childWhenDragging: const SizedBox.shrink(),
+                onDragEnd: (details) {
+                  setState(() {
+                    partyPiPPosition = Offset(
+                      details.offset.dx.clamp(0.0, MediaQuery.of(context).size.width - 100),
+                      details.offset.dy.clamp(0.0, MediaQuery.of(context).size.height - 200),
+                    );
+                  });
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    final item = activePartyPiPStreamer;
+                    setState(() => activePartyPiPStreamer = null);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PartyMultiSeatRoomScreen(
+                          streamer: item,
+                          onMinimizePartyPiP: () {
+                            Navigator.pop(context);
+                            setState(() => activePartyPiPStreamer = item);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  child: _buildMiniPartyPiPBox(),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -235,6 +277,40 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                 backgroundColor: Colors.black54,
                 child: Icon(Icons.close, size: 12, color: Colors.white),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniPartyPiPBox() {
+    return Container(
+      width: 100,
+      height: 140,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Colors.purpleAccent, Colors.pinkAccent]),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 8)],
+      ),
+      child: Stack(
+        children: [
+          const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.graphic_eq, color: Colors.white, size: 28),
+                SizedBox(height: 4),
+                Text('Party Audio', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => setState(() => activePartyPiPStreamer = null),
+              child: const CircleAvatar(radius: 9, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 10, color: Colors.white)),
             ),
           ),
         ],
@@ -273,7 +349,15 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
             if (item.type == 'party') {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => PartyMultiSeatRoomScreen(streamer: item)),
+                MaterialPageRoute(
+                  builder: (_) => PartyMultiSeatRoomScreen(
+                    streamer: item,
+                    onMinimizePartyPiP: () {
+                      Navigator.pop(context);
+                      setState(() => activePartyPiPStreamer = item);
+                    },
+                  ),
+                ),
               );
             } else if (item.type == 'live') {
               Navigator.push(
