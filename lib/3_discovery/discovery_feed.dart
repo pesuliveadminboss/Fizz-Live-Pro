@@ -106,7 +106,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
             Positioned(
               bottom: 20,
               right: 20,
-              child: GestureDetector(
+              child: GestureDetector(...),
                 onTap: () {
                   final currentPiP = activePiPStreamer!;
                   setState(() => activePiPStreamer = null);
