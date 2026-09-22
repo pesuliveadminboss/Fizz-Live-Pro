@@ -44,10 +44,11 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
                         streamer: room.StreamerItemData(
-                          id: item.id,
+                          id: item.name,
                           name: item.name,
-                          idDigit: item.idDigit,
-                          type: item.type,
+                          idDigit: '101',
+                          type: item.name.toLowerCase().contains('party') ? 'party' : 'video',
+                          
                         ),
                         onDismissTotal: () => Navigator.pop(context),
                         onMinimizePIP: (room.StreamerItemData streamerData) {
@@ -74,7 +75,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     children: [
                       Center(
                         child: Icon(
-                          item.type == 'party' ? Icons.group : Icons.person,
+                          item.name.toLowerCase().contains('party') ? Icons.group : Icons.person,
                           size: 50,
                           color: Colors.white24,
                         ),
@@ -92,7 +93,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min',
+                              item.name.toLowerCase().contains('party') ? 'Party Room' : 'Video Call • 💎 40/min',
                               style: const TextStyle(color: Colors.amber, fontSize: 10),
                             ),
                           ],
