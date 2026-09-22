@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'streamer_model.dart' as model;
 import 'live_stream_room_screen.dart' as room;
 import '../4_interactions/call_screen.dart';
-import '../4_interactions/gift_sheet.dart';
-import '../4_interactions/party_room_widget.dart';
 
 typedef DiscoveryFeedView = DiscoveryFeedScreen;
 
@@ -17,11 +15,13 @@ class DiscoveryFeedScreen extends StatefulWidget {
 class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   dynamic activePiPStreamer;
+  Offset pipPosition = const Offset(20, 400);
 
-  final List<Map<String, dynamic>> streamers = [
-    {'name': 'Ayesha_Live', 'type': 'video'},
-    {'name': 'Party_King_99', 'type': 'party'},
-    {'name': 'Nisha_Vibe', 'type': 'video'},
+  List<model.StreamerItemData> streamers = [
+    model.StreamerItemData(name: 'Ayesha_Live', type: 'live', isFollowed: true),
+    model.StreamerItemData(name: 'Party_King_99', type: 'party'),
+    model.StreamerItemData(name: 'Nisha_Vibe', type: 'online'),
+    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'), // Hot la vara koodadhu
   ];
 
   @override
@@ -34,6 +34,28 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _showBottomToast(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.black87,
+      ),
+    );
+  }
+
+  void _toggleFollow(int index, String tabType) {
+    setState(() {
+      final targetList = tabType == 'hot' 
+          ? streamers.where((s) => s.type != 'offline').toList()
+          : streamers.where((s) => s.type == tabType).toList();
+      final item = targetList[index];
+      item.isFollowed = !item.isFollowed;
+      _showBottomToast(item.isFollowed ? 'following' : 'unfollowing');
+    });
   }
 
   @override
@@ -67,71 +89,48 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
         children: [
           TabBarView(
             controller: _tabController,
-            children: List.generate(4, (_) => _buildStreamerGrid()),
+            children: [
+              _buildGrid(filter: 'hot'),
+              _buildGrid(filter: 'live'),
+              _buildGrid(filter: 'party'),
+              _buildGrid(filter: 'online'),
+            ],
           ),
           if (activePiPStreamer != null)
             Positioned(
-              bottom: 20,
-              right: 20,
-              child: GestureDetector(
-                onTap: () {
-                  final roomStreamer = activePiPStreamer is room.StreamerItemData
-                      ? activePiPStreamer
-                      : room.StreamerItemData(
-                          id: 'live_pip',
-                          name: activePiPStreamer?.name?.toString() ?? 'Live',
-                          idDigit: '101',
-                          type: 'video',
-                        );
-                  setState(() => activePiPStreamer = null);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: roomStreamer,
-                        onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (dynamic streamerData) {
-                          Navigator.pop(context);
-                          setState(() {
-                            activePiPStreamer = streamerData;
-                          });
-                        },
-                      ),
-                    ),
-                  );
+              left: pipPosition.dx,
+              top: pipPosition.dy,
+              child: Draggable(
+                feedback: _buildPiPBox(isDragging: true),
+                childWhenDragging: const SizedBox.shrink(({}), if(false) const SizedBox()),
+                onDragEnd: (details) {
+                  setState(() {
+                    pipPosition = Offset(
+                      details.offset.dx.clamp(0.0, MediaQuery.of(context).size.width - 120),
+                      details.offset.dy.clamp(0.0, MediaQuery.of(context).size.height - 200),
+                    );
+                  });
                 },
-                child: Container(
-                  width: 120,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.pinkAccent, width: 2),
-                  ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Icon(
-                          activePiPStreamer?.name?.toString().toLowerCase().contains('party') == true
-                              ? Icons.group
-                              : Icons.person,
-                          color: Colors.white54,
+                child: GestureDetector(
+                  onTap: () {
+                    // Center tap opens full live screen
+                    final currentPiP = activePiPStreamer;
+                    setState(() => activePiPStreamer = null);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => room.LiveStreamRoomScreen(
+                          streamer: currentPiP,
+                          onDismissTotal: () => Navigator.pop(context),
+                          onMinimizePIP: (dynamic sd) {
+                            Navigator.pop(context);
+                            setState(() => activePiPStreamer = sd);
+                          },
                         ),
                       ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () => setState(() => activePiPStreamer = null),
-                          child: const CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.black54,
-                            child: Icon(Icons.close, size: 12, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
+                  child: _buildPiPBox(),
                 ),
               ),
             ),
@@ -140,7 +139,43 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 
-  Widget _buildStreamerGrid() {
+  Widget _buildPiPBox({bool isDragging = false}) {
+    return Container(
+      width: 120,
+      height: 180,
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.pinkAccent, width: 2),
+      ),
+      child: Stack(
+        children: [
+          const Center(child: Icon(Icons.videocam, color: Colors.white54, size: 40)),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => setState(() => activePiPStreamer = null),
+              child: const CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.black54,
+                child: Icon(Icons.close, size: 12, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGrid({required String filter}) {
+    List<model.StreamerItemData> list;
+    if (filter == 'hot') {
+      list = streamers.where((s) => s.type != 'offline').toList();
+    } else {
+      list = streamers.where((s) => s.type == filter).toList();
+    }
+
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -149,34 +184,36 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
         mainAxisSpacing: 10,
         childAspectRatio: 0.75,
       ),
-      itemCount: streamers.length,
+      itemCount: list.length,
       itemBuilder: (_, index) {
-        final item = streamers[index];
-        final nameVal = item['name'] as String;
-        final isParty = nameVal.toLowerCase().contains('party') || item['type'] == 'party';
+        final item = list[index];
+        Color statusColor = item.type == 'online'
+            ? Colors.green
+            : item.type == 'live'
+                ? Colors.redAccent
+                : Colors.purpleAccent;
+
         return GestureDetector(
           onTap: () {
-            final roomStreamer = room.StreamerItemData(
-              id: nameVal,
-              name: nameVal,
-              idDigit: '101',
-              type: isParty ? 'party' : 'video',
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => room.LiveStreamRoomScreen(
-                  streamer: roomStreamer,
-                  onDismissTotal: () => Navigator.pop(context),
-                  onMinimizePIP: (dynamic streamerData) {
-                    Navigator.pop(context);
-                    setState(() {
-                      activePiPStreamer = streamerData;
-                    });
-                  },
+            if (item.type == 'party') {
+              _showBottomToast('Opening Party Room: ${item.name}');
+            } else if (item.type == 'live') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => room.LiveStreamRoomScreen(
+                    streamer: item,
+                    onDismissTotal: () => Navigator.pop(context),
+                    onMinimizePIP: (dynamic sd) {
+                      Navigator.pop(context);
+                      setState(() => activePiPStreamer = sd);
+                    },
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              _showBottomToast('Opening Profile: ${item.name} (${item.idDigit})');
+            }
           },
           child: Container(
             decoration: BoxDecoration(
@@ -187,11 +224,41 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               children: [
                 Center(
                   child: Icon(
-                    isParty ? Icons.group : Icons.person,
+                    item.type == 'party' ? Icons.group : Icons.person,
                     size: 50,
                     color: Colors.white24,
                   ),
                 ),
+                // Status badge left top corner
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      item.type.toUpperCase(),
+                      style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                // If followed badge
+                if (item.isFollowed)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.pinkAccent.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('your follow', style: TextStyle(color: Colors.white, fontSize: 7)),
+                    ),
+                  ),
                 Positioned(
                   bottom: 8,
                   left: 8,
@@ -199,14 +266,41 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        nameVal,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${item.name} | ${item.country} | ${item.age}y',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _toggleFollow(index, filter),
+                            child: Icon(
+                              item.isFollowed ? Icons.favorite : Icons.favorite_border,
+                              color: item.isFollowed ? Colors.black : Colors.pinkAccent,
+                              size: 18,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        isParty ? 'Party Room' : 'Video Call • 💎 40/min',
-                        style: const TextStyle(color: Colors.amber, fontSize: 10),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min',
+                            style: const TextStyle(color: Colors.amber, fontSize: 9),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen()));
+                            },
+                            child: const Icon(Icons.video_call, color: Colors.pinkAccent, size: 20),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -219,3 +313,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 }
+
