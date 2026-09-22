@@ -1,23 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'streamer_model.dart' as model;
 import '../4_interactions/call_screen.dart';
-import '../4_interactions/gift_sheet.dart';
-import '../4_interactions/party_room_widget.dart';
-import '../1_core/core_data.dart';
-import '../2_auth/user_profile_model.dart';
-
-class StreamerItemData {
-  final String id;
-  final String name;
-  final String idDigit;
-  final String type; // 'video' or 'party'
-  StreamerItemData({required this.id, required this.name, required this.idDigit, required this.type});
-}
 
 class LiveStreamRoomScreen extends StatefulWidget {
-  final StreamerItemData streamer;
+  final dynamic streamer;
   final VoidCallback onDismissTotal;
-  final Function(StreamerItemData) onMinimizePIP;
+  final ValueChanged<dynamic> onMinimizePIP;
 
   const LiveStreamRoomScreen({
     super.key,
@@ -31,159 +19,308 @@ class LiveStreamRoomScreen extends StatefulWidget {
 }
 
 class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
-  late List<String> chatMessages;
-  final chatCtrl = TextEditingController();
-  final List<String> miniAds = [
-    'Ad #1: Play & Earn 💎',
-    'Ad #2: VIP Dating Pass 🎟️',
-    'Ad #3: Topup 50% Bonus 🔥',
-    'Ad #4: Lucky Wheel Spin 🎡',
-    'Ad #5: Secret Room Access 🔒',
+  int userCount = 3;
+  final TextEditingController _msgController = TextEditingController();
+  final List<Map<String, dynamic>> messages = [];
+  bool isFollowed = false;
+
+  final List<Map<String, String>> viewersList = [
+    {'name': 'user-0001', 'id': '90001001', 'age': '24', 'country': 'IN 🇮🇳'},
+    {'name': 'user-0002', 'id': '90001002', 'age': '22', 'country': 'US 🇺🇸'},
+    {'name': 'user-0003', 'id': '90001003', 'age': '26', 'country': 'AE 🇦🇪'},
   ];
-  int adIndex = 0;
-  Timer? adTimer;
 
   @override
   void initState() {
     super.initState();
-    chatMessages = [
-      "Welcome to ${widget.streamer.name}'s room!",
-      'Say hi to the host 👋',
-    ];
-    adTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (mounted) setState(() => adIndex = (adIndex + 1) % miniAds.length);
+    // Simulate initial join messages
+    messages.add({'type': 'join', 'text': 'user-0001 : join the stream'});
+    messages.add({'type': 'chat', 'user': 'user-0002', 'msg': 'hii good morning'});
+    isFollowed = widget.streamer is model.StreamerItemData ? widget.streamer.isFollowed : false;
+
+    // Simulate auto user count fluctuate / join pill
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        setState(() {
+          userCount++;
+          messages.add({'type': 'join', 'text': 'user-0004 : join the stream'});
+        });
+      }
     });
   }
 
-  @override
-  void dispose() {
-    adTimer?.cancel();
-    chatCtrl.dispose();
-    super.dispose();
-  }
-
-  void _sendChatMessage(String? customText) {
-    final text = customText ?? chatCtrl.text.trim();
-    if (text.isEmpty) return;
+  void _sendMessage() {
+    if (_msgController.text.trim().isEmpty) return;
     setState(() {
-      chatMessages.add('${userProfile.username.isNotEmpty ? userProfile.username : 'Guest'}: $text');
+      messages.add({
+        'type': 'chat',
+        'user': 'user-0001',
+        'msg': _msgController.text.trim(),
+      });
+      _msgController.clear();
     });
-    if (customText == null) chatCtrl.clear();
+  }
+
+  void _showViewersModal() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1F1A24),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(16),
+        height: 300,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Live Viewers', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const Divider(color: Colors.white24),
+            Expanded(
+              child: ListView.builder(
+                itemCount: viewersList.length,
+                itemBuilder: (_, i) {
+                  final v = viewersList[i];
+                  return ListTile(
+                    leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white)),
+                    title: Text(v['name']!, style: const TextStyle(color: Colors.yellow, fontSize: 13)),
+                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: const TextStyle(color: Colors.white75, fontSize: 10)),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showStreamerProfile() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1F1A24),
+        title: Text(widget.streamer.name, style: const TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ID: ${widget.streamer.idDigit}', style: const TextStyle(color: Colors.yellow)),
+            Text('Country: ${widget.streamer.country}', style: const TextStyle(color: Colors.white75)),
+            Text('Induction: ${widget.streamer.induction}', style: const TextStyle(color: Colors.white75)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close', style: TextStyle(color: Colors.pinkAccent))),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(context) {
+    final sName = widget.streamer is model.StreamerItemData ? widget.streamer.name : 'Live Stream';
+    final sIdDigit = widget.streamer is model.StreamerItemData ? widget.streamer.idDigit : '101';
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          widget.streamer.type == 'party'
-              ? const PartyRoomGridWidget()
-              : ZegoVideoCallScreen(
-                  streamerName: widget.streamer.name,
-                  streamerId: widget.streamer.idDigit,
-                ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white),
-                    onPressed: () => widget.onMinimizePIP(widget.streamer),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: widget.onDismissTotal,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Simulated live stream background canvas
+          const Center(child: Icon(Icons.live_tv, size: 80, color: Colors.white12)),
+
+          // Top Header (Profile touch -> profile dialog, user count touch -> viewers modal, X -> PiP mini screen)
           Positioned(
-            bottom: 16, left: 16, right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            top: 40,
+            left: 12,
+            right: 12,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    itemCount: chatMessages.length,
-                    itemBuilder: (_, i) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(10)),
-                        child: Text(chatMessages[i], style: const TextStyle(color: Colors.white, fontSize: 12)),
+                GestureDetector(
+                  onTap: _showStreamerProfile,
+                  child: Row(
+                    children: [
+                      const CircleAvatar(radius: 18, backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, size: 20)),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(sName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                              const SizedBox(width: 6),
+                              GestureDetector(
+                                onTap: () => setState(() => isFollowed = !isFollowed),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: isFollowed ? Colors.black54 : Colors.pinkAccent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(isFollowed ? Icons.favorite : Icons.favorite_border, size: 10, color: Colors.white),
+                                      const SizedBox(width: 2),
+                                      Text(isFollowed ? 'black' : 'follow', style: const TextStyle(color: Colors.white, fontSize: 8)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text('ID: $sIdDigit • 💎 40/min', style: const TextStyle(color: Colors.yellow, fontSize: 9)),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
                 Row(
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: chatCtrl,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: 'Say something...',
-                          hintStyle: const TextStyle(color: Colors.white54),
-                          filled: true,
-                          fillColor: Colors.black54,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        ),
-                        onSubmitted: (_) => _sendChatMessage(null),
+                    GestureDetector(
+                      onTap: _showViewersModal,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(10)),
+                        child: Text('$userCount', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.send, color: Colors.pinkAccent),
-                      onPressed: () => _sendChatMessage(null),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.card_giftcard, color: Colors.amber),
-                      onPressed: () => showGiftSendingSheet(context, widget.streamer.name),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => widget.onMinimizePIP(widget.streamer),
+                      child: const CircleAvatar(radius: 14, backgroundColor: Colors.black54, child: Icon(Icons.close, size: 16, color: Colors.white)),
                     ),
                   ],
                 ),
               ],
             ),
           ),
+
+          // 3 Mini Ad Rotation Boxes near video call / top section
+          Positioned(
+            top: 95,
+            right: 12,
+            child: Column(
+              children: List.generate(3, (i) => Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Center(child: Text('AD${i + 1}', style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold))),
+              )),
+            ),
+          ),
+
+          // Bottom Left: Color-coded chat + join pill queue (auto scroll / 1-inch fade feel)
+          Positioned(
+            bottom: 75,
+            left: 12,
+            right: 120,
+            child: SizedBox(
+              height: 140,
+              child: ListView.builder(
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (_, index) {
+                  final msgItem = messages[messages.length - 1 - index];
+                  final isJoin = msgItem['type'] == 'join';
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: EdgeInsets.symmetric(horizontal: isJoin ? 10 : 0, vertical: isJoin ? 3 : 1),
+                    decoration: isJoin
+                        ? BoxDecoration(color: Colors.blue.withOpacity(0.4), borderRadius: BorderRadius.circular(12))
+                        : null,
+                    child: RichText(
+                      text: TextSpan(
+                        children: isJoin
+                            ? [
+                                TextSpan(
+                                  text: msgItem['text'],
+                                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                                ),
+                              ]
+                            : [
+                                TextSpan(
+                                  text: '${msgItem['user']} : ',
+                                  style: TextStyle(
+                                    color: msgItem['user'] == 'streamer' ? Colors.redAccent : Colors.yellow,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: msgItem['msg'],
+                                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                                ),
+                              ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // Bottom Bar: Chat input + Gift icon with pink heart + follow + 1-to-1 video call button
+          Positioned(
+            bottom: 20,
+            left: 12,
+            right: 12,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 38,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(20)),
+                    child: TextField(
+                      controller: _msgController,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      decoration: const InputDecoration(
+                        hintText: 'Say something...',
+                        hintStyle: TextStyle(color: Colors.white60, fontSize: 11),
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _sendMessage,
+                  child: const CircleAvatar(radius: 18, backgroundColor: Colors.pinkAccent, child: Icon(Icons.send, size: 14, color: Colors.white)),
+                ),
+                const SizedBox(width: 6),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const Icon(Icons.favorite, color: Colors.pinkAccent, size: 32),
+                    const Text('follow', style: TextStyle(color: Colors.white, fontSize: 6, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () {
+                    // Streamer reply simulator or gift action
+                    setState(() {
+                      messages.add({'type': 'chat', 'user': 'streamer', 'msg': 'Thank you for support!'});
+                    });
+                  },
+                  child: const CircleAvatar(radius: 18, backgroundColor: Colors.amber, child: Icon(Icons.card_giftcard, size: 16, color: Colors.black)),
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen()));
+                  },
+                  child: const CircleAvatar(radius: 18, backgroundColor: Colors.redAccent, child: Icon(Icons.video_call, size: 18, color: Colors.white)),
+                ),
+              ],
+            ),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class DraggableLivePIPWrapper extends StatefulWidget {
-  final Widget child;
-  const DraggableLivePIPWrapper({super.key, required this.child});
-
-  @override
-  State<DraggableLivePIPWrapper> createState() => _DraggableLivePIPWrapperState();
-}
-
-class _DraggableLivePIPWrapperState extends State<DraggableLivePIPWrapper> {
-  double top = 100;
-  double left = 20;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      left: left,
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          setState(() {
-            top += details.delta.dy;
-            left += details.delta.dx;
-          });
-        },
-        child: widget.child,
       ),
     );
   }
