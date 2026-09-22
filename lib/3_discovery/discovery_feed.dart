@@ -43,12 +43,22 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: item,
+                        streamer: room.StreamerItemData(
+                          id: item.id,
+                          name: item.name,
+                          idDigit: item.idDigit,
+                          type: item.type,
+                        ),
                         onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (streamerData) {
+                        onMinimizePIP: (room.StreamerItemData streamerData) {
                           Navigator.pop(context);
                           setState(() {
-                            activePiPStreamer = streamerData;
+                            activePiPStreamer = StreamerItemData(
+                              id: streamerData.id,
+                              name: streamerData.name,
+                              idDigit: streamerData.idDigit,
+                              type: streamerData.type,
+                            );
                           });
                         },
                       ),
@@ -106,12 +116,22 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: currentPiP,
+                        streamer: room.StreamerItemData(
+                          id: currentPiP.id,
+                          name: currentPiP.name,
+                          idDigit: currentPiP.idDigit,
+                          type: currentPiP.type,
+                        ),
                         onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (streamerData) {
+                        onMinimizePIP: (room.StreamerItemData streamerData) {
                           Navigator.pop(context);
                           setState(() {
-                            activePiPStreamer = streamerData;
+                            activePiPStreamer = StreamerItemData(
+                              id: streamerData.id,
+                              name: streamerData.name,
+                              idDigit: streamerData.idDigit,
+                              type: streamerData.type,
+                            );
                           });
                         },
                       ),
@@ -156,4 +176,3 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
     );
   }
 }
-
