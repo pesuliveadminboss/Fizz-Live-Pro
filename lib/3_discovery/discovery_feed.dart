@@ -14,97 +14,60 @@ class DiscoveryFeedScreen extends StatefulWidget {
   State<DiscoveryFeedScreen> createState() => _DiscoveryFeedScreenState();
 }
 
-class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
+class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   dynamic activePiPStreamer;
-  List<Map<String, dynamic>> streamers = [
+
+  final List<Map<String, dynamic>> streamers = [
     {'name': 'Ayesha_Live', 'type': 'video'},
     {'name': 'Party_King_99', 'type': 'party'},
     {'name': 'Nisha_Vibe', 'type': 'video'},
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0B1E),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(42),
+        child: AppBar(
+          backgroundColor: const Color(0xFF0F0B1E),
+          elevation: 0,
+          titleSpacing: 0,
+          title: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            indicatorColor: Colors.pinkAccent,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white54,
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            tabs: const [
+              Tab(text: 'Hot'),
+              Tab(text: 'Live'),
+              Tab(text: 'Party'),
+              Tab(text: 'Match'),
+            ],
+          ),
+        ),
+      ),
       body: Stack(
         children: [
-          GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: streamers.length,
-            itemBuilder: (_, index) {
-              final item = streamers[index];
-              final nameVal = item['name'] as String;
-              final isParty = nameVal.toLowerCase().contains('party') || item['type'] == 'party';
-              return GestureDetector(
-                onTap: () {
-                  final roomStreamer = activePiPStreamer is room.StreamerItemData
-                      ? activePiPStreamer
-                      : room.StreamerItemData(
-                          id: nameVal,
-                          name: nameVal,
-                          idDigit: '101',
-                          type: isParty ? 'party' : 'video',
-                        );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: roomStreamer,
-                        onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (dynamic streamerData) {
-                          Navigator.pop(context);
-                          setState(() {
-                            activePiPStreamer = streamerData;
-                          });
-                        },
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1F1A24),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Icon(
-                          isParty ? Icons.group : Icons.person,
-                          size: 50,
-                          color: Colors.white24,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 8,
-                        left: 8,
-                        right: 8,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              nameVal,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              isParty ? 'Party Room' : 'Video Call • 💎 40/min',
-                              style: const TextStyle(color: Colors.amber, fontSize: 10),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+          TabBarView(
+            controller: _tabController,
+            children: List.generate(4, (_) => _buildStreamerGrid()),
           ),
           if (activePiPStreamer != null)
             Positioned(
@@ -112,7 +75,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
               right: 20,
               child: GestureDetector(
                 onTap: () {
-                  final currentPiP = activePiPStreamer is room.StreamerItemData
+                  final roomStreamer = activePiPStreamer is room.StreamerItemData
                       ? activePiPStreamer
                       : room.StreamerItemData(
                           id: 'live_pip',
@@ -125,7 +88,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: currentPiP,
+                        streamer: roomStreamer,
                         onDismissTotal: () => Navigator.pop(context),
                         onMinimizePIP: (dynamic streamerData) {
                           Navigator.pop(context);
@@ -176,5 +139,83 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
       ),
     );
   }
-}
 
+  Widget _buildStreamerGrid() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: streamers.length,
+      itemBuilder: (_, index) {
+        final item = streamers[index];
+        final nameVal = item['name'] as String;
+        final isParty = nameVal.toLowerCase().contains('party') || item['type'] == 'party';
+        return GestureDetector(
+          onTap: () {
+            final roomStreamer = room.StreamerItemData(
+              id: nameVal,
+              name: nameVal,
+              idDigit: '101',
+              type: isParty ? 'party' : 'video',
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => room.LiveStreamRoomScreen(
+                  streamer: roomStreamer,
+                  onDismissTotal: () => Navigator.pop(context),
+                  onMinimizePIP: (dynamic streamerData) {
+                    Navigator.pop(context);
+                    setState(() {
+                      activePiPStreamer = streamerData;
+                    });
+                  },
+                ),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1F1A24),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Icon(
+                    isParty ? Icons.group : Icons.person,
+                    size: 50,
+                    color: Colors.white24,
+                  ),
+                ),
+                Positioned(
+                  bottom: 8,
+                  left: 8,
+                  right: 8,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        nameVal,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        isParty ? 'Party Room' : 'Video Call • 💎 40/min',
+                        style: const TextStyle(color: Colors.amber, fontSize: 10),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
