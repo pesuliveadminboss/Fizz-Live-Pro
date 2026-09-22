@@ -11,6 +11,7 @@ class StreamerItemData {
   final String language;
   int closeFriendsCount;
   final int closeFriendsMax = 3;
+  List<String> closeFriendsList;
   bool isFollowed;
 
   StreamerItemData({
@@ -23,10 +24,12 @@ class StreamerItemData {
     this.induction = 'Welcome to my live/party vibe!',
     this.language = 'Tamil, English',
     this.closeFriendsCount = 1,
+    List<String>? closeFriendsList,
     this.isFollowed = false,
   }) : id = id ?? 's_${_idCounter}',
        idDigit = idDigit ?? (_idCounter++).toString(),
-       dateOfBirth = dateOfBirth ?? DateTime(1999, 8, 14);
+       dateOfBirth = dateOfBirth ?? DateTime(1999, 8, 14),
+       closeFriendsList = closeFriendsList ?? ['user-0001 (You)'];
 
   int get age {
     final now = DateTime.now();
@@ -40,6 +43,7 @@ class StreamerItemData {
   StreamerItemData copyWith({
     bool? isFollowed,
     int? closeFriendsCount,
+    List<String>? closeFriendsList,
     String? type,
   }) {
     return StreamerItemData(
@@ -52,7 +56,9 @@ class StreamerItemData {
       induction: induction,
       language: language,
       closeFriendsCount: closeFriendsCount ?? this.closeFriendsCount,
+      closeFriendsList: closeFriendsList ?? this.closeFriendsList,
       isFollowed: isFollowed ?? this.isFollowed,
     );
   }
 }
+
