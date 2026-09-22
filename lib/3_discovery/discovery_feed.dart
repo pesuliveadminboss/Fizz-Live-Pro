@@ -48,6 +48,65 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     );
   }
 
+  void _showCloseFriendsSheet(model.StreamerItemData item) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1F1A24),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Container(
+          padding: const EdgeInsets.all(16),
+          height: 320,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Close Friends (${item.closeFriendsCount}/${item.closeFriendsMax}) 🤝', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(item.country, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text('Bio/Induction: ${item.induction}', style: const TextStyle(color: Colors.amber, fontSize: 11)),
+              const Divider(color: Colors.white24, height: 20),
+              Expanded(
+                child: ListView(
+                  children: List.generate(item.closeFriendsMax, (index) {
+                    final isOccupied = index < item.closeFriendsCount;
+                    final friendName = isOccupied ? item.closeFriendsList[index] : 'waiting for someone...';
+                    return ListTile(
+                      dense: true,
+                      leading: CircleAvatar(
+                        radius: 14,
+                        backgroundColor: isOccupied ? Colors.pinkAccent : Colors.white12,
+                        child: Icon(isOccupied ? Icons.person : Icons.add, size: 14, color: Colors.white),
+                      ),
+                      title: Text(friendName, style: TextStyle(color: isOccupied ? Colors.white : Colors.white54, fontSize: 12)),
+                      trailing: item.closeFriendsCount < item.closeFriendsMax && !isOccupied && index == item.closeFriendsCount
+                          ? TextButton(
+                              onPressed: () {
+                                setSheetState(() {
+                                  setState(() {
+                                    item.closeFriendsCount++;
+                                    item.closeFriendsList.add('Viewer_${DateTime.now().second}');
+                                  });
+                                });
+                              },
+                              child: const Text('Add Slot', style: TextStyle(color: Colors.pinkAccent, fontSize: 11)),
+                            )
+                          : const SizedBox.shrink(),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showSearchDialog() {
     final TextEditingController searchCtrl = TextEditingController();
     showDialog(
@@ -284,7 +343,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                 ),
               );
             } else {
-              _showBottomToast('Opening Profile: ${item.name} (${item.idDigit})');
+              _showCloseFriendsSheet(item);
             }
           },
           child: Container(
