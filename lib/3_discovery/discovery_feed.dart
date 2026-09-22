@@ -102,34 +102,24 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
               );
             },
           ),
-          if (activePiPStreamer != null)
+                    if (activePiPStreamer != null)
             Positioned(
               bottom: 20,
               right: 20,
-              child: GestureDetector(...),
+              child: GestureDetector(
                 onTap: () {
-                  final currentPiP = activePiPStreamer!;
+                  final currentPiP = activePiPStreamer;
                   setState(() => activePiPStreamer = null);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => room.LiveStreamRoomScreen(
-                        streamer: room.StreamerItemData(
-                          id: currentPiP.id,
-                          name: currentPiP.name,
-                          idDigit: currentPiP.idDigit,
-                          type: currentPiP.type,
-                        ),
+                        streamer: currentPiP,
                         onDismissTotal: () => Navigator.pop(context),
-                        onMinimizePIP: (room.StreamerItemData streamerData) {
+                        onMinimizePIP: (dynamic streamerData) {
                           Navigator.pop(context);
                           setState(() {
-                            activePiPStreamer = StreamerItemData(
-                              id: streamerData.id,
-                              name: streamerData.name,
-                              idDigit: streamerData.idDigit,
-                              type: streamerData.type,
-                            );
+                            activePiPStreamer = streamerData;
                           });
                         },
                       ),
@@ -148,7 +138,9 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                     children: [
                       Center(
                         child: Icon(
-                          activePiPStreamer!.type == 'party' ? Icons.group : Icons.person,
+                          activePiPStreamer?.name?.toString().toLowerCase().contains('party') == true
+                              ? Icons.group
+                              : Icons.person,
                           color: Colors.white54,
                         ),
                       ),
@@ -169,8 +161,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
                 ),
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
+          
