@@ -13,7 +13,7 @@ class DiscoveryFeedScreen extends StatefulWidget {
 }
 
 class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
-  StreamerItemData? activePiPStreamer;
+  dynamic activePiPStreamer;
   List<StreamerItemData> streamers = [
     StreamerItemData(id: 's1', name: 'Ayesha_Live', idDigit: '99011', type: 'video'),
     StreamerItemData(id: 's2', name: 'Party_King_99', idDigit: '901', type: 'party'),
