@@ -27,7 +27,6 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
 
   String selectedLanguageFilter = 'All';
 
-  // Map local streamers to Global AppStateController items for real-time sync
   List<model.StreamerItemData> get streamers {
     return AppStateController.instance.allUsers.map((u) {
       String t = 'online';
@@ -493,7 +492,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                         children: [
                           Expanded(
                             child: Text(
-                              '${item.name} | ${item.country} | ${item.age}y',
+                              '${item.name} | ${item.country}',
                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -508,6 +507,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                           ),
                         ],
                       ),
+                      Text('${item.age}y • ${item.language}', style: const TextStyle(color: Colors.white54, fontSize: 9)),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -515,4 +515,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                           Text(item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min', style: const TextStyle(color: Colors.amber, fontSize: 9)),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen()
+                              Navigator.push(context, MaterialPageRoute(build
