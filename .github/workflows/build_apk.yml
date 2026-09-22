@@ -19,10 +19,10 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Setup Flutter (Compatible SDK)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
+          flutter-version: '3.24.0'
           channel: 'stable'
 
       - name: Fix Package Name Case for Dart Rules
