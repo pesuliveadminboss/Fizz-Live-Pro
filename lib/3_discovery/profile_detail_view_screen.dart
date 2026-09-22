@@ -51,8 +51,15 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
 
   @override
   Widget build(context) {
-    final name = widget.streamer is UserProfileItem ? (widget.streamer as UserProfileItem).name : 'Streamer/User';
-    final idDigits = widget.streamer is UserProfileItem ? (widget.streamer as UserProfileItem).idDigit : '90001001';
+    final name = widget.streamer is UserProfileItem 
+        ? (widget.streamer as UserProfileItem).name 
+        : (widget.streamer?.name ?? 'Streamer/User');
+    final idDigits = widget.streamer is UserProfileItem 
+        ? (widget.streamer as UserProfileItem).idDigit 
+        : '90001001';
+    final country = widget.streamer is UserProfileItem 
+        ? (widget.streamer as UserProfileItem).country 
+        : (widget.streamer?.country ?? 'India 🇮🇳');
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0B1E),
@@ -88,6 +95,14 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.flag, size: 14, color: Colors.amber),
+                            const SizedBox(width: 4),
+                            Text('Country: $country', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                          ],
+                        ),
                         Text('ID: $idDigits', style: const TextStyle(color: Colors.amber, fontSize: 12)),
                         const Text('Status: Online / Active', style: TextStyle(color: Colors.green, fontSize: 12)),
                       ],
