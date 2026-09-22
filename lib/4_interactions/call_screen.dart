@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../wallet/video_call_gems_sheet.dart';
 
 class CallScreen extends StatefulWidget {
   final String callType; // 'Video' or 'Voice'
   final String peerName;
-  const CallScreen({super.key, this.callType = 'Video', this.peerName = 'User_90001001'});
+  final int initialWalletGems;
+  const CallScreen({super.key, this.callType = 'Video', this.peerName = 'User_90001001', this.initialWalletGems = 3500});
 
   @override
   State<CallScreen> createState() => _CallScreenState();
@@ -15,15 +17,28 @@ class _CallScreenState extends State<CallScreen> {
   bool isCameraOff = false;
   bool isSpeakerOn = true;
   int secondsElapsed = 0;
+  late int remainingGems;
   Timer? _callTimer;
 
   @override
   void initState() {
     super.initState();
     isCameraOff = widget.callType == 'Voice';
+    remainingGems = widget.initialWalletGems;
+
     _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        setState(() => secondsElapsed++);
+        setState(() {
+          secondsElapsed++;
+          // 1800 gems per minute burn rate (~30 gems per second)
+          if (secondsElapsed % 2 == 0 && remainingGems > 0) {
+            remainingGems = (remainingGems - 30).clamp(0, 999999);
+          }
+          // Low gem warning threshold (< 2000 gems remaining triggers recharge modal prompt check)
+        });
+        if (remainingGems < 2000 && secondsElapsed % 10 == 0) {
+          // Trigger low balance warning cue
+        }
       }
     });
   }
@@ -39,6 +54,8 @@ class _CallScreenState extends State<CallScreen> {
     final remainingSecs = secs % 60;
     return '${mins.toString().padLeft(2, '0')}:${remainingSecs.toString().padLeft(2, '0')}';
   }
+
+  bool get isLowGemsAlert => remainingGems < 2000;
 
   @override
   Widget build(context) {
@@ -79,15 +96,32 @@ class _CallScreenState extends State<CallScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(widget.peerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                          Text(_formatDuration(secondsElapsed), style: const TextStyle(color: Colors.amber, fontSize: 11)),
+                          Text(
+                            _formatDuration(secondsElapsed),
+                            style: TextStyle(
+                              color: isLowGemsAlert ? Colors.redAccent : Colors.amber,
+                              fontWeight: isLowGemsAlert ? FontWeight.bold : FontWeight.normal,
+                              fontSize: isLowGemsAlert ? 13 : 11,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)),
-                    child: const Text('💎 40/min', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onTap: () => showVideoCallGemsSheet(context, remainingGems),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isLowGemsAlert ? Colors.red.withOpacity(0.3) : Colors.black54,
+                        border: isLowGemsAlert ? Border.all(color: Colors.redAccent) : null,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        isLowGemsAlert ? '⚠️ Low Gems (💎 $remainingGems)' : '💎 1800/min | Bal: $remainingGems',
+                        style: TextStyle(color: isLowGemsAlert ? Colors.redAccent : Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ],
               ),
