@@ -29,6 +29,12 @@ jobs:
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
 
+      - name: Upgrade Gradle Wrapper Version
+        run: |
+          if [ -f "android/gradle/wrapper/gradle-wrapper.properties" ]; then
+            sed -i 's/gradle-.*-bin.zip/gradle-8.4-bin.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
+          fi
+
       - name: Get Dependencies
         run: flutter pub get
 
