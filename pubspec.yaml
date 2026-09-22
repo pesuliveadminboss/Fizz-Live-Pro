@@ -1,23 +1,24 @@
-name: pesulive
-description: "A new Flutter project for social discovery, live streaming and calls."
-publish_to: 'none' 
-
+name: fizz_live_pro
+description: A new Flutter project for Pesu Live / Fizz Live.
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.0 <4.0.0'
-  
+  sdk: '>=3.5.0 <4.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  shared_preferences: ^2.5.2 
+  flutter_lints: ^5.0.0
+  cupertino_icons: ^1.0.6
+  # unga existing dependencies inga irukkum (zegocloud, etc.)
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
-  # assets: ...
+  # assets:
+  #   - assets/
+  
