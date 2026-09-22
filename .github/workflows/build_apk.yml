@@ -19,10 +19,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Flutter (Dart 3.4 Compatible)
+      - name: Setup Flutter (Dart 3.5 Compatible)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2'
+          flutter-version: '3.24.3'
           channel: 'stable'
 
       - name: Fix Package Name in Pubspec
