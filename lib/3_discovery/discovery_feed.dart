@@ -16,12 +16,13 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   late TabController _tabController;
   dynamic activePiPStreamer;
   Offset pipPosition = const Offset(20, 400);
+  String selectedLanguageFilter = 'All';
 
   List<model.StreamerItemData> streamers = [
-    model.StreamerItemData(name: 'Ayesha_Live', type: 'live', isFollowed: true),
-    model.StreamerItemData(name: 'Party_King_99', type: 'party'),
-    model.StreamerItemData(name: 'Nisha_Vibe', type: 'online'),
-    model.StreamerItemData(name: 'Offline_Guy', type: 'offline'),
+    model.StreamerItemData(name: 'Ayesha_Live', type: 'live', isFollowed: true, language: 'Tamil, English'),
+    model.StreamerItemData(name: 'Party_King_99', type: 'party', language: 'Hindi, English'),
+    model.StreamerItemData(name: 'Nisha_Vibe', type: 'online', language: 'Tamil'),
+    model.StreamerItemData(name: 'Offline_Guy', type: 'offline', language: 'English'),
   ];
 
   @override
@@ -43,6 +44,67 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
         content: Text(msg, style: const TextStyle(color: Colors.white, fontSize: 12)),
         duration: const Duration(seconds: 2),
         backgroundColor: Colors.black87,
+      ),
+    );
+  }
+
+  void _showSearchDialog() {
+    final TextEditingController searchCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1F1A24),
+        title: const Text('Search by 8-Digit ID', style: TextStyle(color: Colors.white, fontSize: 14)),
+        content: TextField(
+          controller: searchCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'e.g. 90001001',
+            hintStyle: TextStyle(color: Colors.white54),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
+            onPressed: () {
+              Navigator.pop(context);
+              _showBottomToast('Searching ID: ${searchCtrl.text}');
+            },
+            child: const Text('Search'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageFilterSheet() {
+    final langs = ['All', 'Tamil', 'English', 'Hindi'];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1F1A24),
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Filter by Language 🌐', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 12),
+            ...langs.map((l) => ListTile(
+              title: Text(l, style: const TextStyle(color: Colors.white)),
+              trailing: selectedLanguageFilter == l ? const Icon(Icons.check, color: Colors.pinkAccent) : null,
+              onTap: () {
+                setState(() => selectedLanguageFilter = l);
+                Navigator.pop(context);
+                _showBottomToast('Language filter: $l');
+              },
+            )),
+          ],
+        ),
       ),
     );
   }
@@ -83,6 +145,16 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               Tab(text: 'Match'),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.white, size: 20),
+              onPressed: _showSearchDialog,
+            ),
+            IconButton(
+              icon: const Icon(Icons.language, color: Colors.white, size: 20),
+              onPressed: _showLanguageFilterSheet,
+            ),
+          ],
         ),
       ),
       body: Stack(
@@ -171,6 +243,10 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
     List<model.StreamerItemData> list = filter == 'hot'
         ? streamers.where((s) => s.type != 'offline').toList()
         : streamers.where((s) => s.type == filter).toList();
+
+    if (selectedLanguageFilter != 'All') {
+      list = list.where((s) => s.language.toLowerCase().contains(selectedLanguageFilter.toLowerCase())).toList();
+    }
 
     return GridView.builder(
       padding: const EdgeInsets.all(12),
