@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../controllers/app_state_controller.dart';
 import '../4_interactions/call_screen.dart';
-import '../wallet/video_call_gems_sheet.dart';
 
 class ProfileDetailViewScreen extends StatefulWidget {
   final dynamic streamer;
@@ -96,7 +95,6 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Interactive follow/unfollow toggle button area matching requirement 2 & 3
                 GestureDetector(
                   onTap: _toggleFollowSync,
                   child: Container(
@@ -138,13 +136,16 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
             bottom: 20,
             left: 16,
             right: 16,
-            child: ElevatedButton.styleFrom != null ? ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent, padding: const EdgeInsets.symmetric(vertical: 14)),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen(callType: 'Video')));
-              },
-              child: const Text('Start 1-to-1 Video Call (1800 gems/min)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ) : const SizedBox.shrink(),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent, padding: const EdgeInsets.symmetric(vertical: 14)),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen(callType: 'Video')));
+                },
+                child: const Text('Start 1-to-1 Video Call (1800 gems/min)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
           ),
         ],
       ),
