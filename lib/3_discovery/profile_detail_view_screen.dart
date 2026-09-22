@@ -16,50 +16,50 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
   bool showUnfollowToast = false;
   bool showFollowToast = false;
 
+  UserProfileItem? get _userItem {
+    if (widget.streamer is UserProfileItem) {
+      return widget.streamer as UserProfileItem;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
-    isFollowed = widget.streamer is UserProfileItem 
-        ? (widget.streamer as UserProfileItem).isFollowed 
-        : false;
+    isFollowed = _userItem?.isFollowed ?? false;
   }
 
   void _toggleFollowSync() {
-    setState(() {
-      isFollowed = !isFollowed;
-      if (widget.streamer is UserProfileItem) {
-        AppStateController.instance.toggleFollow(widget.streamer as UserProfileItem);
-      }
-      if (isFollowed) {
-        showFollowToast = true;
-        showUnfollowToast = false;
-      } else {
-        showUnfollowToast = true;
-        showFollowToast = false;
-      }
-    });
-
-    Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          showFollowToast = false;
+    final item = _userItem;
+    if (item != null) {
+      setState(() {
+        isFollowed = !isFollowed;
+        AppStateController.instance.toggleFollow(item);
+        if (isFollowed) {
+          showFollowToast = true;
           showUnfollowToast = false;
-        });
-      }
-    });
+        } else {
+          showUnfollowToast = true;
+          showFollowToast = false;
+        }
+      });
+      Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            showFollowToast = false;
+            showUnfollowToast = false;
+          });
+        }
+      });
+    }
   }
 
   @override
   Widget build(context) {
-    final name = widget.streamer is UserProfileItem 
-        ? (widget.streamer as UserProfileItem).name 
-        : (widget.streamer?.name ?? 'Streamer/User');
-    final idDigits = widget.streamer is UserProfileItem 
-        ? (widget.streamer as UserProfileItem).idDigit 
-        : '90001001';
-    final country = widget.streamer is UserProfileItem 
-        ? (widget.streamer as UserProfileItem).country 
-        : (widget.streamer?.country ?? 'India 🇮🇳');
+    final item = _userItem;
+    final name = item?.name ?? 'Streamer/User';
+    final idDigits = item?.idDigit ?? '90001001';
+    final country = item?.country ?? 'India 🇮🇳';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0B1E),
@@ -68,16 +68,17 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
         title: Text(name, style: const TextStyle(color: Colors.white, fontSize: 16)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          GestureDetector(
-            onTap: _toggleFollowSync,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(
-                isFollowed ? Icons.favorite : Icons.favorite_border,
-                color: isFollowed ? Colors.black : Colors.pinkAccent,
+          if (item != null)
+            GestureDetector(
+              onTap: _toggleFollowSync,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Icon(
+                  isFollowed ? Icons.favorite : Icons.favorite_border,
+                  color: isFollowed ? Colors.black : Colors.pinkAccent,
+                ),
               ),
             ),
-          ),
         ],
       ),
       body: Stack(
@@ -110,24 +111,25 @@ class _ProfileDetailViewScreenState extends State<ProfileDetailViewScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                GestureDetector(
-                  onTap: _toggleFollowSync,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isFollowed ? Colors.white24 : Colors.pinkAccent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(isFollowed ? Icons.favorite : Icons.favorite_border, color: isFollowed ? Colors.black : Colors.white, size: 16),
-                        const SizedBox(width: 6),
-                        Text(isFollowed ? 'Following (Tap to unfollow)' : 'Follow', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                      ],
+                if (item != null)
+                  GestureDetector(
+                    onTap: _toggleFollowSync,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isFollowed ? Colors.white24 : Colors.pinkAccent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(isFollowed ? Icons.favorite : Icons.favorite_border, color: isFollowed ? Colors.black : Colors.white, size: 16),
+                          const SizedBox(width: 6),
+                          Text(isFollowed ? 'Following (Tap to unfollow)' : 'Follow', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
