@@ -14,7 +14,7 @@ class ProfileOnboardingView extends StatefulWidget {
 }
 
 class _ProfileOnboardingView extends State<ProfileOnboardingView> {
-  final UserProfileController uController = Get.put(UserProfileController());
+  final UserProfileController uController = Get.find<UserProfileController>();
 
   late TextEditingController nameController;
   late TextEditingController dobController;
@@ -24,6 +24,7 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
   String selectedGender = 'Female';
   String selectedCountry = 'India';
   bool otpSent = false;
+  bool otpVerified = false;
 
   @override
   void initState() {
@@ -49,65 +50,99 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Complete Profile (${widget.mode.toUpperCase()})"),
+        title: Text(widget.mode == 'phone' && otpSent && !otpVerified ? "Verify OTP" : "Complete Profile (${widget.mode.toUpperCase()})"),
         backgroundColor: Color(0xFF1E0B36),
       ),
-      body: widget.mode == 'phone' && !otpSent
-          ? _buildPhoneOtpStep()
+      body: widget.mode == 'phone'
+          ? (otpVerified ? _buildProfileForm() : _buildPhoneStepOrOtp())
           : _buildProfileForm(),
     );
   }
 
-  Widget _buildPhoneOtpStep() {
-    return Padding(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Enter Mobile Number", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12),
-          TextField(
-            controller: phoneController,
-            keyboardType: TextInputType.phone,
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: "+91 9876543210",
-              hintStyle: TextStyle(color: Colors.white54),
-              filled: true,
-              fillColor: Colors.white12,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  Widget _buildPhoneStepOrOtp() {
+    if (!otpSent) {
+      return Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Enter Mobile Number", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 12),
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "+91 9876543210",
+                hintStyle: TextStyle(color: Colors.white54),
+                filled: true,
+                fillColor: Colors.white12,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFE91E63),
-              minimumSize: Size(double.infinity, 50),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFE91E63), minimumSize: Size(double.infinity, 50)),
+              child: Text("Send OTP", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onPressed: () {
+                if (phoneController.text.trim().length < 8) {
+                  Get.snackbar("Error", "Enter valid phone number");
+                  return;
+                }
+                setState(() => otpSent = true);
+                Get.snackbar("OTP Sent", "Mock OTP: 1234 sent");
+              },
             ),
-            child: Text("Send OTP", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            onPressed: () {
-              if (phoneController.text.trim().length < 8) {
-                Get.snackbar("Error", "Enter valid phone number");
-                return;
-              }
-              setState(() => otpSent = true);
-              Get.snackbar("OTP Sent", "Mock OTP: 1234 sent to ${phoneController.text}");
-            },
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Enter OTP sent to phone", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 12),
+            TextField(
+              controller: otpController,
+              keyboardType: TextInputType.number,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "1234",
+                hintStyle: TextStyle(color: Colors.white54),
+                filled: true,
+                fillColor: Colors.white12,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFE91E63), minimumSize: Size(double.infinity, 50)),
+              child: Text("Verify OTP & Proceed", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onPressed: () {
+                if (otpController.text.trim().isNotEmpty) {
+                  setState(() => otpVerified = true);
+                  // Per your rule: phone number otp user otp enter panathu direct ulla poganum (or fill form if first time, if existing user auto mark)
+                  if (uController.isRegistered.value) {
+                    Get.offAll(() => HomeFeedView());
+                  }
+                } else {
+                  Get.snackbar("Error", "Enter OTP");
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildProfileForm() {
-    if (widget.mode == 'phone' && otpSent) {
-      // verification mini step inside or proceed directly to fill
-    }
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       child: Column(
         children: [
-          // Display Profile Photo with Gender Auto-switcher for Guest/Edit
           Obx(() => Column(
             children: [
               CircleAvatar(
@@ -122,8 +157,6 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
             ],
           )),
           SizedBox(height: 20),
-
-          // Name Field
           TextField(
             controller: nameController,
             style: TextStyle(color: Colors.white),
@@ -135,8 +168,6 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
             ),
           ),
           SizedBox(height: 16),
-
-          // Gender Selector Row
           Row(
             children: [
               Text("Gender (18+ required): ", style: TextStyle(color: Colors.white, fontSize: 14)),
@@ -156,8 +187,6 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
             ],
           ),
           SizedBox(height: 16),
-
-          // DOB Field
           TextField(
             controller: dobController,
             style: TextStyle(color: Colors.white),
@@ -168,8 +197,6 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
             ),
           ),
           SizedBox(height: 16),
-
-          // Country Selector (Default India, All Countries available)
           Row(
             children: [
               Text("Country: ", style: TextStyle(color: Colors.white, fontSize: 14)),
@@ -191,8 +218,6 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
             ],
           ),
           SizedBox(height: 30),
-
-          // Submit & Enter App Button
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFFE91E63),
@@ -207,6 +232,7 @@ class _ProfileOnboardingView extends State<ProfileOnboardingView> {
                 d: dobController.text.trim(),
                 c: selectedCountry,
               );
+              uController.markAsExistingUser();
               Get.offAll(() => HomeFeedView());
             },
           ),
