@@ -30,9 +30,13 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
   List<model.StreamerItemData> get streamers {
     return AppStateController.instance.allUsers.map((u) {
       String t = 'online';
-      if (u.status == 'live') t = 'live';
-      else if (u.status == 'party') t = 'party';
-      else if (u.status == 'offline') t = 'offline';
+      if (u.status == 'live') {
+        t = 'live';
+      } else if (u.status == 'party') {
+        t = 'party';
+      } else if (u.status == 'offline') {
+        t = 'offline';
+      }
       return model.StreamerItemData(
         name: u.name,
         type: t,
@@ -515,4 +519,4 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
                           Text(item.type == 'party' ? 'Party Room' : 'Video Call • 💎 40/min', style: const TextStyle(color: Colors.amber, fontSize: 9)),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(build
+                              Navig
