@@ -27,7 +27,7 @@ jobs:
 
       - name: Fix Package Name Case for Dart Rules
         run: |
-          sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
+          sed -i 's/fizz-live-pro/fizz_live_pro/g' pubspec.yaml || true
 
       - name: Get Dependencies
         run: flutter pub get
