@@ -4,6 +4,7 @@ import 'live_stream_room_screen.dart' as room;
 import '../4_interactions/call_screen.dart';
 import 'profile_detail_view_screen.dart';
 import 'party_multi_seat_room_screen.dart';
+import 'match_screen.dart';
 
 typedef DiscoveryFeedView = DiscoveryFeedScreen;
 
@@ -167,7 +168,7 @@ class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> with SingleTi
               _buildGrid(filter: 'hot'),
               _buildGrid(filter: 'live'),
               _buildGrid(filter: 'party'),
-              _buildGrid(filter: 'online'),
+              const MatchScreen(),
             ],
           ),
           if (activePiPStreamer != null)
