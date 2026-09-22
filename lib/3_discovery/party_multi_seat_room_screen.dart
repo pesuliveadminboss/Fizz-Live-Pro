@@ -103,9 +103,9 @@ class PartyMultiSeatRoomScreen extends StatelessWidget {
                       ),
                       itemBuilder: (_, index) {
                         final seat = seats[index];
-                        final occupied = seat['isOccupied'] as bool;
-                        final seatName = seat['name'] as String;
-                        final seatDiamond = seat['diamond'] as String;
+                        final occupied = seat['isOccupied'] == true;
+                        final seatName = (seat['name'] ?? 'User').toString();
+                        final seatDiamond = (seat['diamond'] ?? '0').toString();
                         return Column(
                           children: [
                             Stack(
