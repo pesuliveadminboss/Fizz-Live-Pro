@@ -63,7 +63,6 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header title & mode selector
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -75,7 +74,7 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                         selectedMatchMode = idx == 0 ? 'Video' : 'Voice';
                       });
                     },
-                    color: Colors.white60,
+                    color: const Color(0x99FFFFFF),
                     selectedColor: Colors.white,
                     fillColor: Colors.pinkAccent,
                     borderColor: Colors.white24,
@@ -90,7 +89,6 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                 ],
               ),
               const SizedBox(height: 16),
-              // Gender preference chips
               Row(
                 children: ['Any', 'Female', 'Male'].map((g) {
                   final isSelected = selectedGender == g;
@@ -101,7 +99,7 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                       selected: isSelected,
                       selectedColor: Colors.pinkAccent,
                       backgroundColor: Colors.white.withOpacity(0.08),
-                      labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.white70),
+                      labelStyle: TextStyle(color: isSelected ? Colors.white : const Color(0xBFFFFFFF)),
                       onSelected: (_) => setState(() => selectedGender = g),
                     ),
                   );
@@ -110,7 +108,6 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
               const Expanded(
                 child: SizedBox.shrink(),
               ),
-              // Center Radar / Match Result Card area
               Center(
                 child: isSearching
                     ? Column(
@@ -134,7 +131,7 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                             ),
                           ),
                           const SizedBox(height: 20),
-                          const Text('Searching for best match...', style: TextStyle(color: Colors.white75, fontSize: 13)),
+                          const Text('Searching for best match...', style: TextStyle(color: Color(0xBFFFFFFF), fontSize: 13)),
                         ],
                       )
                     : matchedUser != null
@@ -180,10 +177,9 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                                         Navigator.push(context, MaterialPageRoute(builder: (_) => const CallScreen()));
                                       },
                                     ),
-                                    OutlinedButton(
-                                      style: OutlinedButton.styleFrom(side: const BorderDataBorder.none()),
+                                    TextButton(
                                       onPressed: _startSearching,
-                                      child: const Text('Next', style: TextStyle(color: Colors.white54)),
+                                      child: const Text('Next', style: TextStyle(color: Color(0x89FFFFFF))),
                                     ),
                                   ],
                                 ),
@@ -201,14 +197,13 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
                               const SizedBox(height: 16),
                               const Text('Ready to match global vibes?', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text('Tap start to find instant partner', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                              const Text('Tap start to find instant partner', style: TextStyle(color: Color(0x89FFFFFF), fontSize: 12)),
                             ],
                           ),
               ),
               const Expanded(
                 child: SizedBox.shrink(),
               ),
-              // Bottom Start/Stop Match Action Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -231,4 +226,3 @@ class _MatchScreenState extends State<MatchScreen> with SingleTickerProviderStat
     );
   }
 }
-
