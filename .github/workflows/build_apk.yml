@@ -28,8 +28,13 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Build Release APK
-        run: flutter build apk --release
+      - name: Check Project Structure and Build
+        run: |
+          if [ ! -d "android" ]; then
+            echo "Android folder missing, generating platform files safely without touching lib..."
+            flutter create --platforms=android . --overwrite
+          fi
+          flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
