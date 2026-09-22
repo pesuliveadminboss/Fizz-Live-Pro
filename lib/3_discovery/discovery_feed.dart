@@ -5,6 +5,8 @@ import '../4_interactions/call_screen.dart';
 import '../4_interactions/gift_sheet.dart';
 import '../4_interactions/party_room_widget.dart';
 
+typedef DiscoveryFeedView = DiscoveryFeedScreen;
+
 class DiscoveryFeedScreen extends StatefulWidget {
   const DiscoveryFeedScreen({super.key});
 
@@ -15,9 +17,9 @@ class DiscoveryFeedScreen extends StatefulWidget {
 class _DiscoveryFeedScreenState extends State<DiscoveryFeedScreen> {
   dynamic activePiPStreamer;
   List<model.StreamerItemData> streamers = [
-    model.StreamerItemData(id: 's1', name: 'Ayesha_Live', idDigit: '99011', type: 'video'),
-    model.StreamerItemData(id: 's2', name: 'Party_King_99', idDigit: '901', type: 'party'),
-    model.StreamerItemData(id: 's3', name: 'Nisha_Vibe', idDigit: '88421', type: 'video'),
+    model.StreamerItemData('s1', 'Ayesha_Live', '99011', 'video'),
+    model.StreamerItemData('s2', 'Party_King_99', '901', 'party'),
+    model.StreamerItemData('s3', 'Nisha_Vibe', '88421', 'video'),
   ];
 
   @override
