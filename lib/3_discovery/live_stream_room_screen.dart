@@ -116,7 +116,7 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
                   return ListTile(
                     leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Icon(Icons.person, color: Colors.white)),
                     title: Text(v['name']!, style: const TextStyle(color: Colors.yellow, fontSize: 13)),
-                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: const TextStyle(color: Colors.white75, fontSize: 10)),
+                    subtitle: Text('ID: ${v['id']} | Age: ${v['age']} | ${v['country']}', style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 10)),
                   );
                 },
               ),
@@ -143,8 +143,8 @@ class _LiveStreamRoomScreenState extends State<LiveStreamRoomScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('ID: $sIdDigit', style: const TextStyle(color: Colors.yellow)),
-            Text('Country: $sCountry', style: const TextStyle(color: Colors.white75)),
-            Text('Induction: $sInduction', style: const TextStyle(color: Colors.white75)),
+            Text('Country: $sCountry', style: TextStyle(color: Colors.white.withOpacity(0.75))),
+            Text('Induction: $sInduction', style: TextStyle(color: Colors.white.withOpacity(0.75))),
           ],
         ),
         actions: [
