@@ -390,9 +390,7 @@ void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
             ),
           ),
           Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
+            bottom: 40, left: 0, right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -408,12 +406,8 @@ void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
             ),
           ),
           Positioned(
-            top: 40,
-            right: 20,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => Navigator.pop(ctx),
-            ),
+            top: 40, right: 20,
+            child: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(ctx)),
           ),
         ],
       ),
@@ -433,4 +427,6 @@ class OnboardingProfileScreen extends StatefulWidget {
 class OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
   late TextEditingController _nameController;
   final TextEditingController _dobController = TextEditingController(text: '10/10/2000');
-  String _selectedGe
+  String _selectedGender = 'Female';
+  String _selectedCountry = 'India';
+  bool _agreed18Plus = fa
