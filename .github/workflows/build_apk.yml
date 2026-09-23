@@ -25,10 +25,9 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Fix Package Name & Regenerate Scaffold
+      - name: Fix Package Name for Dart Rules
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
-          flutter create --overwrite --org com.example --project-name fizz_live_pro .
 
       - name: Clean & Pub Get
         run: |
