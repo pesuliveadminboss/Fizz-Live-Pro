@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'app_state.dart';
-import 'auth_controller.dart';
-import 'login_screen.dart';
-import 'home_screen.dart';
-import 'explore_screen.dart';
-import 'live_stream_screen.dart';
-import 'chat_list_screen.dart';
-import 'profile_screen.dart';
-import 'party_room_screen.dart';
+import 'app_modules.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,3 +94,4 @@ class _MainShellState extends State<MainShell> {
     );
   }
 }
+
