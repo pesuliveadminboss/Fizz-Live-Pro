@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// --- MODEL & MOCK DATA FOR STREAMERS ---
 class StreamerItem {
   final String id;
   final String name;
@@ -37,7 +36,6 @@ final List<StreamerItem> kMockStreamers = [
   StreamerItem(id: '9', name: 'Offline_Emma', country: 'India', flag: '🇮🇳', status: 'offline', age: 26, color: Colors.grey, isOffline: true),
 ];
 
-// --- APP STATE ---
 class AppState extends ChangeNotifier {
   int _gems = 450;
   int _currentStreakDay = 1;
@@ -93,7 +91,6 @@ class AppState extends ChangeNotifier {
   }
 }
 
-// --- AUTH & ROLE CONTROLLER ---
 class AuthController extends ChangeNotifier {
   bool isLoggedIn = false;
   bool isExistingUser = false;
@@ -154,7 +151,6 @@ class AuthController extends ChangeNotifier {
   }
 }
 
-// --- POPUPDIALOG HELPER FOR ENTRY FLOW ---
 class EntryPopupsHelper {
   static void showDailyRewardsDialog(BuildContext context) {
     showDialog(
@@ -368,7 +364,6 @@ class EntryPopupsHelper {
   }
 }
 
-// --- VIDEO CALL 1-TO-1 MODAL / DIALOG ---
 void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
   showDialog(
     context: context,
@@ -426,7 +421,6 @@ void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
   );
 }
 
-// --- ONBOARDING PROFILE SCREEN ---
 class OnboardingProfileScreen extends StatefulWidget {
   final String loginIdentifier;
   final String loginType;
@@ -436,4 +430,7 @@ class OnboardingProfileScreen extends StatefulWidget {
   State<OnboardingProfileScreen> createState() => OnboardingProfileScreenState();
 }
 
-class On
+class OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
+  late TextEditingController _nameController;
+  final TextEditingController _dobController = TextEditingController(text: '10/10/2000');
+  String _selectedGe
