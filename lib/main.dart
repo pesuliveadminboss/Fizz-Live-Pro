@@ -55,9 +55,6 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final authCtrl = context.watch<AuthController>();
-
-    // Men/User (5 tabs): For You, Follow, Game, Message, Me
-    // Women/Streamer (6 tabs): For You, Follow, Go Live, Game, Message, Me
     final isStreamer = authCtrl.isStreamer;
 
     final List<Widget> maleScreens = [
@@ -71,7 +68,7 @@ class _MainShellState extends State<MainShell> {
     final List<Widget> femaleScreens = [
       const HomeScreenContainer(),
       const FollowScreen(),
-      const LiveStreamScreen(), // Go live index 2
+      const LiveStreamScreen(),
       const GameScreen(),
       const ChatListScreen(),
       const ProfileScreen(),
@@ -84,7 +81,7 @@ class _MainShellState extends State<MainShell> {
     final items = isStreamer
         ? const [
             BottomNavigationBarItem(icon: Icon(Icons.thumb_up_alt_outlined), label: 'For You'),
-            BottomNavigationBarItem(icon: Icon(Icons.group_outage), label: 'Follow'),
+            BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Follow'),
             BottomNavigationBarItem(icon: Icon(Icons.videocam_rounded), label: 'Go live'),
             BottomNavigationBarItem(icon: Icon(Icons.games_outlined), label: 'Game'),
             BottomNavigationBarItem(icon: Icon(Icons.message_outlined), label: 'Messages'),
@@ -92,7 +89,7 @@ class _MainShellState extends State<MainShell> {
           ]
         : const [
             BottomNavigationBarItem(icon: Icon(Icons.thumb_up_alt_outlined), label: 'For You'),
-            BottomNavigationBarItem(icon: Icon(Icons.group_outage), label: 'Follow'),
+            BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Follow'),
             BottomNavigationBarItem(icon: Icon(Icons.games_outlined), label: 'Game'),
             BottomNavigationBarItem(icon: Icon(Icons.message_outlined), label: 'Messages'),
             BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Me'),
