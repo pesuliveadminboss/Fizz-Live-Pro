@@ -13,14 +13,13 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely & patch v2 embedding/permissions
+      - name: Generate Android scaffold safely & add permissions
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
           cp -r temp_app/android ./android
           rm -rf temp_app
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           cat << 'EOF' > patch_manifest.py
-          import re
           with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
               content = f.read()
           
@@ -32,7 +31,6 @@ jobs:
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
           content = content.replace('<application', perms + '<application')
-          content = content.replace('<activity', '<meta-data android:name="flutterEmbedding" android:value="2" />\n    <activity')
           
           with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
               f.write(content)
