@@ -1,228 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/fizz_core_controller.dart';
-import '../controllers/user_profile_controller.dart';
-import 'profile_onboarding_view.dart';
-import 'home_feed_view.dart';
+import 'package:fizz_live_pro/core/fizz_core_controller.dart';
+import 'package:fizz_live_pro/views/home_feed_view.dart';
 
-class LoginView extends StatefulWidget {
-  @override
-  _LoginViewState createState() => _LoginViewState();
-}
-
-class _LoginViewState extends State<LoginView> {
-  bool agreeChecked = true;
-  final FizzCoreController core = Get.find<FizzCoreController>();
-  final UserProfileController uController = Get.put(UserProfileController());
-
-  final List<Map<String, dynamic>> avatarData = [
-    {"top": 60, "left": 40, "size": 65, "img": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"},
-    {"top": 40, "right": 50, "size": 55, "img": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200"},
-    {"top": 210, "left": 90, "size": 75, "img": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200"},
-    {"top": 220, "right": 70, "size": 70, "img": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"},
-    {"top": 450, "left": 50, "size": 75, "img": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200"},
-    {"top": 440, "right": 90, "size": 55, "img": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200"},
-  ];
+class LoginView extends StatelessWidget {
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final FizzCoreController core = Get.find<FizzCoreController>();
+    final phoneController = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -0.2),
-                radius: 1.2,
-                colors: [Color(0xFF2E134B), Colors.black],
-              ),
-            ),
-          ),
-          ...avatarData.map((item) {
-            return Positioned(
-              top: (item["top"] as int).toDouble(),
-              left: item.containsKey("left") ? (item["left"] as int).toDouble() : null,
-              right: item.containsKey("right") ? (item["right"] as int).toDouble() : null,
-              child: CircleAvatar(
-                radius: (item["size"] as int) / 2,
-                backgroundImage: NetworkImage(item["img"]),
-                backgroundColor: Colors.pinkAccent,
-              ),
-            );
-          }).toList(),
-          Positioned(top: 290, left: 240, child: _glowingRing(Colors.pinkAccent, 24)),
-          Positioned(top: 590, right: 90, child: _glowingRing(Colors.pinkAccent, 28)),
-          Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFE91E63),
-                      minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    ),
-                    child: Text(
-                      "Fast Login",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    onPressed: () => _handleAuthAction('fast'),
-                  ),
-                ),
-                SizedBox(height: 18),
-                Text("or", style: TextStyle(color: Colors.white54, fontSize: 12)),
-                SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _socialRoundIcon(Icons.g_mobiledata, "Google", () => _handleGoogleAuthClick()),
-                    SizedBox(width: 35),
-                    _socialRoundIcon(Icons.phone_android, "Phone", () => _handleAuthAction('phone')),
-                    SizedBox(width: 35),
-                    _socialRoundIcon(Icons.person_outline, "Guest", () => _handleAuthAction('guest')),
-                  ],
-                ),
-                SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: Checkbox(
-                        value: agreeChecked,
-                        activeColor: Color(0xFFE91E63),
-                        shape: CircleBorder(),
-                        onChanged: (val) {
-                          setState(() {
-                            agreeChecked = val ?? true;
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Text("Agree to ", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    Text("User Agreement", style: TextStyle(color: Color(0xFFE91E63), fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text(" and ", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    Text("Privacy Policy", style: TextStyle(color: Color(0xFFE91E63), fontSize: 12, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    Get.snackbar("Help & Support", "Connecting to live support assistance...", snackPosition: SnackPosition.BOTTOM);
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.headphones, color: Colors.amber, size: 16),
-                      SizedBox(width: 6),
-                      Text("Having login issues ", style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      Text("find help", style: TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _glowingRing(Color color, double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: 2)),
-    );
-  }
-
-  Widget _socialRoundIcon(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white24, width: 1),
-            ),
-            child: Icon(icon, color: Colors.white, size: 26),
-          ),
-          SizedBox(height: 6),
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 11)),
-        ],
-      ),
-    );
-  }
-
-  void _handleGoogleAuthClick() {
-    if (!agreeChecked) {
-      Get.snackbar("Notice", "Please agree to User Agreement and Privacy Policy first!");
-      return;
-    }
-    // Show device email picker sheet per your requirement
-    Get.bottomSheet(
-      Container(
-        color: Color(0xFF1E0B36),
-        padding: EdgeInsets.all(20),
-        child: Wrap(
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Select Google Account", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16),
-            ...uController.mockExistingGoogleEmails.map((email) => ListTile(
-              leading: CircleAvatar(backgroundColor: Colors.pink, child: Text(email[0].toUpperCase(), style: TextStyle(color: Colors.white))),
-              title: Text(email, style: TextStyle(color: Colors.white)),
-              subtitle: Text("Google Account", style: TextStyle(color: Colors.white54, fontSize: 11)),
-              onTap: () {
-                Get.back();
-                uController.fillFromGoogleAccount(email);
-                if (uController.isRegistered.value) {
-                  // Existing user -> direct app ula poiranum
-                  Get.offAll(() => HomeFeedView());
-                } else {
-                  // New user -> auto-fill and go onboarding/setup
-                  Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: email));
-                }
+            const Text(
+              'Fizz Live Pro',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.pinkAccent, fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 40),
+            TextField(
+              controller: phoneController,
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                hintText: 'Enter Mobile Number',
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                filled: true,
+                fillColor: Colors.grey[900],
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pinkAccent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                core.connectionState.value = ConnectionStateEnum.connected;
+                Get.off(() => const HomeFeedView());
               },
-            )).toList(),
-            ListTile(
-              leading: Icon(Icons.add, color: Colors.white),
-              title: Text("Use another account", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Get.back();
-                uController.fillFromGoogleAccount('new.streamer@gmail.com');
-                Get.to(() => ProfileOnboardingView(mode: 'google', initialEmail: 'new.streamer@gmail.com'));
-              },
+              child: const Text('Get OTP / Login', style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _handleAuthAction(String mode) {
-    if (!agreeChecked) {
-      Get.snackbar("Notice", "Please agree to User Agreement and Privacy Policy first!");
-      return;
-    }
-
-    // Existing user check condition simulator or state check
-    if (uController.isRegistered.value) {
-      // Already user -> Direct app kulla poiranum!
-      Get.offAll(() => HomeFeedView());
-    } else {
-      // New user entry -> Onboarding profile flow
-      Get.to(() => ProfileOnboardingView(mode: mode));
-    }
   }
 }
