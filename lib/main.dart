@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/profile_screen.dart';
+import 'screens/explore_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,7 +83,7 @@ class _MainShellState extends State<MainShell> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Scaffold(body: Center(child: Text('Explore / Search Screen'))),
+    const ExploreScreen(),
     const Scaffold(body: Center(child: Text('Live Stream Screen'))),
     const Scaffold(body: Center(child: Text('Chat List Screen'))),
     const ProfileScreen(),
@@ -133,4 +134,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
