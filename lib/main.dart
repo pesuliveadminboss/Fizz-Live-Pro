@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/profile_screen.dart';
 import 'screens/explore_screen.dart';
 import 'screens/chat_list_screen.dart';
+import 'screens/live_stream_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,7 +86,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const ExploreScreen(),
-    const Scaffold(body: Center(child: Text('Live Stream Screen'))),
+    const LiveStreamScreen(),
     const ChatListScreen(),
     const ProfileScreen(),
   ];
@@ -135,3 +136,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
