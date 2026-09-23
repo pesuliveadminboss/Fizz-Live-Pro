@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
@@ -10,13 +12,58 @@ class WalletScreen extends StatelessWidget {
     {'gems': 5000, 'price': '₹3,999'},
   ];
 
-  final List<Map<String, dynamic>> _transactions = const [
-    {'title': 'Recharge 500 Gems', 'date': 'Today, 2:15 PM', 'amount': '+500 Gems', 'isCredit': true},
-    {'title': 'Gift sent to Anitha_Live', 'date': 'Yesterday, 10:40 PM', 'amount': '-50 Gems', 'isCredit': false},
-  ];
+  void _showUpiGateway(BuildContext context, int gems, String price) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E2C),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Mock UPI Gateway 💳',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Recharging $gems Gems for $price',
+                style: const TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFE94057),
+                  child: Icon(Icons.payment, color: Colors.white),
+                ),
+                title: const Text('GPay / PhonePe / Paytm'),
+                subtitle: const Text('UPI ID: fizz.pro@upi'),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Provider.of<AppState>(context, listen: false).addRecharge(gems, price);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Payment approved! +$gems Gems added 💎')),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Wallet & Gems 💎'),
@@ -39,15 +86,15 @@ class WalletScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
-                children: const [
-                  Text('Available Balance', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                  SizedBox(height: 8),
+                children: [
+                  const Text('Available Balance', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.diamond, color: Colors.amberAccent, size: 28),
-                      SizedBox(width: 8),
-                      Text('450', style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+                      const Icon(Icons.diamond, color: Colors.amberAccent, size: 28),
+                      const SizedBox(width: 8),
+                      Text('${appState.gems}', style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ],
@@ -70,9 +117,7 @@ class WalletScreen extends StatelessWidget {
                 final pkg = _rechargePackages[index];
                 return InkWell(
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Purchasing ${pkg['gems']} Gems for ${pkg['price']}...')),
-                    );
+                    _showUpiGateway(context, pkg['gems'] as int, pkg['price'] as String);
                   },
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -111,9 +156,9 @@ class WalletScreen extends StatelessWidget {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _transactions.length,
+              itemCount: appState.transactions.length,
               itemBuilder: (context, index) {
-                final tx = _transactions[index];
+                final tx = appState.transactions[index];
                 final isCredit = tx['isCredit'] as bool;
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
