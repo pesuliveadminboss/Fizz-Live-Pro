@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'providers/app_state.dart';
-import 'screens/profile_screen.dart';
-import 'screens/explore_screen.dart';
-import 'screens/chat_list_screen.dart';
-import 'screens/live_stream_screen.dart';
-import 'screens/party_room_screen.dart';
-import 'screens/login_screen.dart';
+import '../services/auth_controller.dart';
+import '../providers/app_state.dart';
+import 'profile_screen.dart';
+import 'explore_screen.dart';
+import 'chat_list_screen.dart';
+import 'live_stream_screen.dart';
+import 'party_room_screen.dart';
+import 'login_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
+      ],
       child: const FizzLiveProApp(),
     ),
   );
@@ -65,6 +69,8 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final authCtrl = context.watch<AuthController>();
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -74,6 +80,13 @@ class _MainShellState extends State<MainShell> {
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
+          // If tab index 2 is Live and user is NOT a streamer (Male/User), show toast or block
+          if (index == 2 && !authCtrl.isStreamer) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Go Live is available for Streamers (Female role) only.')),
+            );
+            return;
+          }
           setState(() {
             _currentIndex = index;
           });
@@ -95,10 +108,20 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCtrl = context.watch<AuthController>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fizz Live Pro'),
+        title: Text(authCtrl.isStreamer ? 'Fizz Live Pro (Streamer)' : 'Fizz Live Pro (User)'),
         actions: [
+          if (authCtrl.isStreamer)
+            IconButton(
+              icon: const Icon(Icons.videocam, color: Colors.greenAccent),
+              tooltip: 'Go Live',
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveStreamScreen()));
+              },
+            ),
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
         ],
       ),
@@ -107,6 +130,19 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (!authCtrl.isStreamer)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  'Note: Male / User account mode — Go-Live creation hidden.',
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+              ),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF8A2387),
