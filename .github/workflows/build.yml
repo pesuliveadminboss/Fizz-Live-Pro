@@ -13,7 +13,7 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely & add permissions
+      - name: Generate Android scaffold safely & patch manifest
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
           cp -r temp_app/android ./android
@@ -31,12 +31,21 @@ jobs:
           <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
-          content = content.replace('<application', perms + '<application')
+          if '<application' in content and 'INTERNET' not in content:
+              content = content.replace('<application', perms + '<application')
           
           with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
               f.write(content)
           EOF
           python3 patch_manifest.py
+          
+          # Force v2 embedding shim in MainActivity or override gradle check
+          mkdir -p android/app/src/main/java/com/example/fizz_live_pro
+          cat << 'EOF' > android/app/src/main/java/com/example/fizz_live_pro/MainActivity.kt
+          package com.example.fizz_live_pro
+          import io.flutter.embedding.android.FlutterActivity
+          class MainActivity: FlutterActivity()
+          EOF
       - run: flutter pub get
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
