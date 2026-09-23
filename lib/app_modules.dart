@@ -9,7 +9,7 @@ class StreamerItem {
   final String name;
   final String country;
   final String flag;
-  final String status; // 'online', 'live', 'party'
+  final String status;
   final int age;
   final Color color;
   final bool isOffline;
@@ -97,7 +97,7 @@ class AppState extends ChangeNotifier {
 class AuthController extends ChangeNotifier {
   bool isLoggedIn = false;
   bool isExistingUser = false;
-  bool isStreamer = false; // Female = streamer (Go-Live shown), Male = user (No Go-Live)
+  bool isStreamer = false;
   String userName = 'Fizz User';
   String userHandle = '@fizzuser';
   String gender = 'Female';
@@ -433,4 +433,7 @@ class OnboardingProfileScreen extends StatefulWidget {
   final String? defaultName;
   const OnboardingProfileScreen({super.key, required this.loginIdentifier, required this.loginType, this.defaultName});
   @override
- 
+  State<OnboardingProfileScreen> createState() => _OnboardingProfileScreenState();
+}
+
+class _
