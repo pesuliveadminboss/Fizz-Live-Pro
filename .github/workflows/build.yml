@@ -13,17 +13,17 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely
+      - name: Generate Android scaffold safely & inject v2 embedding
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
           cp -r temp_app/android ./android
           rm -rf temp_app
           
-          # Add permissions
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           cat << 'EOF' > patch_manifest.py
           with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
               content = f.read()
+          
           perms = '''
           <uses-permission android:name="android.permission.INTERNET"/>
           <uses-permission android:name="android.permission.CAMERA"/>
@@ -31,17 +31,30 @@ jobs:
           <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
+          
+          meta_v2 = '<meta-data android:name="flutterEmbedding" android:value="2" />'
+          
           if '<application' in content and 'INTERNET' not in content:
               content = content.replace('<application', perms + '<application')
+          
+          if meta_v2 not in content:
+              content = content.replace('<application', '<application>\n        ' + meta_v2)
+          
           with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
               f.write(content)
           EOF
           python3 patch_manifest.py
           
-          # Override embedding warning in gradle.properties if supported
-          echo "flutter.android.embedding.version=2" >> android/gradle.properties
+          # Kotlin MainActivity v2 embedding setup
+          KT_DIR="android/app/src/main/kotlin/com/example/fizz_live_pro"
+          mkdir -p $KT_DIR
+          cat << 'EOF' > $KT_DIR/MainActivity.kt
+          package com.example.fizz_live_pro
+          import io.flutter.embedding.android.FlutterActivity
+          class MainActivity: FlutterActivity()
+          EOF
       - run: flutter pub get
-      - run: flutter build apk --debug --no-pub
+      - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
