@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'wallet_screen.dart';
 import 'settings_screen.dart';
+import 'analytics_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,6 +12,15 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('My Profile'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -50,6 +60,17 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(Icons.bar_chart, color: Color(0xFFE94057)),
+              title: const Text('Analytics & Stats'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.edit, color: Color(0xFFE94057)),
               title: const Text('Edit Profile'),
