@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fizz_live_pro/core/fizz_core_controller.dart';
+import 'package:fizz_live_pro/fizz_core.dart';
 
 class LiveRoomView extends StatelessWidget {
   const LiveRoomView({super.key});
@@ -35,3 +35,4 @@ class LiveRoomView extends StatelessWidget {
     );
   }
 }
+
