@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 
 class LiveStreamScreen extends StatefulWidget {
   const LiveStreamScreen({super.key});
@@ -28,11 +30,12 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Mock Live Video Background Container
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -45,8 +48,6 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
               child: Icon(Icons.videocam, size: 80, color: Colors.white54),
             ),
           ),
-
-          // Top HUD (Streamer Info & Viewers)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -60,9 +61,9 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text('Anitha_Live', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                      Text('1.4K watching', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    children: [
+                      const Text('Anitha_Live', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text('1.4K watching • 💎 ${appState.gems}', style: const TextStyle(color: Colors.amberAccent, fontSize: 11)),
                     ],
                   ),
                   const SizedBox(width: 12),
@@ -84,8 +85,6 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
               ),
             ),
           ),
-
-          // Bottom Overlay: Live Chat & Action Bar
           Positioned(
             left: 0,
             right: 0,
@@ -154,9 +153,19 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                         child: IconButton(
                           icon: const Icon(Icons.card_giftcard, color: Colors.white, size: 20),
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Gift tray opened! 🎁')),
-                            );
+                            bool sent = appState.sendGift('Anitha_Live', 'Super Rose 🌹', 50);
+                            if (sent) {
+                              setState(() {
+                                _messages.add({'user': 'You', 'msg': 'Sent Super Rose 🌹 (-50 Gems)'});
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Gift sent! Gems deducted 💎')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Insufficient Gems! Recharge wallet.')),
+                              );
+                            }
                           },
                         ),
                       ),
@@ -179,4 +188,3 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
     );
   }
 }
-
