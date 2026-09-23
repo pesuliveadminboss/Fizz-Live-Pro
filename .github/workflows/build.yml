@@ -13,17 +13,17 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely & patch manifest
+      - name: Generate Android scaffold safely
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
           cp -r temp_app/android ./android
           rm -rf temp_app
           
+          # Add permissions
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           cat << 'EOF' > patch_manifest.py
           with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
               content = f.read()
-          
           perms = '''
           <uses-permission android:name="android.permission.INTERNET"/>
           <uses-permission android:name="android.permission.CAMERA"/>
@@ -33,21 +33,15 @@ jobs:
           '''
           if '<application' in content and 'INTERNET' not in content:
               content = content.replace('<application', perms + '<application')
-          
           with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
               f.write(content)
           EOF
           python3 patch_manifest.py
           
-          # Force v2 embedding shim in MainActivity or override gradle check
-          mkdir -p android/app/src/main/java/com/example/fizz_live_pro
-          cat << 'EOF' > android/app/src/main/java/com/example/fizz_live_pro/MainActivity.kt
-          package com.example.fizz_live_pro
-          import io.flutter.embedding.android.FlutterActivity
-          class MainActivity: FlutterActivity()
-          EOF
+          # Override embedding warning in gradle.properties if supported
+          echo "flutter.android.embedding.version=2" >> android/gradle.properties
       - run: flutter pub get
-      - run: flutter build apk --debug
+      - run: flutter build apk --debug --no-pub
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
