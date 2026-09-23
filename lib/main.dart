@@ -30,9 +30,9 @@ class FizzLiveProApp extends StatelessWidget {
         primaryColor: const Color(0xFFE94057),
         scaffoldBackgroundColor: const Color(0xFF0F0F1A),
         colorScheme: const ColorScheme.dark(
-          primary: const Color(0xFFE94057),
-          secondary: const Color(0xFF8A2387),
-          surface: const Color(0xFF1E1E2C),
+          primary: Color(0xFFE94057),
+          secondary: Color(0xFF8A2387),
+          surface: Color(0xFF1E1E2C),
         ),
       ),
       home: const SplashScreen(),
