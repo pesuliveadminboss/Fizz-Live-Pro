@@ -6,6 +6,7 @@ import 'screens/explore_screen.dart';
 import 'screens/chat_list_screen.dart';
 import 'screens/live_stream_screen.dart';
 import 'screens/party_room_screen.dart';
+import 'screens/login_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,48 +36,11 @@ class FizzLiveProApp extends StatelessWidget {
           surface: Color(0xFF1E1E2C),
         ),
       ),
-      home: const SplashScreen(),
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainShell()),
-        );
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.live_tv, size: 80, color: Color(0xFFE94057)),
-            SizedBox(height: 16),
-            Text(
-              'Fizz Live Pro',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
+      initialRoute: '/login',
+      routes: {
+        '/login': (_) => const LoginScreen(),
+        '/main': (_) => const MainShell(),
+      },
     );
   }
 }
@@ -172,3 +136,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
