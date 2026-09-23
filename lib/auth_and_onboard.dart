@@ -199,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ]),
                   const SizedBox(height: 18),
                   CheckboxListTile(
-                    title: RichText(text: const TextSpan(style: TextStyle(fontSize: 12, color: Colors.white70), children: [TextSpan(text: 'Agree to '), TextSpan(text: 'User Agreement', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold)), TextSpan(text: ' and '), TextSpan(text: 'Privacy Policy', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold))])),
+                    title: RichText(text: const TextSpan(style: TextStyle(fontSize: 12,color: Colors.white70), children: [TextSpan(text: 'Agree to '), TextSpan(text: 'User Agreement', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold)), TextSpan(text: ' and '), TextSpan(text: 'Privacy Policy', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold))])),
                     value: _agreedToTerms,
                     activeColor: const Color(0xFFE94057),
                     onChanged: (val) => setState(() => _agreedToTerms = val ?? false),
@@ -214,3 +214,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
