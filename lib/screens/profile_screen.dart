@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'wallet_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -53,7 +54,12 @@ class ProfileScreen extends StatelessWidget {
               leading: const Icon(Icons.wallet, color: Color(0xFFE94057)),
               title: const Text('Wallet & Gems'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WalletScreen()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.security, color: Color(0xFFE94057)),
