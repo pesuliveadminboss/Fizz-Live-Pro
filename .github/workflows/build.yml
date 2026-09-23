@@ -1,4 +1,4 @@
-name: Build Fizz Live Pro Release APK
+name: Build Fizz Live Pro Debug APK
 
 on:
   push:
@@ -13,13 +13,12 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely & inject permissions/v2 support
+      - name: Generate Android scaffold safely & add permissions
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
           cp -r temp_app/android ./android
           rm -rf temp_app
           
-          # Inject v2 embedding metadata & permissions into AndroidManifest.xml
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           cat << 'EOF' > patch_manifest.py
           with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
@@ -32,24 +31,16 @@ jobs:
           <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
-          
-          if '<application' in content and '<meta-data android:name="flutterEmbedding"' not in content:
-              content = content.replace('<application', perms + '<application')
-              content = content.replace('<activity', '<meta-data android:name="flutterEmbedding" android:value="2" />\n        <activity')
+          content = content.replace('<application', perms + '<application')
           
           with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
               f.write(content)
           EOF
           python3 patch_manifest.py
-          
-          # Ensure FlutterActivity is extended properly or fallback flag set
-          gradle_props="android/gradle.properties"
-          echo "android.useAndroidX=true" >> $gradle_props
-          echo "android.enableJetifier=true" >> $gradle_props
       - run: flutter pub get
-      - run: flutter build apk --release --no-pub
+      - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: app-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
           
