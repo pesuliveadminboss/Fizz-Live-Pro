@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'state_and_auth.dart';
-import 'screens.dart';
+import 'models_and_state.dart';
+import 'popups_and_call.dart';
+import 'auth_and_onboard.dart';
+import 'feed_and_tabs.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
