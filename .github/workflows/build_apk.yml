@@ -25,18 +25,14 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Fix Package Name for Dart Rules
+      - name: Clean Legacy Android & Recreate
         run: |
+          rm -rf android ios
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
+          flutter create --platforms=android .
 
-      - name: Create Native Scaffold if Missing
-        run: |
-          flutter create --platforms=android . --overwrite || true
-
-      - name: Clean Build Cache & Pub Get
-        run: |
-          flutter clean
-          flutter pub get
+      - name: Pub Get
+        run: flutter pub get
 
       - name: Build Release APK
         run: flutter build apk --release --no-pub
