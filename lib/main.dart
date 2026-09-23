@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fizz_live_pro/core/fizz_core_controller.dart';
+import 'package:fizz_live_pro/fizz_core.dart';
 import 'package:fizz_live_pro/views/login_view.dart';
 
 void main() {
@@ -22,3 +22,4 @@ class FizzLiveApp extends StatelessWidget {
     );
   }
 }
+
