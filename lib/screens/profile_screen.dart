@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_state.dart';
 import 'wallet_screen.dart';
 import 'settings_screen.dart';
 import 'analytics_screen.dart';
@@ -6,8 +8,55 @@ import 'analytics_screen.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  void _showEditProfileDialog(BuildContext context) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final nameController = TextEditingController(text: appState.userName);
+    final handleController = TextEditingController(text: appState.userHandle);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        title: const Text('Edit Profile'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Display Name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: handleController,
+              decoration: const InputDecoration(labelText: 'Handle'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057)),
+            onPressed: () {
+              appState.updateProfile(nameController.text.trim(), handleController.text.trim());
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Profile updated successfully! ✨')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
@@ -42,21 +91,21 @@ class ProfileScreen extends StatelessWidget {
               child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Fizz User',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              appState.userName,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              '@fizzuser_101',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              appState.userHandle,
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
-                _StatItem(count: '128', label: 'Following'),
-                _StatItem(count: '1.4K', label: 'Followers'),
-                _StatItem(count: '450', label: 'Gems'),
+              children: [
+                const _StatItem(count: '128', label: 'Following'),
+                const _StatItem(count: '1.4K', label: 'Followers'),
+                _StatItem(count: '${appState.gems}', label: 'Gems'),
               ],
             ),
             const SizedBox(height: 24),
@@ -75,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
               leading: const Icon(Icons.edit, color: Color(0xFFE94057)),
               title: const Text('Edit Profile'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+              onTap: () => _showEditProfileDialog(context),
             ),
             ListTile(
               leading: const Icon(Icons.wallet, color: Color(0xFFE94057)),
@@ -121,3 +170,4 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
+
