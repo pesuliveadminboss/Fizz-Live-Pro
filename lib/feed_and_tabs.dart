@@ -1,3 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'models_and_state.dart';
+import 'popups_and_call.dart';
+
 class ForYouScreen extends StatefulWidget {
   const ForYouScreen({super.key});
 
@@ -6,7 +11,7 @@ class ForYouScreen extends StatefulWidget {
 }
 
 class _ForYouScreenState extends State<ForYouScreen> {
-  int _selectedTopIndex = 0; // 0: Hot, 1: Live, 2: Party, 3: Match
+  int _selectedTopIndex = 0;
   final List<String> _topTabs = ['Hot', 'Live', 'Party', 'Match'];
   String _selectedCountry = 'All';
   final List<String> _countries = ['All', 'India', 'America', 'Bangladesh', 'Pakistan', 'Russia', 'Africa', 'Madagascar'];
@@ -107,7 +112,6 @@ class _ForYouScreenState extends State<ForYouScreen> {
 
     return Column(
       children: [
-        // Fixed Top Row (Hot, Live, Party, Match) + search 🔍 & world 🌎 without sliding
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           color: const Color(0xFF0F0F1A),
@@ -265,6 +269,85 @@ class _ForYouScreenState extends State<ForYouScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class FollowScreen extends StatelessWidget {
+  const FollowScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Followed Creators')));
+}
+
+class GameScreen extends StatelessWidget {
+  const GameScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Interactive Live Games 🎮')));
+}
+
+class HomeScreenContainer extends StatefulWidget {
+  const HomeScreenContainer({super.key});
+  @override
+  State<HomeScreenContainer> createState() => _HomeScreenContainerState();
+}
+
+class _HomeScreenContainerState extends State<HomeScreenContainer> {
+  bool _popupsTriggered = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_popupsTriggered) {
+      _popupsTriggered = true;
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) EntryPopupsHelper.showDailyRewardsDialog(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const ForYouScreen();
+}
+
+class ExploreScreen extends StatelessWidget {
+  const ExploreScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Explore Streams')));
+}
+
+class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
+  @override
+  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Messages')), body: const Center(child: Text('Chat List')));
+}
+
+class LiveStreamScreen extends StatelessWidget {
+  const LiveStreamScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(title: Text('Go Live (Streamer) • 💎 ${appState.gems}'), actions: [IconButton(icon: const Icon(Icons.card_giftcard), onPressed: () => appState.sendGift('Anitha_Live', 'Rose', 50))]),
+      body: const Center(child: Text('Live Stream Broadcaster View', style: TextStyle(color: Colors.white))),
+    );
+  }
+}
+
+class PartyRoomScreen extends StatelessWidget {
+  const PartyRoomScreen({super.key});
+  @override
+  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Voice Party Room')), body: const Center(child: Text('8-Seat Voice Room')));
+}
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Profile')),
+      body: Center(child: Text('${appState.userName}\n${appState.userHandle}\nGems: ${appState.gems}')),
     );
   }
 }
