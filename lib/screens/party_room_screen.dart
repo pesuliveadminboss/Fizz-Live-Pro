@@ -34,7 +34,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       ),
       body: Column(
         children: [
-          // Room Topic Banner
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -46,7 +45,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // 8-Seat Grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -115,7 +113,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               },
             ),
           ),
-          // Bottom Controls for Voice Party
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
