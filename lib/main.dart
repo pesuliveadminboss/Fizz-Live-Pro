@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_controller.dart';
-import '../providers/app_state.dart';
-import 'profile_screen.dart';
-import 'explore_screen.dart';
-import 'chat_list_screen.dart';
-import 'live_stream_screen.dart';
-import 'party_room_screen.dart';
+import 'app_state.dart';
+import 'auth_controller.dart';
 import 'login_screen.dart';
+import 'home_screen.dart';
+import 'explore_screen.dart';
+import 'live_stream_screen.dart';
+import 'chat_list_screen.dart';
+import 'profile_screen.dart';
+import 'party_room_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,7 +81,6 @@ class _MainShellState extends State<MainShell> {
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          // If tab index 2 is Live and user is NOT a streamer (Male/User), show toast or block
           if (index == 2 && !authCtrl.isStreamer) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Go Live is available for Streamers (Female role) only.')),
@@ -102,74 +102,3 @@ class _MainShellState extends State<MainShell> {
     );
   }
 }
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final authCtrl = context.watch<AuthController>();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(authCtrl.isStreamer ? 'Fizz Live Pro (Streamer)' : 'Fizz Live Pro (User)'),
-        actions: [
-          if (authCtrl.isStreamer)
-            IconButton(
-              icon: const Icon(Icons.videocam, color: Colors.greenAccent),
-              tooltip: 'Go Live',
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const LiveStreamScreen()));
-              },
-            ),
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (!authCtrl.isStreamer)
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Text(
-                  'Note: Male / User account mode — Go-Live creation hidden.',
-                  style: TextStyle(fontSize: 12, color: Colors.white70),
-                ),
-              ),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8A2387),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              icon: const Icon(Icons.mic, color: Colors.white),
-              label: const Text('Join Live Voice Party Room 🎙️', style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const PartyRoomScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-            const Text('Live Recommendations Feed', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            const Expanded(
-              child: Center(
-                child: Text('Live feed scroll & recommended creators card list here'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
