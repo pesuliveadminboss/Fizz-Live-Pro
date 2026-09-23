@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // --- APP STATE ---
 class AppState extends ChangeNotifier {
   int _gems = 450;
+  int _currentStreakDay = 1;
+  bool _claimedToday = false;
+  
   String _userName = 'Fizz User';
   String _userHandle = '@fizzuser_101';
   final List<Map<String, dynamic>> _transactions = [
@@ -13,9 +16,38 @@ class AppState extends ChangeNotifier {
     {'title': 'Gift sent to Anitha_Live', 'date': 'Yesterday, 10:40 PM', 'amount': '-50 Gems', 'isCredit': false},
   ];
   int get gems => _gems;
+  int get currentStreakDay => _currentStreakDay;
+  bool get claimedToday => _claimedToday;
   String get userName => _userName;
   String get userHandle => _userHandle;
   List<Map<String, dynamic>> get transactions => _transactions;
+
+  void claimDailyReward() {
+    if (_claimedToday) return;
+    int rewardGems = 0;
+    if (_currentStreakDay == 1) rewardGems = 40;
+    else if (_currentStreakDay == 2) rewardGems = 0; // Card reward handled separately or bonus gems
+    else if (_currentStreakDay == 3) rewardGems = 50;
+    else if (_currentStreakDay == 4) rewardGems = 90;
+    else if (_currentStreakDay == 5) rewardGems = 120;
+    else if (_currentStreakDay == 6) rewardGems = 180;
+    else if (_currentStreakDay == 7) rewardGems = 200; // Gift box 200 gems as per screenshot screenshot 1 rule
+
+    if (_currentStreakDay == 2) {
+      _transactions.insert(0, {'title': 'Daily Reward Day 2 (Surprise Card 🃏)', 'date': 'Today', 'amount': '+1 Card', 'isCredit': true});
+    } else {
+      _gems += rewardGems;
+      _transactions.insert(0, {'title': 'Daily Reward Day $_currentStreakDay', 'date': 'Today', 'amount': '+$rewardGems Gems', 'isCredit': true});
+    }
+
+    _claimedToday = true;
+    if (_currentStreakDay < 7) {
+      _currentStreakDay++;
+    } else {
+      _currentStreakDay = 1; // cycle reset or keep completed
+    }
+    notifyListeners();
+  }
 
   void updateProfile(String name, String handle) {
     _userName = name;
@@ -111,6 +143,282 @@ class AuthController extends ChangeNotifier {
   }
 }
 
+// --- POPUPDIALOG HELPER FOR ENTRY FLOW ---
+class EntryPopupsHelper {
+  static void showDailyRewardsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Consumer<AppState>(
+        builder: (context, appState, child) {
+          final dayRewards = [
+            {'day': 1, 'label': 'x 40', 'icon': Icons.diamond, 'color': Colors.amberAccent},
+            {'day': 2, 'label': 'x 1', 'icon': Icons.credit_card, 'color': Colors.orangeAccent},
+            {'day': 3, 'label': 'x 50', 'icon': Icons.diamond, 'color': Colors.amberAccent},
+            {'day': 4, 'label': 'x 90', 'icon': Icons.diamond, 'color': Colors.amberAccent},
+            {'day': 5, 'label': 'x 120', 'icon': Icons.diamond, 'color': Colors.amberAccent},
+            {'day': 6, 'label': 'x 180', 'icon': Icons.diamond, 'color': Colors.amberAccent},
+            {'day': 7, 'label': 'x 1 (🎁)', 'icon': Icons.card_giftcard, 'color': Colors.pinkAccent},
+          ];
+
+          return Dialog(
+            backgroundColor: const Color(0xFF1E1E2C),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Daily rewards', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white)),
+                          SizedBox(height: 4),
+                          Text('Sign in for 7 days to get a surprise', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white70),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemCount: dayRewards.length,
+                    itemBuilder: (context, index) {
+                      final item = dayRewards[index];
+                      final dayNum = item['day'] as int;
+                      final isSelected = dayNum == appState.currentStreakDay;
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFFE94057).withOpacity(0.25) : const Color(0xFF151522),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: isSelected ? const Color(0xFFE94057) : Colors.white10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('day $dayNum', style: const TextStyle(fontSize: 10, color: Colors.white60)),
+                            const Spacer(),
+                            Icon(item['icon'] as IconData, size: 24, color: item['color'] as Color),
+                            const Spacer(),
+                            Text(item['label'] as String, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF8E53)]),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+                        onPressed: () {
+                          appState.claimDailyReward();
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Daily reward claimed successfully! 🎁')),
+                          );
+                        },
+                        child: Text(
+                          appState.claimedToday ? 'Claimed Today ✓' : 'Check-in',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  static void showAuthorizationSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(icon: const Icon(Icons.close, color: Colors.white54, size: 20), onPressed: () => Navigator.pop(ctx)),
+              ],
+            ),
+            const Text('Authorization Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 8),
+            const Text('Please open authorization setting for better experience', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white70)),
+            const SizedBox(height: 20),
+            _buildAuthItem(Icons.camera_alt_outlined, 'Camera', Colors.pinkAccent),
+            const SizedBox(height: 10),
+            _buildAuthItem(Icons.phone_outlined, 'Phone', Colors.orangeAccent),
+            const SizedBox(height: 10),
+            _buildAuthItem(Icons.mic_none, 'Microphone', Colors.redAccent),
+            const SizedBox(height: 10),
+            _buildAuthItem(Icons.notifications_none, 'Notification', Colors.purpleAccent),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('All permissions allowed (Camera, Phone, Mic, Notification) ✓')),
+                    );
+                  },
+                  child: const Text('Allow all', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildAuthItem(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF151522),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 14),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  static void showCallReminderDialog(BuildContext context) {
+    bool callReminderOn = true;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateModal) => AlertDialog(
+          backgroundColor: const Color(0xFF1E1E2C),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top banner representation matching screenshot 3 phone icon badge
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF416C)]),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const CircleAvatar(radius: 28, backgroundColor: Colors.green, child: Icon(Icons.phone, color: Colors.white, size: 28)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Users call reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                        Switch(
+                          value: callReminderOn,
+                          activeColor: Colors.white,
+                          activeTrackColor: Colors.green,
+                          onChanged: (val) => setStateModal(() => callReminderOn = val),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Turn on the call reminder and don\'t miss any call from users', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white70)),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Icon(Icons.star_outline, color: Colors.amberAccent, size: 20),
+                  const SizedBox(width: 10),
+                  const Text('Received evaluation', style: TextStyle(color: Colors.white, fontSize: 14)),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  const Icon(Icons.notifications_active_outlined, color: Colors.pinkAccent, size: 20),
+                  const SizedBox(width: 10),
+                  const Text('New message', style: TextStyle(color: Colors.white, fontSize: 14)),
+                ],
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Notifications & Call reminder turned on! 🔔')),
+                      );
+                    },
+                    child: const Text('Turn on notifications', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // --- ONBOARDING PROFILE SCREEN ---
 class OnboardingProfileScreen extends StatefulWidget {
   final String loginIdentifier;
@@ -161,231 +469,4 @@ class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
                 Expanded(child: RadioListTile<String>(title: const Text('Male'), value: 'Male', groupValue: _selectedGender, activeColor: const Color(0xFFE94057), onChanged: (val) => setState(() => _selectedGender = val!))),
               ],
             ),
-            TextField(controller: TextEditingController(text: _selectedDob), style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Date of Birth (DD/MM/YYYY)', border: OutlineInputBorder()), onChanged: (val) => _selectedDob = val),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(value: _selectedCountry, dropdownColor: const Color(0xFF1E1E2C), style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Country', border: OutlineInputBorder()), items: _countries.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(), onChanged: (val) => setState(() => _selectedCountry = val!)),
-            const SizedBox(height: 16),
-            CheckboxListTile(title: const Text('I confirm I am 18+ years old', style: TextStyle(fontSize: 13)), value: _agreed18Plus, activeColor: const Color(0xFFE94057), onChanged: (val) => setState(() => _agreed18Plus = val ?? false)),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057), padding: const EdgeInsets.symmetric(vertical: 14)),
-              onPressed: () {
-                if (_nameController.text.trim().isEmpty || !_agreed18Plus) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill name and check 18+')));
-                  return;
-                }
-                Provider.of<AuthController>(context, listen: false).completeNewUserProfile(
-                  name: _nameController.text.trim(),
-                  selectedGender: _selectedGender,
-                  selectedDob: _selectedDob,
-                  selectedCountry: _selectedCountry,
-                  loginIdentifier: widget.loginIdentifier,
-                  loginType: widget.loginType,
-                );
-                Navigator.pushReplacementNamed(context, '/main');
-              },
-              child: const Text('Save & Enter App'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// --- LOGIN SCREEN WITH SCREENSHOT UI ---
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-class _LoginScreenState extends State<LoginScreen> {
-  bool _agreedToTerms = false;
-  final List<Map<String, dynamic>> _floatingAvatars = [
-    {'name': 'Anitha', 'top': 40, 'left': 40, 'size': 68, 'color': const Color(0xFFE94057)},
-    {'name': 'Priya', 'top': 60, 'right': 40, 'size': 56, 'color': const Color(0xFF8A2387)},
-    {'name': 'Kavya', 'top': 190, 'left': 90, 'size': 74, 'color': const Color(0xFFF27121)},
-    {'name': 'Divya', 'top': 210, 'right': 50, 'size': 70, 'color': const Color(0xFFE94057)},
-    {'name': 'Meera', 'top': 380, 'left': 50, 'size': 78, 'color': const Color(0xFF8A2387)},
-    {'name': 'Sneha', 'top': 430, 'right': 70, 'size': 58, 'color': const Color(0xFFE94057)},
-  ];
-
-  void _validateAndProceed({required BuildContext context, required String loginType, required String identifier, String? defaultNameForNewUser}) {
-    if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please agree to User Agreement and Privacy Policy first')));
-      return;
-    }
-    Provider.of<AuthController>(context, listen: false).checkExistingAndLogin(
-      identifier: identifier,
-      loginType: loginType,
-      context: context,
-      onExistingSuccess: () => Navigator.pushReplacementNamed(context, '/main'),
-      onNewUserNeedsProfile: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OnboardingProfileScreen(loginIdentifier: identifier, loginType: loginType, defaultName: defaultNameForNewUser))),
-    );
-  }
-
-  void _showGoogleAccountPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1E1E2C),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('Choose Google Account', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          ListTile(leading: const CircleAvatar(backgroundColor: Color(0xFFE94057), child: Text('A')), title: const Text('Anitha Live', style: TextStyle(color: Colors.white)), subtitle: const Text('anitha@gmail.com', style: TextStyle(color: Colors.white70)), onTap: () { Navigator.pop(ctx); _validateAndProceed(context: context, loginType: 'google', identifier: 'anitha@gmail.com', defaultNameForNewUser: 'Anitha Live'); }),
-        ]),
-      ),
-    );
-  }
-
-  void _showPhoneOtpDialog(BuildContext context) {
-    final phoneCtrl = TextEditingController();
-    bool otpSent = false;
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2C),
-          title: Text(otpSent ? 'Enter OTP (1234)' : 'Enter Phone Number'),
-          content: TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone')),
-          actions: [
-            ElevatedButton(onPressed: () { if (!otpSent) { setDialogState(() => otpSent = true); } else { Navigator.pop(ctx); _validateAndProceed(context: context, loginType: 'phone', identifier: phoneCtrl.text.trim()); } }, child: Text(otpSent ? 'Verify' : 'Send OTP')),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _handleGuestLogin(BuildContext context) {
-    final randomNum = 100000 + Random().nextInt(900000);
-    _validateAndProceed(context: context, loginType: 'guest', identifier: 'guest_$randomNum', defaultNameForNewUser: 'user_$randomNum');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070F),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ..._floatingAvatars.map((item) {
-              return Positioned(
-                top: (item['top'] as int).toDouble(),
-                left: item.containsKey('left') ? (item['left'] as int).toDouble() : null,
-                right: item.containsKey('right') ? (item['right'] as int).toDouble() : null,
-                child: Container(
-                  width: (item['size'] as int).toDouble(),
-                  height: (item['size'] as int).toDouble(),
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: (item['color'] as Color).withOpacity(0.6), width: 2.5), color: const Color(0xFF1E1E2C)),
-                  child: Center(child: Text((item['name'] as String)[0], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                ),
-              );
-            }),
-            Positioned(
-              top: 310, left: 0, right: 0,
-              child: Column(
-                children: [
-                  const Text('Fizz Live Pro', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
-                  const SizedBox(height: 6),
-                  const Text('live stream • private call • 18+', style: TextStyle(fontSize: 13, color: Colors.cyanAccent, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-            Positioned(
-              left: 20, right: 20, bottom: 24,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(width: double.infinity, height: 50, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057)), onPressed: () => _validateAndProceed(context: context, loginType: 'fast_login', identifier: 'fast_token'), child: const Text('Fast Login', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
-                  const SizedBox(height: 18),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                    IconButton(icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent, size: 32), onPressed: () => _showGoogleAccountPicker(context)),
-                    IconButton(icon: const Icon(Icons.phone_android, color: Colors.greenAccent, size: 28), onPressed: () => _showPhoneOtpDialog(context)),
-                    IconButton(icon: const Icon(Icons.person_outline, color: Colors.amberAccent, size: 28), onPressed: () => _handleGuestLogin(context)),
-                  ]),
-                  const SizedBox(height: 18),
-                  CheckboxListTile(
-                    title: RichText(text: const TextSpan(style: TextStyle(fontSize: 12, color: Colors.white70), children: [TextSpan(text: 'Agree to '), TextSpan(text: 'User Agreement', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold)), TextSpan(text: ' and '), TextSpan(text: 'Privacy Policy', style: TextStyle(color: Color(0xFFE94057), fontWeight: FontWeight.bold))])),
-                    value: _agreedToTerms,
-                    activeColor: const Color(0xFFE94057),
-                    onChanged: (val) => setState(() => _agreedToTerms = val ?? false),
-                  ),
-                  const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.headphones_outlined, size: 15, color: Colors.white60), SizedBox(width: 6), Text('Having login issues? Find help', style: TextStyle(fontSize: 12, color: Colors.white70, decoration: TextDecoration.underline))]),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// --- APP SCREENS ---
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final authCtrl = context.watch<AuthController>();
-    return Scaffold(
-      appBar: AppBar(title: Text(authCtrl.isStreamer ? 'Fizz Live Pro (Streamer)' : 'Fizz Live Pro (User)')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8A2387)),
-            icon: const Icon(Icons.mic, color: Colors.white),
-            label: const Text('Join Live Voice Party Room 🎙️'),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PartyRoomScreen())),
-          ),
-          const SizedBox(height: 24),
-          const Expanded(child: Center(child: Text('Live feed recommended creators card list'))),
-        ]),
-      ),
-    );
-  }
-}
-
-class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Explore Streams')));
-}
-
-class ChatListScreen extends StatelessWidget {
-  const ChatListScreen({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Messages')), body: const Center(child: Text('Chat List')));
-}
-
-class LiveStreamScreen extends StatelessWidget {
-  const LiveStreamScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(title: Text('Anitha_Live • 💎 ${appState.gems}'), actions: [IconButton(icon: const Icon(Icons.card_giftcard), onPressed: () => appState.sendGift('Anitha_Live', 'Rose', 50))]),
-      body: const Center(child: Text('Live Stream View', style: TextStyle(color: Colors.white))),
-    );
-  }
-}
-
-class PartyRoomScreen extends StatelessWidget {
-  const PartyRoomScreen({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Voice Party Room')), body: const Center(child: Text('8-Seat Voice Room')));
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
-      body: Center(child: Text('${appState.userName}\n${appState.userHandle}\nGems: ${appState.gems}')),
-    );
-  }
-}
-
+            TextField(controller: TextEditingCont
