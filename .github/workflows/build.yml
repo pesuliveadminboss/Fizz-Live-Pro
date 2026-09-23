@@ -13,7 +13,11 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - run: flutter create . --platforms=android
+      - name: Generate Android scaffold safely
+        run: |
+          flutter create temp_app --platforms=android --project-name=fizz_live_pro
+          cp -r temp_app/android ./android
+          rm -rf temp_app
       - run: flutter pub get
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
