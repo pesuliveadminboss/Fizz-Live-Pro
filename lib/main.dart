@@ -17,7 +17,7 @@ class FizzLiveProApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: const Color(0xFFE94057),
         scaffoldBackgroundColor: const Color(0xFF0F0F1A),
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: const Color(0xFFE94057),
           secondary: const Color(0xFF8A2387),
           surface: const Color(0xFF1E1E2C),
@@ -38,7 +38,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    super.init();
+    super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -138,4 +138,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
