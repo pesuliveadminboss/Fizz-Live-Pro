@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/app_state.dart';
 import 'screens/profile_screen.dart';
 import 'screens/explore_screen.dart';
 import 'screens/chat_list_screen.dart';
@@ -7,7 +9,12 @@ import 'screens/party_room_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FizzLiveProApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AppState(),
+      child: const FizzLiveProApp(),
+    ),
+  );
 }
 
 class FizzLiveProApp extends StatelessWidget {
