@@ -428,4 +428,4 @@ class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderSt
                 Container(
                   color: streamer.color.withOpacity(0.4),
                   child: Center(
-                    child: Text(streamer.name[0], style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Col
+                    child: Text(streamer.name[0], style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white24
