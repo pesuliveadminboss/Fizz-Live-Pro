@@ -74,7 +74,7 @@ class AuthController extends ChangeNotifier {
     if (_registeredUsers.contains(key) || (prefs.getBool(key) ?? false)) {
       isExistingUser = true;
       isLoggedIn = true;
-      notifyListeners';
+      notifyListeners();
       onExistingSuccess();
     } else {
       isExistingUser = false;
@@ -388,3 +388,4 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
