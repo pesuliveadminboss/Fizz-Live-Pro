@@ -52,44 +52,86 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const ExploreScreen(),
-    const LiveStreamScreen(),
-    const ChatListScreen(),
-    const ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final authCtrl = context.watch<AuthController>();
 
+    // Men/User (5 tabs): For You, Follow, Game, Message, Me
+    // Women/Streamer (6 tabs): For You, Follow, Go Live, Game, Message, Me
+    final isStreamer = authCtrl.isStreamer;
+
+    final List<Widget> maleScreens = [
+      const HomeScreenContainer(),
+      const FollowScreen(),
+      const GameScreen(),
+      const ChatListScreen(),
+      const ProfileScreen(),
+    ];
+
+    final List<Widget> femaleScreens = [
+      const HomeScreenContainer(),
+      const FollowScreen(),
+      const LiveStreamScreen(), // Go live index 2
+      const GameScreen(),
+      const ChatListScreen(),
+      const ProfileScreen(),
+    ];
+
+    final currentScreen = isStreamer
+        ? femaleScreens[_currentIndex < femaleScreens.length ? _currentIndex : 0]
+        : maleScreens[_currentIndex < maleScreens.length ? _currentIndex : 0];
+
+    final items = isStreamer
+        ? const [
+            BottomNavigationBarItem(icon: Icon(Icons.thumb_up_alt_outlined), label: 'For You'),
+            BottomNavigationBarItem(icon: Icon(Icons.group_outage), label: 'Follow'),
+            BottomNavigationBarItem(icon: Icon(Icons.videocam_rounded), label: 'Go live'),
+            BottomNavigationBarItem(icon: Icon(Icons.games_outlined), label: 'Game'),
+            BottomNavigationBarItem(icon: Icon(Icons.message_outlined), label: 'Messages'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Me'),
+          ]
+        : const [
+            BottomNavigationBarItem(icon: Icon(Icons.thumb_up_alt_outlined), label: 'For You'),
+            BottomNavigationBarItem(icon: Icon(Icons.group_outage), label: 'Follow'),
+            BottomNavigationBarItem(icon: Icon(Icons.games_outlined), label: 'Game'),
+            BottomNavigationBarItem(icon: Icon(Icons.message_outlined), label: 'Messages'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Me'),
+          ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      appBar: AppBar(
+        title: Text(isStreamer ? 'Fizz Live Pro (Streamer)' : 'Fizz Live Pro (User)'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.security, color: Colors.cyanAccent),
+            tooltip: 'Auth Settings',
+            onPressed: () => EntryPopupsHelper.showAuthorizationSettingsDialog(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications_active, color: Colors.amberAccent),
+            tooltip: 'Call Reminder',
+            onPressed: () => EntryPopupsHelper.showCallReminderDialog(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent),
+            tooltip: 'Daily Rewards',
+            onPressed: () => EntryPopupsHelper.showDailyRewardsDialog(context),
+          ),
+        ],
+      ),
+      body: currentScreen,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF1E1E2C),
         selectedItemColor: const Color(0xFFE94057),
         unselectedItemColor: Colors.grey,
-        currentIndex: _currentIndex,
+        currentIndex: _currentIndex >= items.length ? 0 : _currentIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          if (index == 2 && !authCtrl.isStreamer) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Go Live is available for Streamers (Female role) only.')),
-            );
-            return;
-          }
           setState(() {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.live_tv), label: 'Live'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+        items: items,
       ),
     );
   }
