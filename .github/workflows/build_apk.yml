@@ -25,9 +25,9 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Fix Pubspec Package Name & Clean Native
+      - name: Fix Pubspec Package Name via Python & Clean Native
         run: |
-          sed -i 's/^name:.*/name: fizz_live_pro/' pubspec.yaml
+          python3 -c "with open('pubspec.yaml', 'r') as f: c = f.read(); open('pubspec.yaml', 'w').write(c.replace('Fizz-Live-Pro', 'fizz_live_pro'))"
           rm -rf android ios
 
       - name: Create Native Scaffold
