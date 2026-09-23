@@ -1,44 +1,46 @@
-name: Build Flutter APK for Fizz Live Pro
+name: Build Release APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Java (JDK 17)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: 'adopt'
           java-version: '17'
 
-      - name: Set up Flutter SDK (Latest Stable)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.0'
           channel: 'stable'
-          cache: true
 
-      - name: Generate Android/iOS platform scaffolding if missing
-        run: flutter create . --platforms=android,ios
+      - name: Fix Package Name & Regenerate Scaffold
+        run: |
+          sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
+          flutter create --overwrite --org com.example --project-name fizz_live_pro .
 
-      - name: Install Flutter Dependencies
-        run: flutter pub get
+      - name: Clean & Pub Get
+        run: |
+          flutter clean
+          flutter pub get
 
-      - name: Build Android APK (Release)
-        run: flutter build apk --release
+      - name: Build Release APK
+        run: flutter build apk --release --no-pub
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fizz-live-pro-release-apk
+          name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           
