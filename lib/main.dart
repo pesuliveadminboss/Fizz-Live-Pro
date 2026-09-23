@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Fizz Live Pro'),
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: {}),
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
         ],
       ),
       body: const Center(
@@ -133,3 +133,4 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
