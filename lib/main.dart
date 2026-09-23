@@ -433,7 +433,7 @@ class OnboardingProfileScreen extends StatefulWidget {
   final String? defaultName;
   const OnboardingProfileScreen({super.key, required this.loginIdentifier, required this.loginType, this.defaultName});
   @override
-  State<OnboardingProfileScreen> createState() => _OnboardingProfileScreenState();
+  State<OnboardingProfileScreen> createState() => OnboardingProfileScreenState();
 }
 
-class _app
+class On
