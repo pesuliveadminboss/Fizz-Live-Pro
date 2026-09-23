@@ -100,7 +100,7 @@ class _MainShellState extends State<MainShell> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isStreamer ? 'Fizz Live Pro (Streamer)' : 'Fizz Live Pro (User)'),
+        title: const Text('Fizz Live Pro', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.security, color: Colors.cyanAccent),
@@ -136,3 +136,4 @@ class _MainShellState extends State<MainShell> {
     );
   }
 }
+
