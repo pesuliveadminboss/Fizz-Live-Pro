@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'models_and_state.dart';
-import 'popups_and_call.dart';
-
 class ForYouScreen extends StatefulWidget {
   const ForYouScreen({super.key});
 
@@ -10,22 +5,11 @@ class ForYouScreen extends StatefulWidget {
   State<ForYouScreen> createState() => _ForYouScreenState();
 }
 
-class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ForYouScreenState extends State<ForYouScreen> {
+  int _selectedTopIndex = 0; // 0: Hot, 1: Live, 2: Party, 3: Match
+  final List<String> _topTabs = ['Hot', 'Live', 'Party', 'Match'];
   String _selectedCountry = 'All';
   final List<String> _countries = ['All', 'India', 'America', 'Bangladesh', 'Pakistan', 'Russia', 'Africa', 'Madagascar'];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   void _openCountryFilter() {
     showModalBottomSheet(
@@ -41,8 +25,7 @@ class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderSt
             const Text('Select Country 🌎', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 8, runSpacing: 8,
               children: _countries.map((c) => ChoiceChip(
                 label: Text(c),
                 selected: _selectedCountry == c,
@@ -113,40 +96,60 @@ class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    List<StreamerItem> getFilteredList(String tabName) {
-      return kMockStreamers.where((s) {
-        if (s.isOffline) return false;
-        if (_selectedCountry != 'All' && s.country != _selectedCountry) return false;
-        if (tabName == 'live') return s.status == 'live';
-        if (tabName == 'party') return s.status == 'party';
-        return true;
-      }).toList();
-    }
+    String tabName = ['hot', 'live', 'party', 'match'][_selectedTopIndex];
+    final list = kMockStreamers.where((s) {
+      if (s.isOffline) return false;
+      if (_selectedCountry != 'All' && s.country != _selectedCountry) return false;
+      if (tabName == 'live') return s.status == 'live';
+      if (tabName == 'party') return s.status == 'party';
+      return true;
+    }).toList();
 
     return Column(
       children: [
+        // Fixed Top Row (Hot, Live, Party, Match) + search 🔍 & world 🌎 without sliding
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           color: const Color(0xFF0F0F1A),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  labelColor: const Color(0xFFE94057),
-                  unselectedLabelColor: Colors.white70,
-                  indicatorColor: const Color(0xFFE94057),
-                  tabs: const [
-                    Tab(text: 'Hot'),
-                    Tab(text: 'Live'),
-                    Tab(text: 'Party'),
-                    Tab(text: 'Match'),
-                  ],
-                ),
+              Row(
+                children: List.generate(_topTabs.length, (index) {
+                  final isSelected = _selectedTopIndex == index;
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedTopIndex = index),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _topTabs[index],
+                            style: TextStyle(
+                              color: isSelected ? const Color(0xFFE94057) : Colors.white70,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: 2,
+                            width: isSelected ? 24 : 0,
+                            color: const Color(0xFFE94057),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               ),
-              IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: _openSearchDialog),
-              IconButton(icon: const Icon(Icons.public, color: Colors.cyanAccent), onPressed: _openCountryFilter),
+              Row(
+                children: [
+                  IconButton(icon: const Icon(Icons.search, color: Colors.white, size: 20), onPressed: _openSearchDialog),
+                  IconButton(icon: const Icon(Icons.public, color: Colors.cyanAccent, size: 20), onPressed: _openCountryFilter),
+                ],
+              ),
             ],
           ),
         ),
@@ -165,17 +168,7 @@ class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderSt
               ],
             ),
           ),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildStreamerGrid(getFilteredList('hot')),
-              _buildStreamerGrid(getFilteredList('live')),
-              _buildStreamerGrid(getFilteredList('party')),
-              _buildStreamerGrid(getFilteredList('hot')),
-            ],
-          ),
-        ),
+        Expanded(child: _buildStreamerGrid(list)),
       ],
     );
   }
@@ -276,81 +269,3 @@ class _ForYouScreenState extends State<ForYouScreen> with SingleTickerProviderSt
   }
 }
 
-class FollowScreen extends StatelessWidget {
-  const FollowScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Followed Creators')));
-}
-
-class GameScreen extends StatelessWidget {
-  const GameScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Interactive Live Games 🎮')));
-}
-
-class HomeScreenContainer extends StatefulWidget {
-  const HomeScreenContainer({super.key});
-  @override
-  State<HomeScreenContainer> createState() => _HomeScreenContainerState();
-}
-
-class _HomeScreenContainerState extends State<HomeScreenContainer> {
-  bool _popupsTriggered = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_popupsTriggered) {
-      _popupsTriggered = true;
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) EntryPopupsHelper.showDailyRewardsDialog(context);
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => const ForYouScreen();
-}
-
-class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Explore Streams')));
-}
-
-class ChatListScreen extends StatelessWidget {
-  const ChatListScreen({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Messages')), body: const Center(child: Text('Chat List')));
-}
-
-class LiveStreamScreen extends StatelessWidget {
-  const LiveStreamScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(title: Text('Go Live (Streamer) • 💎 ${appState.gems}'), actions: [IconButton(icon: const Icon(Icons.card_giftcard), onPressed: () => appState.sendGift('Anitha_Live', 'Rose', 50))]),
-      body: const Center(child: Text('Live Stream Broadcaster View', style: TextStyle(color: Colors.white))),
-    );
-  }
-}
-
-class PartyRoomScreen extends StatelessWidget {
-  const PartyRoomScreen({super.key});
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Voice Party Room')), body: const Center(child: Text('8-Seat Voice Room')));
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
-      body: Center(child: Text('${appState.userName}\n${appState.userHandle}\nGems: ${appState.gems}')),
-    );
-  }
-}
