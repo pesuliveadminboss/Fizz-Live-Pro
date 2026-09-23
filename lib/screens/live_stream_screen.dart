@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 class LiveStreamScreen extends StatefulWidget {
   const LiveStreamScreen({super.key});
@@ -15,6 +16,36 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
     {'user': 'Karthik', 'msg': 'Semai performance macha! 🔥'},
     {'user': 'Anitha', 'msg': 'Gift sent 🎁'},
   ];
+  int? _viewID;
+
+  @override
+  void initState() {
+    super.initState();
+    _initZegoPreview();
+  }
+
+  Future<void> _initZegoPreview() async {
+    ZegoExpressEngine.instance.createCanvasView((viewID) {
+      if (mounted) {
+        setState(() {
+          _viewID = viewID;
+        });
+      }
+      ZegoExpressEngine.instance.startPreview(
+        canvas: ZegoCanvas(viewID, viewMode: ZegoViewMode.AspectFill),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    ZegoExpressEngine.instance.stopPreview();
+    if (_viewID != null) {
+      ZegoExpressEngine.instance.destroyCanvasView(_viewID!);
+    }
+    _msgController.dispose();
+    super.dispose();
+  }
 
   void _sendMessage() {
     if (_msgController.text.trim().isNotEmpty) {
@@ -36,18 +67,20 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF8A2387), Color(0xFFE94057), Color(0xFFF27121)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: const Center(
-              child: Icon(Icons.videocam, size: 80, color: Colors.white54),
-            ),
-          ),
+          _viewID != null
+              ? Texture(textureId: _viewID!)
+              : Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF8A2387), Color(0xFFE94057), Color(0xFFF27121)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.videocam, size: 80, color: Colors.white54),
+                  ),
+                ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
