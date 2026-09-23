@@ -3,6 +3,7 @@ import 'screens/profile_screen.dart';
 import 'screens/explore_screen.dart';
 import 'screens/chat_list_screen.dart';
 import 'screens/live_stream_screen.dart';
+import 'screens/party_room_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -130,10 +131,37 @@ class HomeScreen extends StatelessWidget {
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
         ],
       ),
-      body: const Center(
-        child: Text('Live Feed & Recommendations Home'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8A2387),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: const Icon(Icons.mic, color: Colors.white),
+              label: const Text('Join Live Voice Party Room 🎙️', style: TextStyle(fontWeight: FontWeight.bold)),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PartyRoomScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            const Text('Live Recommendations Feed', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            const Expanded(
+              child: Center(
+                child: Text('Live feed scroll & recommended creators card list here'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
