@@ -3,6 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// --- MODEL & MOCK DATA FOR STREAMERS ---
+class StreamerItem {
+  final String id;
+  final String name;
+  final String country;
+  final String flag;
+  final String status; // 'online', 'live', 'party'
+  final int age;
+  final Color color;
+  final bool isOffline;
+  StreamerItem({
+    required this.id,
+    required this.name,
+    required this.country,
+    required this.flag,
+    required this.status,
+    required this.age,
+    required this.color,
+    this.isOffline = false,
+  });
+}
+
+final List<StreamerItem> kMockStreamers = [
+  StreamerItem(id: '1', name: 'AvniHotnessDil', country: 'India', flag: '🇮🇳', status: 'online', age: 27, color: const Color(0xFFE94057)),
+  StreamerItem(id: '2', name: 'Shiny Sanya', country: 'India', flag: '🇮🇳', status: 'party', age: 25, color: const Color(0xFF8A2387)),
+  StreamerItem(id: '3', name: 'Bella_America', country: 'America', flag: '🇺🇸', status: 'live', age: 24, color: const Color(0xFF00C9FF)),
+  StreamerItem(id: '4', name: 'Riya_BD', country: 'Bangladesh', flag: '🇧🇩', status: 'online', age: 23, color: const Color(0xFF00B09B)),
+  StreamerItem(id: '5', name: 'Zara_Pak', country: 'Pakistan', flag: '🇵🇰', status: 'party', age: 26, color: const Color(0xFFFF512F)),
+  StreamerItem(id: '6', name: 'Elena_Rus', country: 'Russia', flag: '🇷🇺', status: 'live', age: 25, color: const Color(0xFF92FE9D)),
+  StreamerItem(id: '7', name: 'Asha_Afr', country: 'Africa', flag: '🌍', status: 'online', age: 24, color: const Color(0xFFF27121)),
+  StreamerItem(id: '8', name: 'Mada_Girl', country: 'Madagascar', flag: '🇲🇬', status: 'party', age: 22, color: const Color(0xFFE94057)),
+  StreamerItem(id: '9', name: 'Offline_Emma', country: 'India', flag: '🇮🇳', status: 'offline', age: 26, color: Colors.grey, isOffline: true),
+];
+
 // --- APP STATE ---
 class AppState extends ChangeNotifier {
   int _gems = 450;
@@ -24,28 +58,15 @@ class AppState extends ChangeNotifier {
 
   void claimDailyReward() {
     if (_claimedToday) return;
-    int rewardGems = 0;
-    if (_currentStreakDay == 1) rewardGems = 40;
-    else if (_currentStreakDay == 2) rewardGems = 0; // Card reward handled separately or bonus gems
-    else if (_currentStreakDay == 3) rewardGems = 50;
-    else if (_currentStreakDay == 4) rewardGems = 90;
-    else if (_currentStreakDay == 5) rewardGems = 120;
-    else if (_currentStreakDay == 6) rewardGems = 180;
-    else if (_currentStreakDay == 7) rewardGems = 200; // Gift box 200 gems as per screenshot screenshot 1 rule
-
+    int rewardGems = _currentStreakDay == 7 ? 200 : (_currentStreakDay == 2 ? 0 : [0, 40, 0, 50, 90, 120, 180, 200][_currentStreakDay]);
     if (_currentStreakDay == 2) {
       _transactions.insert(0, {'title': 'Daily Reward Day 2 (Surprise Card 🃏)', 'date': 'Today', 'amount': '+1 Card', 'isCredit': true});
     } else {
       _gems += rewardGems;
       _transactions.insert(0, {'title': 'Daily Reward Day $_currentStreakDay', 'date': 'Today', 'amount': '+$rewardGems Gems', 'isCredit': true});
     }
-
     _claimedToday = true;
-    if (_currentStreakDay < 7) {
-      _currentStreakDay++;
-    } else {
-      _currentStreakDay = 1; // cycle reset or keep completed
-    }
+    _currentStreakDay = _currentStreakDay < 7 ? _currentStreakDay + 1 : 1;
     notifyListeners();
   }
 
@@ -58,12 +79,7 @@ class AppState extends ChangeNotifier {
   bool sendGift(String receiver, String giftName, int cost) {
     if (_gems >= cost) {
       _gems -= cost;
-      _transactions.insert(0, {
-        'title': 'Sent $giftName to $receiver',
-        'date': 'Just now',
-        'amount': '-$cost Gems',
-        'isCredit': false,
-      });
+      _transactions.insert(0, {'title': 'Sent $giftName to $receiver', 'date': 'Just now', 'amount': '-$cost Gems', 'isCredit': false});
       notifyListeners();
       return true;
     }
@@ -72,12 +88,7 @@ class AppState extends ChangeNotifier {
 
   void addRecharge(int amount, String priceLabel) {
     _gems += amount;
-    _transactions.insert(0, {
-      'title': 'Recharge $amount Gems ($priceLabel)',
-      'date': 'Just now',
-      'amount': '+$amount Gems',
-      'isCredit': true,
-    });
+    _transactions.insert(0, {'title': 'Recharge $amount Gems ($priceLabel)', 'date': 'Just now', 'amount': '+$amount Gems', 'isCredit': true});
     notifyListeners();
   }
 }
@@ -158,9 +169,8 @@ class EntryPopupsHelper {
             {'day': 4, 'label': 'x 90', 'icon': Icons.diamond, 'color': Colors.amberAccent},
             {'day': 5, 'label': 'x 120', 'icon': Icons.diamond, 'color': Colors.amberAccent},
             {'day': 6, 'label': 'x 180', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 7, 'label': 'x 1 (🎁)', 'icon': Icons.card_giftcard, 'color': Colors.pinkAccent},
+            {'day': 7, 'label': 'x 1 (🎁 200)', 'icon': Icons.card_giftcard, 'color': Colors.pinkAccent},
           ];
-
           return Dialog(
             backgroundColor: const Color(0xFF1E1E2C),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -180,10 +190,7 @@ class EntryPopupsHelper {
                           Text('Sign in for 7 days to get a surprise', style: TextStyle(fontSize: 12, color: Colors.white70)),
                         ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white70),
-                        onPressed: () => Navigator.pop(ctx),
-                      ),
+                      IconButton(icon: const Icon(Icons.close, color: Colors.white70), onPressed: () => Navigator.pop(ctx)),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -191,10 +198,7 @@ class EntryPopupsHelper {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 0.85,
+                      crossAxisCount: 4, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.85,
                     ),
                     itemCount: dayRewards.length,
                     itemBuilder: (context, index) {
@@ -223,8 +227,7 @@ class EntryPopupsHelper {
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
-                    width: double.infinity,
-                    height: 48,
+                    width: double.infinity, height: 48,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF8E53)]),
@@ -235,14 +238,9 @@ class EntryPopupsHelper {
                         onPressed: () {
                           appState.claimDailyReward();
                           Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Daily reward claimed successfully! 🎁')),
-                          );
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Daily reward claimed successfully! 🎁')));
                         },
-                        child: Text(
-                          appState.claimedToday ? 'Claimed Today ✓' : 'Check-in',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
+                        child: Text(appState.claimedToday ? 'Claimed Today ✓' : 'Check-in', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                   ),
@@ -284,8 +282,7 @@ class EntryPopupsHelper {
             _buildAuthItem(Icons.notifications_none, 'Notification', Colors.purpleAccent),
             const SizedBox(height: 24),
             SizedBox(
-              width: double.infinity,
-              height: 48,
+              width: double.infinity, height: 48,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]),
@@ -295,9 +292,7 @@ class EntryPopupsHelper {
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All permissions allowed (Camera, Phone, Mic, Notification) ✓')),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All permissions allowed (Camera, Phone, Mic, Notification) ✓')));
                   },
                   child: const Text('Allow all', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
@@ -312,18 +307,8 @@ class EntryPopupsHelper {
   static Widget _buildAuthItem(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF151522),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 14),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
-        ],
-      ),
+      decoration: BoxDecoration(color: const Color(0xFF151522), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white10)),
+      child: Row(children: [Icon(icon, color: color, size: 20), const SizedBox(width: 14), Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500))]),
     );
   }
 
@@ -340,33 +325,18 @@ class EntryPopupsHelper {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Top banner representation matching screenshot 3 phone icon badge
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF416C)]),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                width: double.infinity, padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF416C)]), borderRadius: BorderRadius.circular(16)),
                 child: Column(
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const CircleAvatar(radius: 28, backgroundColor: Colors.green, child: Icon(Icons.phone, color: Colors.white, size: 28)),
-                      ],
-                    ),
+                    const CircleAvatar(radius: 28, backgroundColor: Colors.green, child: Icon(Icons.phone, color: Colors.white, size: 28)),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Users call reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                        Switch(
-                          value: callReminderOn,
-                          activeColor: Colors.white,
-                          activeTrackColor: Colors.green,
-                          onChanged: (val) => setStateModal(() => callReminderOn = val),
-                        ),
+                        Switch(value: callReminderOn, activeColor: Colors.white, activeTrackColor: Colors.green, onChanged: (val) => setStateModal(() => callReminderOn = val)),
                       ],
                     ),
                   ],
@@ -375,38 +345,17 @@ class EntryPopupsHelper {
               const SizedBox(height: 16),
               const Text('Turn on the call reminder and don\'t miss any call from users', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white70)),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Icon(Icons.star_outline, color: Colors.amberAccent, size: 20),
-                  const SizedBox(width: 10),
-                  const Text('Received evaluation', style: TextStyle(color: Colors.white, fontSize: 14)),
-                ],
-              ),
+              const Row(children: [Icon(Icons.star_outline, color: Colors.amberAccent, size: 20), SizedBox(width: 10), Text('Received evaluation', style: TextStyle(color: Colors.white, fontSize: 14))]),
               const SizedBox(height: 14),
-              Row(
-                children: [
-                  const Icon(Icons.notifications_active_outlined, color: Colors.pinkAccent, size: 20),
-                  const SizedBox(width: 10),
-                  const Text('New message', style: TextStyle(color: Colors.white, fontSize: 14)),
-                ],
-              ),
+              const Row(children: [Icon(Icons.notifications_active_outlined, color: Colors.pinkAccent, size: 20), SizedBox(width: 10), Text('New message', style: TextStyle(color: Colors.white, fontSize: 14))]),
               const SizedBox(height: 24),
               SizedBox(
-                width: double.infinity,
-                height: 48,
+                width: double.infinity, height: 48,
                 child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                  decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]), borderRadius: BorderRadius.circular(24)),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Notifications & Call reminder turned on! 🔔')),
-                      );
-                    },
+                    onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notifications & Call reminder turned on! 🔔'))); },
                     child: const Text('Turn on notifications', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 ),
@@ -419,6 +368,64 @@ class EntryPopupsHelper {
   }
 }
 
+// --- VIDEO CALL 1-TO-1 MODAL / DIALOG ---
+void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
+  showDialog(
+    context: context,
+    builder: (ctx) => Dialog(
+      backgroundColor: Colors.black,
+      insetPadding: EdgeInsets.zero,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            color: streamer.color.withOpacity(0.3),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(radius: 50, backgroundColor: streamer.color, child: Text(streamer.name[0], style: const TextStyle(fontSize: 40, color: Colors.white))),
+                  const SizedBox(height: 16),
+                  Text('1-to-1 Video Call with ${streamer.name}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('${streamer.flag} ${streamer.country} • Age ${streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 24),
+                  const Text('Connecting secure audio/video channel...', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  backgroundColor: Colors.red,
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Video call ended')));
+                  },
+                  child: const Icon(Icons.call_end, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 40,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(ctx),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 // --- ONBOARDING PROFILE SCREEN ---
 class OnboardingProfileScreen extends StatefulWidget {
   final String loginIdentifier;
@@ -426,47 +433,4 @@ class OnboardingProfileScreen extends StatefulWidget {
   final String? defaultName;
   const OnboardingProfileScreen({super.key, required this.loginIdentifier, required this.loginType, this.defaultName});
   @override
-  State<OnboardingProfileScreen> createState() => _OnboardingProfileScreenState();
-}
-class _OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
-  late TextEditingController _nameController;
-  String _selectedGender = 'Female';
-  String _selectedDob = '10/10/2000';
-  String _selectedCountry = 'India';
-  bool _agreed18Plus = false;
-  final List<String> _countries = ['India', 'USA', 'UAE', 'Singapore', 'UK'];
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.defaultName ?? '');
-  }
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1A),
-      appBar: AppBar(title: const Text('Complete Your Profile')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Center(
-              child: CircleAvatar(radius: 46, backgroundColor: Color(0xFFE94057), child: Icon(Icons.camera_alt, size: 32, color: Colors.white)),
-            ),
-            const SizedBox(height: 24),
-            TextField(controller: _nameController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Profile Name', border: OutlineInputBorder())),
-            const SizedBox(height: 16),
-            const Text('Gender (Women = Streamer/Go-Live, Men = User)', style: TextStyle(color: Colors.white70)),
-            Row(
-              children: [
-                Expanded(child: RadioListTile<String>(title: const Text('Female'), value: 'Female', groupValue: _selectedGender, activeColor: const Color(0xFFE94057), onChanged: (val) => setState(() => _selectedGender = val!))),
-                Expanded(child: RadioListTile<String>(title: const Text('Male'), value: 'Male', groupValue: _selectedGender, activeColor: const Color(0xFFE94057), onChanged: (val) => setState(() => _selectedGender = val!))),
-              ],
-            ),
-            TextField(controller: TextEditingCont
+ 
