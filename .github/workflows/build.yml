@@ -19,8 +19,6 @@ jobs:
           mkdir -p android
           cp -r temp_app/android/* android/
           rm -rf temp_app
-          
-          # Add permissions to AndroidManifest.xml safely
           cat << 'EOF' > patch_manifest.py
           import os
           manifest_path = 'android/app/src/main/AndroidManifest.xml'
