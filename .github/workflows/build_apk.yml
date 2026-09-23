@@ -25,12 +25,14 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Fix Package Name for Dart Rules
+      - name: Fix Package Name & Regenerate Android v2 Scaffold
         run: |
           sed -i 's/Fizz-Live-Pro/fizz_live_pro/g' pubspec.yaml || true
+          flutter create --platforms=android --org com.example --project-name fizz_live_pro .
 
-      - name: Clean & Pub Get
+      - name: Clean Build Cache & Pub Get
         run: |
+          rm -rf android/.gradle build
           flutter clean
           flutter pub get
 
