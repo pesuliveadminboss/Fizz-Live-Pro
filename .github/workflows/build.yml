@@ -13,46 +13,33 @@ jobs:
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-      - name: Generate Android scaffold safely & inject v2 embedding
+      - name: Generate and copy Android scaffold properly
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
-          cp -r temp_app/android ./android
+          mkdir -p android
+          cp -r temp_app/android/* android/
           rm -rf temp_app
           
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          # Add permissions to AndroidManifest.xml safely
           cat << 'EOF' > patch_manifest.py
-          with open('android/app/src/main/AndroidManifest.xml', 'r') as f:
-              content = f.read()
-          
-          perms = '''
+          import os
+          manifest_path = 'android/app/src/main/AndroidManifest.xml'
+          if os.path.exists(manifest_path):
+              with open(manifest_path, 'r') as f:
+                  content = f.read()
+              perms = '''
           <uses-permission android:name="android.permission.INTERNET"/>
           <uses-permission android:name="android.permission.CAMERA"/>
           <uses-permission android:name="android.permission.RECORD_AUDIO"/>
           <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
-          
-          meta_v2 = '<meta-data android:name="flutterEmbedding" android:value="2" />'
-          
-          if '<application' in content and 'INTERNET' not in content:
-              content = content.replace('<application', perms + '<application')
-          
-          if meta_v2 not in content:
-              content = content.replace('<application', '<application>\n        ' + meta_v2)
-          
-          with open('android/app/src/main/AndroidManifest.xml', 'w') as f:
-              f.write(content)
+              if '<application' in content and 'INTERNET' not in content:
+                  content = content.replace('<application', perms + '<application')
+              with open(manifest_path, 'w') as f:
+                  f.write(content)
           EOF
           python3 patch_manifest.py
-          
-          # Kotlin MainActivity v2 embedding setup
-          KT_DIR="android/app/src/main/kotlin/com/example/fizz_live_pro"
-          mkdir -p $KT_DIR
-          cat << 'EOF' > $KT_DIR/MainActivity.kt
-          package com.example.fizz_live_pro
-          import io.flutter.embedding.android.FlutterActivity
-          class MainActivity: FlutterActivity()
-          EOF
       - run: flutter pub get
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
