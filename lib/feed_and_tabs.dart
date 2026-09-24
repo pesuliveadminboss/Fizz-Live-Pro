@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models_and_state.dart';
 import 'popups_and_call.dart';
+import 'streamer_profile_screen.dart';
 
 class ForYouScreen extends StatefulWidget {
   const ForYouScreen({super.key});
@@ -85,6 +86,10 @@ class _ForYouScreenState extends State<ForYouScreen> {
                                 showVideoCall1to1Dialog(context, item);
                               },
                             ),
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: item)));
+                            },
                           );
                         },
                       ),
@@ -199,72 +204,80 @@ class _ForYouScreenState extends State<ForYouScreen> {
           statusText = 'Party';
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: const Color(0xFF1E1E2C),
-            border: Border.all(color: Colors.white12),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  color: streamer.color.withOpacity(0.4),
-                  child: Center(
-                    child: Text(streamer.name[0], style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white24)),
-                  ),
-                ),
-                Positioned(
-                  top: 8, left: 8,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(10)),
-                        child: Text(statusText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(streamer.flag, style: const TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 0, left: 0, right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
-                        begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                      ),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: streamer)),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xFF1E1E2C),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    color: streamer.color.withOpacity(0.4),
+                    child: Center(
+                      child: Text(streamer.name[0], style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white24)),
                     ),
+                  ),
+                  Positioned(
+                    top: 8, left: 8,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(streamer.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
-                              Text('${streamer.country} • ${streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 10)),
-                            ],
-                          ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(10)),
+                          child: Text(statusText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
                         ),
-                        GestureDetector(
-                          onTap: () => showVideoCall1to1Dialog(context, streamer),
-                          child: Container(
-                            width: 34, height: 34,
-                            decoration: const BoxDecoration(color: Color(0xFFE94057), shape: BoxShape.circle),
-                            child: const Icon(Icons.videocam, color: Colors.white, size: 18),
-                          ),
-                        ),
+                        const SizedBox(width: 4),
+                        Text(streamer.flag, style: const TextStyle(fontSize: 14)),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: 0, left: 0, right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
+                          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(streamer.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
+                                Text('${streamer.country} • ${streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => showVideoCall1to1Dialog(context, streamer),
+                            child: Container(
+                              width: 34, height: 34,
+                              decoration: const BoxDecoration(color: Color(0xFFE94057), shape: BoxShape.circle),
+                              child: const Icon(Icons.videocam, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -351,4 +364,3 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
-
