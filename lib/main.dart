@@ -1,5 +1,3 @@
-// Replace the IntegratedForYouScreen class inside main.dart with this code:
-
 class IntegratedForYouScreen extends StatefulWidget {
   const IntegratedForYouScreen({super.key});
 
@@ -40,7 +38,6 @@ class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> with Si
           childContent: Stack(
             fit: StackFit.expand,
             children: [
-              // Top Synced Heart / Follow Controller
               Positioned(
                 top: 90,
                 left: 16,
@@ -48,8 +45,6 @@ class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> with Si
                   onFollowStateChanged: () {},
                 ),
               ),
-
-              // Viewer count & Video call actions
               Positioned(
                 top: 90,
                 right: 16,
@@ -107,8 +102,6 @@ class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> with Si
                   },
                 ),
               ),
-
-              // Live Chat & Warning Banner at bottom left
               const Positioned(
                 bottom: 20,
                 left: 16,
@@ -152,7 +145,6 @@ class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> with Si
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 1. Hot Tab (Contains Pretty, New, Sexy cards & Live Row Grid)
           SingleChildScrollView(
             padding: const EdgeInsets.all(12),
             child: Column(
@@ -181,15 +173,11 @@ class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> with Si
               ],
             ),
           ),
-          // 2. Live Tab
           const Center(child: Text('Live Streamers Feed', style: TextStyle(color: Colors.white70))),
-          // 3. Party Tab
           const Center(child: Text('Party Rooms Feed', style: TextStyle(color: Colors.white70))),
-          // 4. Match Tab
           const Center(child: Text('Match & Connect Feed', style: TextStyle(color: Colors.white70))),
         ],
       ),
     );
   }
 }
-
