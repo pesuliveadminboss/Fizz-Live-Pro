@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'main.dart';
+import 'core_data.dart';
 
 class EntryPopupsHelper {
   static void showDailyRewardsDialog(BuildContext context) {
@@ -384,5 +384,4 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showGoogleAccountPicker(BuildContext context) {
     showModalBottomSheet(
-      context: context,
- 
+      context: conte
