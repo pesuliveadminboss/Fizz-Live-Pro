@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models_and_state.dart';
-import 'popups_and_call.dart';
+import 'core_data.dart';
+import 'auth_and_popups.dart';
 
 class StreamerProfileScreen extends StatefulWidget {
   final StreamerItem streamer;
@@ -136,12 +136,12 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (isBanned) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: Colors.black,
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: const Text('Account Restricted / Customer Met 1 Month Ban due to reports.', textAlign: TextAlign.center, style: TextStyle(color: Colors.redAccent, fontSize: 18, fontWeight: FontWeight.bold)),
+            padding: EdgeInsets.all(24.0),
+            child: Text('Account Restricted / Customer Met 1 Month Ban due to reports.', textAlign: TextAlign.center, style: TextStyle(color: Colors.redAccent, fontSize: 18, fontWeight: FontWeight.bold)),
           ),
         ),
       );
@@ -155,7 +155,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Big Profile Photo Section
                 Container(
                   height: 380,
                   width: double.infinity,
@@ -194,7 +193,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                                 ),
                               ],
                             ),
-                            // Pink / Black Heart Follow Button with 2s Popup
                             GestureDetector(
                               onTap: () {
                                 setState(() => isFollowing = !isFollowing);
@@ -222,7 +220,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Status & Age
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -238,7 +235,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Introduction Box
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -260,7 +256,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Speaking Language
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -279,7 +274,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
               ],
             ),
           ),
-          // Top Back & Options Navigation
           Positioned(
             top: 40,
             left: 16,
@@ -298,7 +292,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
               ],
             ),
           ),
-          // Bottom Action Bar: Message + Video Call Button (1 min = 1800 gems)
           Positioned(
             bottom: 0,
             left: 0,
@@ -352,3 +345,4 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
     );
   }
 }
+
