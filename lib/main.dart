@@ -6,6 +6,16 @@ import 'login_screen.dart';
 import 'popups_and_dialogs.dart';
 import 'feed_and_tabs.dart';
 
+// Import our 8 New Modular Files
+import 'live_stream_model_and_filters.dart';
+import 'live_row_grid_widget.dart';
+import 'category_filter_cards_widget.dart';
+import 'live_room_main_screen.dart';
+import 'synced_hearts_and_follow_controller.dart';
+import 'pip_floating_window_manager.dart';
+import 'live_chat_and_warning_banner.dart';
+import 'viewer_list_and_video_call_actions.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -62,7 +72,7 @@ class _MainShellState extends State<MainShell> {
     final isStreamer = authCtrl.isStreamer;
 
     final List<Widget> maleScreens = [
-      const HomeScreenContainer(),
+      const IntegratedForYouScreen(),
       const FollowScreen(),
       const GameScreen(),
       const ChatListScreen(),
@@ -70,7 +80,7 @@ class _MainShellState extends State<MainShell> {
     ];
 
     final List<Widget> femaleScreens = [
-      const HomeScreenContainer(),
+      const IntegratedForYouScreen(),
       const FollowScreen(),
       const LiveStreamScreen(),
       const GameScreen(),
@@ -138,6 +148,160 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
+// Integrated For You Screen using our New Modules & Filters
+class IntegratedForYouScreen extends StatefulWidget {
+  const IntegratedForYouScreen({super.key});
+
+  @override
+  State<IntegratedForYouScreen> createState() => _IntegratedForYouScreenState();
+}
+
+class _IntegratedForYouScreenState extends State<IntegratedForYouScreen> {
+  StreamerCategory? _selectedCategory;
+
+  void _openLiveRoom(CategoryStreamerItem streamer) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LiveRoomMainScreen(
+          streamerName: streamer.name,
+          streamerId: streamer.id,
+          streamerCountry: streamer.country,
+          onClosePressed: () => Navigator.pop(context),
+          onProfilePressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Opening Profile for ${streamer.name}')),
+            );
+          },
+          childContent: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Top Synced Heart / Follow Controller
+              Positioned(
+                top: 90,
+                left: 16,
+                child: SyncedHeartsAndFollowController(
+                  onFollowStateChanged: () {
+                    // Sync action handled inside controller
+                  },
+                ),
+              ),
+
+              // Viewer count & Video call actions
+              Positioned(
+                top: 90,
+                right: 16,
+                child: ViewerListAndVideoCallActions(
+                  viewersCount: streamer.viewersCount,
+                  onViewersListTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.grey[900],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (ctx) => Container(
+                        padding: const EdgeInsets.all(16),
+                        height: 250,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Active Viewers', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            const Divider(color: Colors.white24),
+                            Expanded(
+                              child: ListView(
+                                children: [
+                                  ListTile(
+                                    leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Text('U1')),
+                                    title: const Text('Viewer_Alex'),
+                                    subtitle: const Text('@alex_99'),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                                    onTap: () => Navigator.pop(ctx),
+                                  ),
+                                  ListTile(
+                                    leading: const CircleAvatar(backgroundColor: Colors.purpleAccent, child: Text('U2')),
+                                    title: const Text('Viewer_Priya'),
+                                    subtitle: const Text('@priya_live'),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                                    onTap: () => Navigator.pop(ctx),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  onGiftTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Gift sent successfully! 🎁')),
+                    );
+                  },
+                  onVideoCallTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Connecting 1-to-1 Video Call... 📞')),
+                    );
+                  },
+                ),
+              ),
+
+              // Live Chat & Warning Banner at bottom left
+              const Positioned(
+                bottom: 20,
+                left: 16,
+                right: 16,
+                child: LiveChatAndWarningBanner(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allStreamers = LiveStreamFilterManager.getMockCategoryStreamers();
+    final displayedStreamers = _selectedCategory == null
+        ? allStreamers
+        : LiveStreamFilterManager.filterByCategory(allStreamers, _selectedCategory!);
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Fixed Pretty, New, Sexy Category Filter Cards
+            CategoryFilterCardsWidget(
+              selectedCategory: _selectedCategory,
+              onCategorySelected: (category) {
+                setState(() {
+                  _selectedCategory = category;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Live Streamers',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            // Live Stream Grid View linked to our Live Room Screen
+            LiveRowGridWidget(
+              streamers: displayedStreamers,
+              onStreamerTap: (streamer) {
+                _openLiveRoom(streamer);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class FollowScreen extends StatelessWidget {
   const FollowScreen({super.key});
   @override
@@ -148,30 +312,6 @@ class GameScreen extends StatelessWidget {
   const GameScreen({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Interactive Live Games 🎮')));
-}
-
-class HomeScreenContainer extends StatefulWidget {
-  const HomeScreenContainer({super.key});
-  @override
-  State<HomeScreenContainer> createState() => _HomeScreenContainerState();
-}
-
-class _HomeScreenContainerState extends State<HomeScreenContainer> {
-  bool _popupsTriggered = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_popupsTriggered) {
-      _popupsTriggered = true;
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) EntryPopupsHelper.showDailyRewardsDialog(context);
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => const ForYouScreen();
 }
 
 class ChatListScreen extends StatelessWidget {
@@ -204,3 +344,4 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
