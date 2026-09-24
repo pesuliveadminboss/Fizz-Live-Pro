@@ -19,7 +19,6 @@ class PipFloatingWindowManager extends StatefulWidget {
 class _PipFloatingWindowManagerState extends State<PipFloatingWindowManager> {
   Offset _position = const Offset(20, 100);
 
-  @app_update_note('Draggable PiP Controller')
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -92,7 +91,3 @@ class _PipFloatingWindowManagerState extends State<PipFloatingWindowManager> {
   }
 }
 
-class _app_update_note {
-  final String note;
-  const _app_update_note(this.note);
-}
