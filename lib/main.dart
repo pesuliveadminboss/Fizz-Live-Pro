@@ -4,7 +4,6 @@ import 'models_and_state.dart';
 import 'popups_and_call.dart';
 import 'auth_and_onboard.dart';
 import 'feed_and_tabs.dart';
-import 'popups_and_call.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
