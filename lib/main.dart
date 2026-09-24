@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'streamer_profile_screen.dart';
+import 'auth_and_popups.dart';
 
 class StreamerItem {
   final String id;
@@ -146,148 +147,43 @@ class AuthController extends ChangeNotifier {
   }
 }
 
-class EntryPopupsHelper {
-  static void showDailyRewardsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Consumer<AppState>(
-        builder: (context, appState, child) {
-          final dayRewards = [
-            {'day': 1, 'label': 'x 40', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 2, 'label': 'x 1', 'icon': Icons.credit_card, 'color': Colors.orangeAccent},
-            {'day': 3, 'label': 'x 50', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 4, 'label': 'x 90', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 5, 'label': 'x 120', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 6, 'label': 'x 180', 'icon': Icons.diamond, 'color': Colors.amberAccent},
-            {'day': 7, 'label': 'x 1 (🎁 200)', 'icon': Icons.card_giftcard, 'color': Colors.pinkAccent},
-          ];
-          return Dialog(
-            backgroundColor: const Color(0xFF1E1E2C),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Daily rewards', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white)),
-                          SizedBox(height: 2),
-                          Text('Sign in for 7 days to get a surprise', style: TextStyle(fontSize: 11, color: Colors.white70)),
-                        ],
-                      ),
-                      IconButton(icon: const Icon(Icons.close, color: Colors.white70, size: 20), onPressed: () => Navigator.pop(ctx)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 0.82,
-                    ),
-                    itemCount: dayRewards.length,
-                    itemBuilder: (context, index) {
-                      final item = dayRewards[index];
-                      final dayNum = item['day'] as int;
-                      final isSelected = dayNum == appState.currentStreakDay;
-                      return Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFE94057).withOpacity(0.25) : const Color(0xFF151522),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: isSelected ? const Color(0xFFE94057) : Colors.white10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('day $dayNum', style: const TextStyle(fontSize: 9, color: Colors.white60)),
-                            const Spacer(),
-                            Icon(item['icon'] as IconData, size: 20, color: item['color'] as Color),
-                            const Spacer(),
-                            Text(item['label'] as String, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity, height: 44,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF8E53)]),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                        onPressed: () {
-                          appState.claimDailyReward();
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Daily reward claimed successfully! 🎁')));
-                        },
-                        child: Text(appState.claimedToday ? 'Claimed Today ✓' : 'Check-in', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+class ForYouScreen extends StatefulWidget {
+  const ForYouScreen({super.key});
 
-  static void showAuthorizationSettingsDialog(BuildContext context) {
-    showDialog(
+  @override
+  State<ForYouScreen> createState() => _ForYouScreenState();
+}
+
+class _ForYouScreenState extends State<ForYouScreen> {
+  int _selectedTopIndex = 0;
+  final List<String> _topTabs = ['Hot', 'Live', 'Party', 'Match'];
+  String _selectedCountry = 'All';
+  final List<String> _countries = ['All', 'India', 'America', 'Bangladesh', 'Pakistan', 'Russia', 'Africa', 'Madagascar'];
+
+  void _openCountryFilter() {
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: true,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2C),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
+      backgroundColor: const Color(0xFF1E1E2C),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(icon: const Icon(Icons.close, color: Colors.white54, size: 20), onPressed: () => Navigator.pop(ctx)),
-              ],
-            ),
-            const Text('Authorization Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 8),
-            const Text('Please open authorization setting for better experience', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white70)),
-            const SizedBox(height: 20),
-            _buildAuthItem(Icons.camera_alt_outlined, 'Camera', Colors.pinkAccent),
-            const SizedBox(height: 10),
-            _buildAuthItem(Icons.phone_outlined, 'Phone', Colors.orangeAccent),
-            const SizedBox(height: 10),
-            _buildAuthItem(Icons.mic_none, 'Microphone', Colors.redAccent),
-            const SizedBox(height: 10),
-            _buildAuthItem(Icons.notifications_none, 'Notification', Colors.purpleAccent),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity, height: 48,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All permissions allowed (Camera, Phone, Mic, Notification) ✓')));
-                  },
-                  child: const Text('Allow all', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                ),
-              ),
+            const Text('Select Country 🌎', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8, runSpacing: 8,
+              children: _countries.map((c) => ChoiceChip(
+                label: Text(c),
+                selected: _selectedCountry == c,
+                selectedColor: const Color(0xFFE94057),
+                onSelected: (val) {
+                  setState(() => _selectedCountry = c);
+                  Navigator.pop(ctx);
+                },
+              )).toList(),
             ),
           ],
         ),
@@ -295,139 +191,332 @@ class EntryPopupsHelper {
     );
   }
 
-  static Widget _buildAuthItem(IconData icon, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(color: const Color(0xFF151522), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white10)),
-      child: Row(children: [Icon(icon, color: color, size: 20), const SizedBox(width: 14), Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500))]),
-    );
-  }
-
-  static void showCallReminderDialog(BuildContext context) {
-    bool callReminderOn = true;
+  void _openSearchDialog() {
     showDialog(
       context: context,
-      barrierDismissible: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setStateModal) => AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2C),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          contentPadding: const EdgeInsets.all(20),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: double.infinity, padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF416C)]), borderRadius: BorderRadius.circular(16)),
+      builder: (ctx) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final results = kMockStreamers.where((s) => !s.isOffline && s.name.toLowerCase().contains(query.toLowerCase())).toList();
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1E1E2C),
+              title: const Text('Search Streamers 🔍'),
+              content: SizedBox(
+                width: 300,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircleAvatar(radius: 28, backgroundColor: Colors.green, child: Icon(Icons.phone, color: Colors.white, size: 28)),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Users call reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                        Switch(value: callReminderOn, activeColor: Colors.white, activeTrackColor: Colors.green, onChanged: (val) => setStateModal(() => callReminderOn = val)),
-                      ],
+                    TextField(
+                      decoration: const InputDecoration(hintText: 'Type favorite streamer name...'),
+                      onChanged: (val) => setModalState(() => query = val),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        itemCount: results.length,
+                        itemBuilder: (context, index) {
+                          final item = results[index];
+                          return ListTile(
+                            leading: CircleAvatar(backgroundColor: item.color, child: Text(item.name[0])),
+                            title: Text(item.name),
+                            subtitle: Text('${item.flag} ${item.country}'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.video_call, color: Color(0xFFE94057)),
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                showVideoCall1to1Dialog(context, item);
+                              },
+                            ),
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: item)));
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text('Turn on the call reminder and don\'t miss any call from users', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.white70)),
-              const SizedBox(height: 20),
-              const Row(children: [Icon(Icons.star_outline, color: Colors.amberAccent, size: 20), SizedBox(width: 10), Text('Received evaluation', style: TextStyle(color: Colors.white, fontSize: 14))]),
-              const SizedBox(height: 14),
-              const Row(children: [Icon(Icons.notifications_active_outlined, color: Colors.pinkAccent, size: 20), SizedBox(width: 10), Text('New message', style: TextStyle(color: Colors.white, fontSize: 14))]),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity, height: 48,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFE94057), Color(0xFFFF6B8B)]), borderRadius: BorderRadius.circular(24)),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                    onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notifications & Call reminder turned on! 🔔'))); },
-                    child: const Text('Turn on notifications', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  ),
-                ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String tabName = ['hot', 'live', 'party', 'match'][_selectedTopIndex];
+    final list = kMockStreamers.where((s) {
+      if (s.isOffline) return false;
+      if (_selectedCountry != 'All' && s.country != _selectedCountry) return false;
+      if (tabName == 'live') return s.status == 'live';
+      if (tabName == 'party') return s.status == 'party';
+      return true;
+    }).toList();
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          color: const Color(0xFF0F0F1A),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: List.generate(_topTabs.length, (index) {
+                  final isSelected = _selectedTopIndex == index;
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedTopIndex = index),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _topTabs[index],
+                            style: TextStyle(
+                              color: isSelected ? const Color(0xFFE94057) : Colors.white70,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: 2,
+                            width: isSelected ? 24 : 0,
+                            color: const Color(0xFFE94057),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              Row(
+                children: [
+                  IconButton(icon: const Icon(Icons.search, color: Colors.white, size: 20), onPressed: _openSearchDialog),
+                  IconButton(icon: const Icon(Icons.public, color: Colors.cyanAccent, size: 20), onPressed: _openCountryFilter),
+                ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-void showVideoCall1to1Dialog(BuildContext context, StreamerItem streamer) {
-  showDialog(
-    context: context,
-    builder: (ctx) => Dialog(
-      backgroundColor: Colors.black,
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
+        if (_selectedCountry != 'All')
           Container(
-            color: streamer.color.withOpacity(0.3),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(radius: 50, backgroundColor: streamer.color, child: Text(streamer.name[0], style: const TextStyle(fontSize: 40, color: Colors.white))),
-                  const SizedBox(height: 16),
-                  Text('1-to-1 Video Call with ${streamer.name}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('${streamer.flag} ${streamer.country} • Age ${streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                  const SizedBox(height: 24),
-                  const Text('Connecting secure ZegoCloud channel...', style: TextStyle(color: Colors.greenAccent, fontSize: 12)),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 40, left: 0, right: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            color: const Color(0xFF1E1E2C),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.red,
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Video call ended')));
-                  },
-                  child: const Icon(Icons.call_end, color: Colors.white),
+                Text('Filtered by: 🌎 $_selectedCountry', style: const TextStyle(fontSize: 12, color: Colors.cyanAccent)),
+                TextButton(
+                  onPressed: () => setState(() => _selectedCountry = 'All'),
+                  child: const Text('Reset', style: TextStyle(fontSize: 12, color: Colors.white70)),
                 ),
               ],
             ),
           ),
-          Positioned(
-            top: 40, right: 20,
-            child: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(ctx)),
-          ),
-        ],
+        Expanded(child: _buildStreamerGrid(list)),
+      ],
+    );
+  }
+
+  Widget _buildStreamerGrid(List<StreamerItem> list) {
+    if (list.isEmpty) {
+      return const Center(child: Text('No active streamers found in this selection'));
+    }
+    return GridView.builder(
+      padding: const EdgeInsets.all(10),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.78,
       ),
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        final streamer = list[index];
+        Color statusBg = Colors.green;
+        String statusText = 'Online';
+        if (streamer.status == 'live') {
+          statusBg = const Color(0xFFE94057);
+          statusText = 'Live';
+        } else if (streamer.status == 'party') {
+          statusBg = Colors.blueAccent;
+          statusText = 'Party';
+        }
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: streamer)),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xFF1E1E2C),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    color: streamer.color.withOpacity(0.4),
+                    child: Center(
+                      child: Text(streamer.name[0], style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white24)),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8, left: 8,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(10)),
+                          child: Text(statusText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(streamer.flag, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0, left: 0, right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
+                          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(streamer.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
+                                Text('${streamer.country} • ${streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => showVideoCall1to1Dialog(context, streamer),
+                            child: Container(
+                              width: 34, height: 34,
+                              decoration: const BoxDecoration(color: Color(0xFFE94057), shape: BoxShape.circle),
+                              child: const Icon(Icons.videocam, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class FollowScreen extends StatelessWidget {
+  const FollowScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Followed Creators')));
+}
+
+class GameScreen extends StatelessWidget {
+  const GameScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Interactive Live Games 🎮')));
+}
+
+class HomeScreenContainer extends StatefulWidget {
+  const HomeScreenContainer({super.key});
+  @override
+  State<HomeScreenContainer> createState() => _HomeScreenContainerState();
+}
+
+class _HomeScreenContainerState extends State<HomeScreenContainer> {
+  bool _popupsTriggered = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_popupsTriggered) {
+      _popupsTriggered = true;
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) EntryPopupsHelper.showDailyRewardsDialog(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const ForYouScreen();
+}
+
+class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
+  @override
+  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Messages')), body: const Center(child: Text('Chat List')));
+}
+
+class LiveStreamScreen extends StatelessWidget {
+  const LiveStreamScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(title: Text('Go Live (Streamer) • 💎 ${appState.gems}'), actions: [IconButton(icon: const Icon(Icons.card_giftcard), onPressed: () => appState.sendGift('Anitha_Live', 'Rose', 50))]),
+      body: const Center(child: Text('Live Stream Broadcaster View', style: TextStyle(color: Colors.white))),
+    );
+  }
+}
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Profile')),
+      body: Center(child: Text('${appState.userName}\n${appState.userHandle}\nGems: ${appState.gems}')),
+    );
+  }
+}
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
+      ],
+      child: const FizzLiveProApp(),
     ),
   );
 }
 
-class OnboardingProfileScreen extends StatefulWidget {
-  final String loginIdentifier;
-  final String loginType;
-  final String? defaultName;
-  const OnboardingProfileScreen({super.key, required this.loginIdentifier, required this.loginType, this.defaultName});
-  @override
-  State<OnboardingProfileScreen> createState() => OnboardingProfileScreenState();
-}
-
-class OnboardingProfileScreenState extends State<OnboardingProfileScreen> {
-  late TextEditingController _nameController;
-  final TextEditingController _dobController = TextEditingController(text: '10/10/2000');
-  String _selectedGender = 'Female';
-  String _selectedCountry = 'India';
-  bool _agreed18Plus = false;
-  final List<String> _countries = ['India', 'USA', 'UAE', 'Singapore', 'UK'];
+class FizzLiveProApp extends StatelessWidget {
+  const FizzLiveProApp({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Fizz Live Pro',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: const Color(0x
