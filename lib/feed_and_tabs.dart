@@ -3,6 +3,14 @@ import 'core_data.dart';
 import 'streamer_profile_screen.dart';
 import 'zego_video_call.dart';
 
+// Import our 8 New Modular Files features
+import 'live_stream_model_and_filters.dart';
+import 'category_filter_cards_widget.dart';
+import 'live_room_main_screen.dart';
+import 'synced_hearts_and_follow_controller.dart';
+import 'live_chat_and_warning_banner.dart';
+import 'viewer_list_and_video_call_actions.dart';
+
 class ForYouScreen extends StatefulWidget {
   const ForYouScreen({super.key});
 
@@ -14,6 +22,8 @@ class _ForYouScreenState extends State<ForYouScreen> {
   int _selectedTopIndex = 0;
   final List<String> _topTabs = ['Hot', 'Live', 'Party', 'Match'];
   String _selectedCountry = 'All';
+  StreamerCategory? _selectedCategory; // New filter category (Pretty, New, Sexy)
+  
   final List<String> _countries = ['All', 'India', 'America', 'Bangladesh', 'Pakistan', 'Russia', 'Africa', 'Madagascar'];
 
   void _openCountryFilter() {
@@ -103,9 +113,106 @@ class _ForYouScreenState extends State<ForYouScreen> {
     );
   }
 
+  // Open the full immersive Live Room with all new features (Synced hearts, chat, PiP, viewer list)
+  void _openCustomLiveRoom(StreamerItem streamer) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LiveRoomMainScreen(
+          streamerName: streamer.name,
+          streamerId: streamer.id,
+          streamerCountry: streamer.country,
+          onClosePressed: () => Navigator.pop(context),
+          onProfilePressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: streamer)));
+          },
+          childContent: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Top Synced Heart & Follow Controller
+              Positioned(
+                top: 90,
+                left: 16,
+                child: SyncedHeartsAndFollowController(
+                  onFollowStateChanged: () {},
+                ),
+              ),
+
+              // Viewer count & 1-to-1 Video Call Action Bar
+              Positioned(
+                top: 90,
+                right: 16,
+                child: ViewerListAndVideoCallActions(
+                  viewersCount: streamer.age * 120, // dynamic view count based on streamer
+                  onViewersListTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.grey[900],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (ctx) => Container(
+                        padding: const EdgeInsets.all(16),
+                        height: 250,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Active Viewers 👥', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            const Divider(color: Colors.white24),
+                            Expanded(
+                              child: ListView(
+                                children: [
+                                  ListTile(
+                                    leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Text('U1')),
+                                    title: const Text('Viewer_Alex'),
+                                    subtitle: const Text('@alex_99'),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                                    onTap: () => Navigator.pop(ctx),
+                                  ),
+                                  ListTile(
+                                    leading: const CircleAvatar(backgroundColor: Colors.purpleAccent, child: Text('U2')),
+                                    title: const Text('Viewer_Priya'),
+                                    subtitle: const Text('@priya_live'),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                                    onTap: () => Navigator.pop(ctx),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  onGiftTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Gift sent successfully! 🎁')),
+                    );
+                  },
+                  onVideoCallTap: () {
+                    showVideoCall1to1Dialog(context, streamer);
+                  },
+                ),
+              ),
+
+              // Bottom Live Chat & Pinned Warning Banner
+              const Positioned(
+                bottom: 20,
+                left: 16,
+                right: 16,
+                child: LiveChatAndWarningBanner(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    String tabName = ['hot', 'live', 'party', 'match'][_selectedTopIndex];
+    String tabName = _topTabs[_selectedTopIndex].toLowerCase();
+    
     final list = kMockStreamers.where((s) {
       if (s.isOffline) return false;
       if (_selectedCountry != 'All' && s.country != _selectedCountry) return false;
@@ -116,6 +223,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
 
     return Column(
       children: [
+        // Top Navigation Tabs (Hot, Live, Party, Match) & Utilities
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           color: const Color(0xFF0F0F1A),
@@ -161,6 +269,8 @@ class _ForYouScreenState extends State<ForYouScreen> {
             ],
           ),
         ),
+
+        // Country Filter Active Banner
         if (_selectedCountry != 'All')
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -176,16 +286,48 @@ class _ForYouScreenState extends State<ForYouScreen> {
               ],
             ),
           ),
-        Expanded(child: _buildStreamerGrid(list)),
+
+        // Main Body Content with Tabs & Filter Cards
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Show Pretty, New, Sexy Filter Cards exclusively on the "Hot" tab
+                if (tabName == 'hot') ...[
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: CategoryFilterCardsWidget(
+                      selectedCategory: _selectedCategory,
+                      onCategorySelected: (category) {
+                        setState(() {
+                          _selectedCategory = category;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+                
+                // Streamer Grid View
+                _buildStreamerGrid(list),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildStreamerGrid(List<StreamerItem> list) {
     if (list.isEmpty) {
-      return const Center(child: Text('No active streamers found in this selection'));
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: Center(child: Text('No active streamers found in this selection', style: TextStyle(color: Colors.white70))),
+      );
     }
     return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.78,
@@ -205,10 +347,8 @@ class _ForYouScreenState extends State<ForYouScreen> {
 
         return GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: streamer)),
-            );
+            // Open our custom immersive live room with all new features!
+            _openCustomLiveRoom(streamer);
           },
           child: Container(
             decoration: BoxDecoration(
