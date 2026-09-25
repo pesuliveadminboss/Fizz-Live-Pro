@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../block3_hot_tab/streamer_profile_screen.dart';
-import 'streamer_model_data.dart';
+import 'streamer_profile_screen.dart';
+import 'core_data.dart';
 
 class HotTabGridScreen extends StatelessWidget {
   final String countryFilter;
@@ -8,7 +8,7 @@ class HotTabGridScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeStreamers = kAllStreamers.where((s) {
+    final activeStreamers = kMockStreamers.where((s) {
       bool isNotOffline = s.status != 'offline';
       bool matchesCountry = (countryFilter == 'All' || s.country.toLowerCase() == countryFilter.toLowerCase());
       return isNotOffline && matchesCountry;
