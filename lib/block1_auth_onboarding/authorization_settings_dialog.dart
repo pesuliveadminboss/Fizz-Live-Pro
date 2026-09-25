@@ -46,4 +46,3 @@ class AuthorizationSettingsDialog extends StatelessWidget {
     );
   }
 }
-
