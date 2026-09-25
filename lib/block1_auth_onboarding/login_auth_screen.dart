@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'profile_setup_screen.dart';
 
+// Global shared state for verification of already registered users
+class GlobalAuthRegistry {
+  static final Set<String> registeredIdentifiers = {};
+  static String userGender = 'Female'; // Default female (streamer) or male (user)
+}
+
 class LoginAuthScreen extends StatefulWidget {
   const LoginAuthScreen({super.key});
 
@@ -11,26 +17,32 @@ class LoginAuthScreen extends StatefulWidget {
 class _LoginAuthScreenState extends State<LoginAuthScreen> {
   bool _isAgreementChecked = false;
 
-  void _handleLoginAttempt(String method) {
+  void _handleLoginAction(String type, String identifier) {
     if (!_isAgreementChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please click agree to User Agreement and Privacy Policy!')),
+        const SnackBar(content: Text('Please click agree to User Agreement and Privacy Policy & Find help!')),
       );
       return;
     }
 
-    if (method == 'fast') {
+    // Check if already registered
+    bool isAlreadyRegistered = GlobalAuthRegistry.registeredIdentifiers.contains(identifier);
+
+    if (isAlreadyRegistered || type == 'fast') {
+      // Direct entry to app for already registered users
       Navigator.pushReplacementNamed(context, '/main_shell');
-    } else if (method == 'google') {
-      _showGoogleAccountPicker();
-    } else if (method == 'phone') {
-      _showPhoneOtpModal();
-    } else if (method == 'guest') {
-      _loginAsGuestUser();
+    } else {
+      // New user flow -> Profile setup required
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ProfileSetupScreen(identifier: identifier, defaultName: type == 'guest' ? 'Guest 001' : 'New User'),
+        ),
+      );
     }
   }
 
-  void _showGoogleAccountPicker() {
+  void _showGooglePicker() {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E2C),
@@ -49,10 +61,7 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
               subtitle: const Text('Auto-fills Name, DOB, Gender & Country (18+)', style: TextStyle(color: Colors.white70, fontSize: 11)),
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileSetupScreen(defaultName: 'Google User')),
-                );
+                _handleLoginAction('google', 'streamer.macha@gmail.com');
               },
             ),
           ],
@@ -100,10 +109,7 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
                     }
                   } else {
                     Navigator.pop(ctx);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ProfileSetupScreen(defaultName: 'Phone User')),
-                    );
+                    _handleLoginAction('phone', phoneController.text);
                   }
                 },
                 child: Text(otpSent ? 'Verify OTP & Enter' : 'Get OTP', style: const TextStyle(color: Colors.white)),
@@ -112,13 +118,6 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  void _loginAsGuestUser() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProfileSetupScreen(defaultName: 'Guest 001')),
     );
   }
 
@@ -142,7 +141,7 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
                     backgroundColor: const Color(0xFFE94057),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   ),
-                  onPressed: () => _handleLoginAttempt('fast'),
+                  onPressed: () => _handleLoginAction('fast', 'fast_user_default'),
                   child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
@@ -154,17 +153,17 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
                 children: [
                   IconButton(
                     icon: const CircleAvatar(backgroundColor: Colors.white12, child: Text('G', style: TextStyle(color: Colors.white))),
-                    onPressed: () => _handleLoginAttempt('google'),
+                    onPressed: _showGooglePicker,
                   ),
                   const SizedBox(width: 20),
                   IconButton(
                     icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.phone, color: Colors.white)),
-                    onPressed: () => _handleLoginAttempt('phone'),
+                    onPressed: _showPhoneOtpModal,
                   ),
                   const SizedBox(width: 20),
                   IconButton(
                     icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.person, color: Colors.white)),
-                    onPressed: () => _handleLoginAttempt('guest'),
+                    onPressed: () => _handleLoginAction('guest', 'Guest_001'),
                   ),
                 ],
               ),
@@ -190,4 +189,3 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
     );
   }
 }
-
