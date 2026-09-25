@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   final String defaultName;
-  const ProfileSetupScreen({super.key, required this.defaultName});
+  const ProfileSetupScreen({super.key, this.defaultName = 'New User'});
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
