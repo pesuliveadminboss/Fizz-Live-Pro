@@ -5,7 +5,11 @@ class ProfileSetupScreen extends StatefulWidget {
   final String identifier;
   final String defaultName;
 
-  const ProfileSetupScreen({super.key, required this.identifier, required this.defaultName});
+  const ProfileSetupScreen({
+    super.key,
+    this.identifier = 'default_user',
+    this.defaultName = 'New User',
+  });
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -120,7 +124,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   ),
                   onPressed: () {
-                    // Save user as registered and save gender preference
                     GlobalAuthRegistry.registeredIdentifiers.add(widget.identifier);
                     GlobalAuthRegistry.userGender = _gender;
 
