@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'profile_setup_screen.dart';
 
-// Global shared state for verification of already registered users
 class GlobalAuthRegistry {
   static final Set<String> registeredIdentifiers = {};
-  static String userGender = 'Female'; // Default female (streamer) or male (user)
+  static String userGender = 'Female';
 }
 
 class LoginAuthScreen extends StatefulWidget {
@@ -20,23 +19,24 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
   void _handleLoginAction(String type, String identifier) {
     if (!_isAgreementChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please click agree to User Agreement and Privacy Policy & Find help!')),
+        const SnackBar(content: Text('Please click agree to User Agreement and Privacy Policy!')),
       );
       return;
     }
 
-    // Check if already registered
     bool isAlreadyRegistered = GlobalAuthRegistry.registeredIdentifiers.contains(identifier);
 
-    if (isAlreadyRegistered || type == 'fast') {
-      // Direct entry to app for already registered users
+    // Fast login or any login for new user must go to profile setup first!
+    if (isAlreadyRegistered && type != 'fast') {
       Navigator.pushReplacementNamed(context, '/main_shell');
     } else {
-      // New user flow -> Profile setup required
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ProfileSetupScreen(identifier: identifier, defaultName: type == 'guest' ? 'Guest 001' : 'New User'),
+          builder: (_) => ProfileSetupScreen(
+            identifier: identifier,
+            defaultName: type == 'guest' ? 'Guest 001' : (type == 'google' ? 'Google User' : 'Fast User'),
+          ),
         ),
       );
     }
@@ -126,66 +126,119 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1A),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Fizz Live Pro 18+', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE94057),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                  ),
-                  onPressed: () => _handleLoginAction('fast', 'fast_user_default'),
-                  child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        child: Stack(
+          children: [
+            // Top floating circular streamer photo bubbles matching Screenshot 2
+            Positioned(
+              top: 30,
+              left: 20,
+              child: _circleBubble(Colors.pink, 'A'),
+            ),
+            Positioned(
+              top: 50,
+              right: 30,
+              child: _circleBubble(Colors.purple, 'B'),
+            ),
+            Positioned(
+              top: 140,
+              left: 70,
+              child: _circleBubble(Colors.deepOrange, 'C'),
+            ),
+            Positioned(
+              top: 120,
+              right: 60,
+              child: _circleBubble(Colors.pinkAccent, 'D'),
+            ),
+            Positioned(
+              top: 240,
+              left: 40,
+              child: _circleBubble(Colors.redAccent, 'E'),
+            ),
+            Positioned(
+              top: 220,
+              right: 90,
+              child: _circleBubble(Colors.purpleAccent, 'F'),
+            ),
+
+            // Bottom login panel matching exact layout requirements
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE94057),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                        ),
+                        onPressed: () => _handleLoginAction('fast', 'fast_user_unique_id'),
+                        child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text('or', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Text('G', style: TextStyle(color: Colors.white))),
+                          onPressed: _showGooglePicker,
+                        ),
+                        const SizedBox(width: 25),
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.phone, color: Colors.white, size: 18)),
+                          onPressed: _showPhoneOtpModal,
+                        ),
+                        const SizedBox(width: 25),
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                          onPressed: () => _handleLoginAction('guest', 'Guest_001'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: _isAgreementChecked,
+                          activeColor: const Color(0xFFE94057),
+                          onChanged: (val) => setState(() => _isAgreementChecked = val ?? false),
+                        ),
+                        const Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('Having login issues? Find help', style: TextStyle(color: Color(0xFFE94057), fontSize: 11, decoration: TextDecoration.underline)),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text('or', style: TextStyle(color: Colors.white54)),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Text('G', style: TextStyle(color: Colors.white))),
-                    onPressed: _showGooglePicker,
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.phone, color: Colors.white)),
-                    onPressed: _showPhoneOtpModal,
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.person, color: Colors.white)),
-                    onPressed: () => _handleLoginAction('guest', 'Guest_001'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isAgreementChecked,
-                    activeColor: const Color(0xFFE94057),
-                    onChanged: (val) => setState(() => _isAgreementChecked = val ?? false),
-                  ),
-                  const Expanded(
-                    child: Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text('Having login issues? Find help', style: TextStyle(color: Color(0xFFE94057), fontSize: 12, decoration: TextDecoration.underline)),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget _circleBubble(Color color, String label) {
+    return Container(
+      width: 65,
+      height: 65,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 2),
+        color: Colors.white24,
+      ),
+      child: Center(
+        child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+      ),
+    );
+  }
 }
+
