@@ -1,11 +1,95 @@
 import 'package:flutter/material.dart';
 import 'core_data.dart';
-import '../block5_live_room_immersive/zego_video_call.dart';
 
-class StreamerProfileScreen extends StatelessWidget {
-  final StreamerItem streamer;
-
+class StreamerProfileScreen extends StatefulWidget {
+  final StreamerModel streamer;
   const StreamerProfileScreen({super.key, required this.streamer});
+
+  @override
+  State<StreamerProfileScreen> createState() => _StreamerProfileScreenState();
+}
+
+class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
+  bool _isLiked = false;
+  bool _isBlocked = false;
+
+  void _showOptionsSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E2C),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.pink),
+            title: Text(_isLiked ? 'Unlike' : 'Like', style: const TextStyle(color: Colors.white)),
+            onTap: () {
+              setState(() => _isLiked = !_isLiked);
+              Navigator.pop(ctx);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.block, color: Colors.red),
+            title: Text(_isBlocked ? 'Unblock User' : 'Block User', style: const TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(ctx);
+              _confirmBlockDialog();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.report, color: Colors.amber),
+            title: const Text('Report User', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(ctx);
+              _showReportDialog();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmBlockDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        title: Text('Are you sure you want to block ${widget.streamer.name}?', style: const TextStyle(color: Colors.white, fontSize: 16)),
+        content: const Text('You can remove her from the blocklist in settings.', style: TextStyle(color: Colors.white70, fontSize: 12)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              setState(() => _isBlocked = !_isBlocked);
+              Navigator.pop(ctx);
+            },
+            child: const Text('Confirm', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReportDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        title: const Text('Report Content', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            CheckboxListTile(title: Text('Inappropriate content', style: TextStyle(color: Colors.white, fontSize: 12)), value: false, onChanged: null),
+            CheckboxListTile(title: Text('Sexual repeated content', style: TextStyle(color: Colors.white, fontSize: 12)), value: false, onChanged: null),
+            CheckboxListTile(title: Text('Abuse or discrimination', style: TextStyle(color: Colors.white, fontSize: 12)), value: false, onChanged: null),
+          ],
+        ),
+        actions: [
+          ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057)), onPressed: () => Navigator.pop(ctx), child: const Text('Submit Report')),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,142 +99,50 @@ class StreamerProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Header Image & Back Button matching Screenshot 4 / Screenshot 9
             Stack(
               children: [
-                Container(
-                  height: 380,
-                  width: double.infinity,
-                  color: streamer.color.withOpacity(0.5),
-                  child: Center(
-                    child: Text(
-                      streamer.name[0],
-                      style: const TextStyle(fontSize: 90, fontWeight: FontWeight.bold, color: Colors.white24),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 40,
-                  left: 16,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 40,
-                  right: 16,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.more_horiz, color: Colors.white),
-                      onPressed: () {},
-                    ),
-                  ),
-                ),
+                Container(height: 300, width: double.infinity, color: Colors.pink.withOpacity(0.3), child: const Center(child: Icon(Icons.person, size: 100, color: Colors.white54))),
+                Positioned(top: 40, left: 16, child: CircleAvatar(backgroundColor: Colors.black45, child: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Navigator.pop(context)))),
+                Positioned(top: 40, right: 16, child: CircleAvatar(backgroundColor: Colors.black45, child: IconButton(icon: const Icon(Icons.more_horiz, color: Colors.white), onPressed: _showOptionsSheet))),
               ],
             ),
-            
-            // Profile Details Container matching Screenshot 4 / Screenshot 9
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0F0F1A),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                streamer.name,
-                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.verified, color: Colors.blue, size: 18),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'ID: 720474292 • ${streamer.flag} ${streamer.country} • ${streamer.age}',
-                            style: const TextStyle(fontSize: 12, color: Colors.white70),
-                          ),
+                          Text(widget.streamer.name, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.verified, color: Colors.blue, size: 16),
                         ],
                       ),
-                      const Icon(Icons.favorite, color: Colors.pinkAccent, size: 28),
+                      IconButton(
+                        icon: Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.pink, size: 28),
+                        onPressed: () => setState(() => _isLiked = !_isLiked),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-
-                  // Introduction Box matching Screenshot 4 / Screenshot 9
-                  const Text('Introduction', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white54)),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E2C),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      streamer.bio,
-                      style: const TextStyle(fontSize: 13, color: Colors.white),
-                    ),
-                  ),
+                  Text('${widget.streamer.flag} ${widget.streamer.country} • Age: ${widget.streamer.age}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                   const SizedBox(height: 16),
-
-                  // Speaking Language matching Screenshot 4 / Screenshot 9
-                  const Text('Speaking language', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white54)),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: streamer.speakingLanguage.split(', ').map((lang) => Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E2C),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(lang, style: const TextStyle(fontSize: 12, color: Colors.white)),
-                    )).toList(),
-                  ),
+                  const Text('Introduction', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  Container(width: double.infinity, padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFF1E1E2C), borderRadius: BorderRadius.circular(12)), child: Text(widget.streamer.intro, style: const TextStyle(color: Colors.white))),
+                  const SizedBox(height: 16),
+                  const Text('Speaking language', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  Text(widget.streamer.language, style: const TextStyle(color: Colors.white)),
                   const SizedBox(height: 30),
-
-                  // Bottom 1-to-1 Video Call Action Button matching Screenshot 4 / Screenshot 9
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE94057),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      onPressed: () {
-                        showVideoCall1to1Dialog(context, streamer);
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.videocam, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text(
-                            'Video Call • 1800/min',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057), minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connecting 1-to-1 Video Call (1800 gems/min)...')));
+                    },
+                    child: const Text('Video • 1800/min', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -161,3 +153,4 @@ class StreamerProfileScreen extends StatelessWidget {
     );
   }
 }
+
