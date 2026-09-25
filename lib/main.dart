@@ -4,7 +4,7 @@ import 'block1_auth_onboarding/profile_setup_screen.dart';
 import 'block1_auth_onboarding/daily_rewards_dialog.dart';
 import 'block1_auth_onboarding/authorization_settings_dialog.dart';
 import 'block1_auth_onboarding/call_reminder_dialog.dart';
-import 'block1_auth_onboarding/theme_config.dart'; // Import this
+import 'block1_auth_onboarding/theme_config.dart';
 import 'block2_navigation_shell/main_shell_navigation.dart';
 
 void main() => runApp(const FizzLiveProApp());
@@ -17,7 +17,7 @@ class FizzLiveProApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fizz Live Pro',
       debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(), // Applies the new Dribbble Deep Dark & Neon Blue theme
+      theme: buildAppTheme(),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: const [
             Text(
               'Fizz Live Pro',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppThemeColors.neonBlueAccent),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppThemeColors.primaryPurple),
             ),
             SizedBox(height: 8),
             Text(
