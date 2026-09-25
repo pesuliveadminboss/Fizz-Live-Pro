@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'login_auth_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
+  final String identifier;
   final String defaultName;
-  const ProfileSetupScreen({super.key, this.defaultName = 'New User'});
+
+  const ProfileSetupScreen({super.key, required this.identifier, required this.defaultName});
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -10,7 +13,7 @@ class ProfileSetupScreen extends StatefulWidget {
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   late TextEditingController _nameController;
-  String _gender = 'Female'; // Female -> Streamer (Go Live shown), Male -> User
+  String _gender = 'Female'; // Female = Streamer (Go Live shown), Male = User (No Go Live)
   String _selectedCountry = 'India';
   bool _is18PlusChecked = true;
   final TextEditingController _dobController = TextEditingController(text: '10/10/2000');
@@ -117,6 +120,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   ),
                   onPressed: () {
+                    // Save user as registered and save gender preference
+                    GlobalAuthRegistry.registeredIdentifiers.add(widget.identifier);
+                    GlobalAuthRegistry.userGender = _gender;
+
                     Navigator.pushReplacementNamed(context, '/popups');
                   },
                   child: const Text('Confirm & Enter App', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
