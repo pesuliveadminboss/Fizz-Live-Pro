@@ -14,7 +14,6 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    // Check gender from global registry: Female = 6 tabs (with Go Live), Male = 5 tabs
     bool isFemaleStreamer = (GlobalAuthRegistry.userGender == 'Female');
 
     final List<Widget> pages = [
