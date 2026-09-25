@@ -1,90 +1,30 @@
 import 'package:flutter/material.dart';
 
-class StreamerItem {
+class StreamerModel {
   final String id;
   final String name;
   final String country;
   final String flag;
   final int age;
-  final String status; // 'live', 'party', 'online'
-  final bool isOffline;
-  final Color color;
-  final String bio;
-  final String speakingLanguage;
-
-  StreamerItem({
+  final String status; // 'online', 'live', 'party', 'offline'
+  final String intro;
+  final String language;
+  
+  StreamerModel({
     required this.id,
     required this.name,
     required this.country,
     required this.flag,
     required this.age,
     required this.status,
-    required this.isOffline,
-    required this.color,
-    required this.bio,
-    required this.speakingLanguage,
+    required this.intro,
+    required this.language,
   });
 }
 
-final List<StreamerItem> kMockStreamers = [
-  StreamerItem(
-    id: 's1',
-    name: 'AvniHotnessDil',
-    country: 'India',
-    flag: '🇮🇳',
-    age: 27,
-    status: 'live',
-    isOffline: false,
-    color: Colors.pink,
-    bio: 'main tumhen chaahati hoon. aap kitane hot hain.',
-    speakingLanguage: 'Hindi, English',
-  ),
-  StreamerItem(
-    id: 's2',
-    name: 'Shiny Sanya',
-    country: 'India',
-    flag: '🇮🇳',
-    age: 28,
-    status: 'party',
-    isOffline: false,
-    color: Colors.purple,
-    bio: 'Always grateful 🌸✨',
-    speakingLanguage: 'English, Tamil',
-  ),
-  StreamerItem(
-    id: 's3',
-    name: 'Exotic Moka',
-    country: 'Egypt',
-    flag: '🇪🇬',
-    age: 25,
-    status: 'live',
-    isOffline: false,
-    color: Colors.blue,
-    bio: 'Call me if you are free. Waiting for you!',
-    speakingLanguage: 'Arabic, English',
-  ),
-  StreamerItem(
-    id: 's4',
-    name: 'Jocelyn Kidmat',
-    country: 'Delhi',
-    flag: '🇮🇳',
-    age: 34,
-    status: 'live',
-    isOffline: false,
-    color: Colors.deepOrange,
-    bio: 'Fun show baby, lets talk dirty.',
-    speakingLanguage: 'Hindi, English',
-  ),
-  StreamerItem(
-    id: 's5',
-    name: 'Sara',
-    country: 'Pakistan',
-    flag: '🇵🇰',
-    age: 21,
-    status: 'live',
-    isOffline: false,
-    color: Colors.teal,
-    bio: 'Welcome to my live room! Lets chat.',
-    speakingLanguage: 'Urdu, English',
-  ),
+final List<StreamerModel> kAllStreamers = [
+  StreamerModel(id: '1', name: 'AvniHotnessDil', country: 'India', flag: '🇮🇳', age: 24, status: 'live', intro: 'Welcome to my live room!', language: 'Hindi, English'),
+  StreamerModel(id: '2', name: 'Shiny Sanya', country: 'America', flag: '🇺🇸', age: 22, status: 'online', intro: 'Always smiling ✨', language: 'English'),
+  StreamerModel(id: '3', name: 'Jocelyn Kidmat', country: 'Bangladesh', flag: '🇧🇩', age: 26, status: 'party', intro: 'Party all night!', language: 'Bengali, English'),
+  StreamerModel(id: '4', name: 'Offline Girl', country: 'India', flag: '🇮🇳', age: 25, status: 'offline', intro: 'Busy right now', language: 'Tamil'),
 ];
