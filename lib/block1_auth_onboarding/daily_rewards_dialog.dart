@@ -96,4 +96,3 @@ class DailyRewardsDialog extends StatelessWidget {
     );
   }
 }
-
