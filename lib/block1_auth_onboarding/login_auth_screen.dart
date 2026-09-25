@@ -8,7 +8,91 @@ class LoginAuthScreen extends StatefulWidget {
 }
 
 class _LoginAuthScreenState extends State<LoginAuthScreen> {
-  bool _agreedToTerms = true;
+  bool _isAgreed = false;
+
+  void _handleLogin(String method) {
+    if (!_isAgreed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please agree to User Agreement and Privacy Policy first!')),
+      );
+      return;
+    }
+
+    if (method == 'google') {
+      _showGoogleAccountPicker();
+    } else if (method == 'phone') {
+      _showPhoneOtpDialog();
+    } else if (method == 'guest') {
+      _loginAsGuest();
+    } else {
+      // Fast Login / Already User Verify
+      Navigator.pushReplacementNamed(context, '/main_shell');
+    }
+  }
+
+  void _showGoogleAccountPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E2C),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Choose Google Account', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: const CircleAvatar(backgroundColor: Colors.pink, child: Text('S', style: TextStyle(color: Colors.white))),
+              title: const Text('streamer.user@gmail.com', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Auto-fill DOB, Gender & Country (18+)', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.pushNamed(context, '/profile_setup');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPhoneOtpDialog() {
+    final phoneController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        title: const Text('Phone Login / OTP', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: phoneController,
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(hintText: 'Enter mobile number', hintStyle: TextStyle(color: Colors.white54)),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057)),
+              onPressed: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('OTP Sent Successfully!')));
+                Navigator.pushNamed(context, '/profile_setup');
+              },
+              child: const Text('Get OTP & Continue', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _loginAsGuest() {
+    // Guest auto-name generation e.g. Guest 001
+    Navigator.pushNamed(context, '/profile_setup');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,146 +100,64 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
       backgroundColor: const Color(0xFF0F0F1A),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Top glowing background avatar circles simulation (matching screenshot 10)
-              Column(
-                children: [
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildMiniAvatar(Colors.pinkAccent, 'A'),
-                      _buildMiniAvatar(Colors.purpleAccent, 'B'),
-                    ],
+              const Text('Fizz Live Pro 18+', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE94057),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildMiniAvatar(Colors.cyanAccent, 'C'),
-                    ],
+                  onPressed: () => _handleLogin('fast'),
+                  child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text('or', style: TextStyle(color: Colors.white54)),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Text('G', style: TextStyle(color: Colors.white))),
+                    onPressed: () => _handleLogin('google'),
+                  ),
+                  const SizedBox(width: 20),
+                  IconButton(
+                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.phone, color: Colors.white)),
+                    onPressed: () => _handleLogin('phone'),
+                  ),
+                  const SizedBox(width: 20),
+                  IconButton(
+                    icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.person, color: Colors.white)),
+                    onPressed: () => _handleLogin('guest'),
                   ),
                 ],
               ),
-
-              // Bottom Login Controls matching Screenshot 10
-              Column(
+              const SizedBox(height: 40),
+              Row(
                 children: [
-                  // Fast Login Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE94057),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      onPressed: () {
-                        // Proceed to profile setup or main shell
-                        Navigator.pushReplacementNamed(context, '/profile_setup');
-                      },
-                      child: const Text(
-                        'Fast Login',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                    ),
+                  Checkbox(
+                    value: _isAgreed,
+                    activeColor: const Color(0xFFE94057),
+                    onChanged: (val) => setState(() => _isAgreed = val ?? false),
                   ),
-                  const SizedBox(height: 16),
-                  const Text('or', style: TextStyle(color: Colors.white54, fontSize: 14)),
-                  const SizedBox(height: 16),
-
-                  // Google, Phone, Guest Login Icons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildSocialIcon(Icons.g_mobiledata, 'Google', () {}),
-                      const SizedBox(width: 30),
-                      _buildSocialIcon(Icons.phone, 'Phone', () {}),
-                      const SizedBox(width: 30),
-                      _buildSocialIcon(Icons.person, 'Guest', () {}),
-                    ],
+                  const Expanded(
+                    child: Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Agreement Checkbox & Text
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: _agreedToTerms,
-                        activeColor: const Color(0xFFE94057),
-                        onChanged: (val) {
-                          setState(() {
-                            _agreedToTerms = val ?? true;
-                          });
-                        },
-                      ),
-                      const Text(
-                        'Agree to User Agreement and Privacy Policy',
-                        style: TextStyle(color: Colors.white70, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Having login issues find help
-                  GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Help & Support: Contact admin support.')),
-                      );
-                    },
-                    child: const Text(
-                      'Having login issues? Find help',
-                      style: TextStyle(
-                        color: Colors.pinkAccent,
-                        fontSize: 12,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                 ],
               ),
+              const Text('Having login issues? Find help', style: TextStyle(color: Color(0xFFE94057), fontSize: 12, decoration: TextDecoration.underline)),
             ],
           ),
         ),
       ),
     );
   }
-
-  Widget _buildMiniAvatar(Color color, String text) {
-    return CircleAvatar(
-      radius: 32,
-      backgroundColor: color.withOpacity(0.3),
-      child: CircleAvatar(
-        radius: 28,
-        backgroundColor: Colors.grey[800],
-        child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  Widget _buildSocialIcon(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: const Color(0xFF1E1E2C),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white60, fontSize: 10)),
-        ],
-      ),
-    );
-  }
 }
-
