@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'chat_and_warning_widget.dart';
-import 'viewer_list_dialog.dart';
-import 'zego_video_call.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final String streamerName;
-
   const LiveRoomScreen({super.key, required this.streamerName});
 
   @override
@@ -14,185 +10,121 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isFollowing = false;
-  final PageController _pageController = PageController();
+  final List<String> _chatMessages = ['User 1: Hello!', 'Guest joined the room'];
+  final TextEditingController _msgController = TextEditingController();
+
+  void _toggleFollow() {
+    setState(() => _isFollowing = !_isFollowing);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_isFollowing ? 'Following (+2s)' : 'Unfollowing (-2s)', style: const TextStyle(fontSize: 12)), duration: const Duration(seconds: 2)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        itemCount: 5, // Mock multiple live streams for vertical reels scrolling
-        itemBuilder: (context, index) {
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background Stream Video Simulation
-              Container(
-                color: Colors.primaries[index % Colors.primaries.length].withOpacity(0.3),
-                child: Center(
-                  child: Text(
-                    '${widget.streamerName} Live #${index + 1}',
-                    style: const TextStyle(color: Colors.white24, fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-
-              // Gradient Overlay for readability
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.black54, Colors.transparent, Colors.black87],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
-
-              // UI Overlays
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(color: Colors.purple.withOpacity(0.3), child: const Center(child: Text('Live Video Stream Active', style: TextStyle(color: Colors.white24, fontSize: 20)))),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Top Header (Streamer Profile & Synced Hearts + Viewer Count + PiP Close X)
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(20)),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(radius: 14, backgroundColor: Colors.pink, child: Icon(Icons.person, size: 14, color: Colors.white)),
+                            const SizedBox(width: 6),
+                            Text(widget.streamerName, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _toggleFollow,
+                              child: Icon(_isFollowing ? Icons.favorite : Icons.favorite_border, color: Colors.pink, size: 18),
+                            ),
+                          ],
+                        ),
+                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Streamer Profile & Synced Pink/Black Heart
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black45,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                const CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Colors.pinkAccent,
-                                  child: Icon(Icons.person, size: 18, color: Colors.white),
-                                ),
-                                const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.streamerName,
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                                    ),
-                                    const Text(
-                                      'ID: 7204742',
-                                      style: TextStyle(color: Colors.white70, fontSize: 9),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 8),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isFollowing = !_isFollowing;
-                                    });
-                                  },
-                                  child: Icon(
-                                    _isFollowing ? Icons.favorite : Icons.favorite_border,
-                                    color: _isFollowing ? Colors.pinkAccent : Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(12)),
+                            child: Row(children: const [Icon(Icons.remove_red_eye, color: Colors.white70, size: 12), SizedBox(width: 4), Text('12', style: TextStyle(color: Colors.white, fontSize: 11))]),
                           ),
-
-                          // Top Right: Viewer Count & Close/PiP Button
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () => showViewerListDialog(context),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    children: const [
-                                      Icon(Icons.remove_red_eye, color: Colors.white70, size: 14),
-                                      SizedBox(width: 4),
-                                      Text('5', style: TextStyle(color: Colors.white, fontSize: 12)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.close, color: Colors.white),
-                                onPressed: () {
-                                  // PiP Minimize or Close Room
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
+                          const SizedBox(width: 8),
+                          IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
                         ],
                       ),
-
-                      // Bottom Area (Warning banner, chat messages scrolling up, and action buttons)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.amber)),
+                        child: const Text('Warning: Pornographic, vulgar or violent content is forbidden!', style: TextStyle(color: Colors.amber, fontSize: 9)),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 90,
+                        child: ListView.builder(
+                          reverse: true,
+                          itemCount: _chatMessages.length,
+                          itemBuilder: (ctx, i) => Text(_chatMessages[i], style: const TextStyle(color: Colors.white, fontSize: 11)),
+                        ),
+                      ),
+                      Row(
                         children: [
-                          const ChatAndWarningWidget(),
-                          const SizedBox(height: 12),
-                          // Bottom Actions: Gift, Follow Heart, 1-to-1 Video Call
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              FloatingActionButton(
-                                mini: true,
-                                backgroundColor: Colors.purpleAccent,
-                                child: const Icon(Icons.card_giftcard, color: Colors.white),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Gift sent to streamer! 🎁')),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              FloatingActionButton(
-                                mini: true,
-                                backgroundColor: Colors.pinkAccent,
-                                child: Icon(_isFollowing ? Icons.favorite : Icons.favorite_border, color: Colors.white),
-                                onPressed: () {
-                                  setState(() {
-                                    _isFollowing = !_isFollowing;
-                                  });
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE94057),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          Expanded(
+                            child: SizedBox(
+                              height: 35,
+                              child: TextField(
+                                controller: _msgController,
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                decoration: InputDecoration(
+                                  hintText: 'Say something...',
+                                  hintStyle: const TextStyle(color: Colors.white54, fontSize: 11),
+                                  filled: true,
+                                  fillColor: Colors.black54,
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                                 ),
-                                icon: const Icon(Icons.videocam, color: Colors.white, size: 18),
-                                label: const Text('Video Call', style: TextStyle(color: Colors.white, fontSize: 12)),
-                                onPressed: () {
-                                  showVideoCall1to1Dialog(context, null);
-                                },
                               ),
-                            ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.send, color: Colors.pink, size: 18),
+                            onPressed: () {
+                              if (_msgController.text.isNotEmpty) {
+                                setState(() => _chatMessages.insert(0, 'Me: ${_msgController.text}'));
+                                _msgController.clear();
+                              }
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(_isFollowing ? Icons.favorite : Icons.favorite_border, color: Colors.pink, size: 22),
+                            onPressed: _toggleFollow,
                           ),
                         ],
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
