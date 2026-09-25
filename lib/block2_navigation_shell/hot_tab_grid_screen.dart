@@ -8,7 +8,6 @@ class HotTabGridScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Hide offline streamers from Hot Tab grid, filter by country if selected
     final activeStreamers = kAllStreamers.where((s) {
       bool isNotOffline = s.status != 'offline';
       bool matchesCountry = (countryFilter == 'All' || s.country.toLowerCase() == countryFilter.toLowerCase());
@@ -106,4 +105,3 @@ class HotTabGridScreen extends StatelessWidget {
     );
   }
 }
-
