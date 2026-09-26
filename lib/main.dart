@@ -21,10 +21,12 @@ import 'block3_hot_tab/streamer_profile_screen.dart';
 import 'block3_hot_tab/profile_actions_dialogs.dart';
 import 'block3_hot_tab/profile_interaction_handler.dart';
 
-// --- BLOCK 4 IMPORTS (Private Chat Area, Emojis, Voice Recorder & Recharge Gems Modal) ---
+// --- BLOCK 4 IMPORTS (Private Chat, Emojis, Voice Recorder, Gallery Picker & Audio Player) ---
 import 'block4_private_chat/private_chat_screen.dart';
 import 'block4_private_chat/recharge_gems_dialog.dart';
 import 'block4_private_chat/voice_recorder_helper.dart';
+import 'block4_private_chat/image_picker_helper.dart';
+import 'block4_private_chat/audio_player_helper.dart';
 
 void main() => runApp(const FizzLiveProApp());
 
@@ -138,3 +140,4 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
     return const MainShellNavigation();
   }
 }
+
