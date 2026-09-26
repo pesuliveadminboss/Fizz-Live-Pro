@@ -66,15 +66,12 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_horiz, color: Colors.white),
-            onPressed: () {
-              // More options trigger
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          // Streamer Profile Card inside Chat Area (matching reference screenshot 5)
           Container(
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.all(12),
@@ -112,7 +109,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Supporter/follower profile thumbnails
                 Row(
                   children: List.generate(4, (index) {
                     return Padding(
@@ -133,8 +129,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               ],
             ),
           ),
-
-          // Scrollable Chat Area
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -160,8 +154,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               },
             ),
           ),
-
-          // Bottom Action Toolbar (matching reference screenshot 6 & 7)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             color: const Color(0xFF121026),
@@ -197,7 +189,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                // Feature Buttons Row (Media, Emoji, Video Call with Price, Gift)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -215,7 +206,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Trigger Recharge Gems Modal when clicking video call or restricted action
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
@@ -229,7 +219,8 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                           color: const Color(0xFFF97316),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        Row(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: const [
                             Icon(Icons.videocam, color: Colors.white, size: 16),
                             SizedBox(width: 4),
@@ -244,8 +235,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                     ),
                   ],
                 ),
-
-                // Emoji Picker Panel (matching reference screenshot 9)
                 if (_isEmojiPickerVisible)
                   Container(
                     height: 160,
@@ -282,3 +271,4 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     );
   }
 }
+
