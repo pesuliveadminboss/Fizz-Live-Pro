@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../block3_hot_tab/streamer_profile_screen.dart';
 import 'streamer_model_data.dart';
 
 class SearchStreamerDialog extends StatefulWidget {
@@ -45,7 +44,9 @@ class _SearchStreamerDialogState extends State<SearchStreamerDialog> {
                     subtitle: Text('${streamer.flag} ${streamer.country}', style: const TextStyle(color: Colors.white60, fontSize: 11)),
                     onTap: () {
                       Navigator.pop(ctx);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => StreamerProfileScreen(streamer: streamer)));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Selected ${streamer.name} from ${streamer.country}')),
+                      );
                     },
                   );
                 },
