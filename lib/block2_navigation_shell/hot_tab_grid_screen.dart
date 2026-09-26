@@ -7,7 +7,6 @@ class HotTabGridScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Independent local filtering (No external block dependency)
     final activeStreamers = kAllStreamers.where((s) {
       bool isNotOffline = s.status != 'offline';
       bool matchesCountry = (countryFilter == 'All' || s.country.toLowerCase() == countryFilter.toLowerCase());
