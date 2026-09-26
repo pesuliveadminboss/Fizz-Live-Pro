@@ -21,6 +21,10 @@ import 'block3_hot_tab/streamer_profile_screen.dart';
 import 'block3_hot_tab/profile_actions_dialogs.dart';
 import 'block3_hot_tab/profile_interaction_handler.dart';
 
+// --- BLOCK 4 IMPORTS (Private Chat Area, Emojis & Recharge Gems Modal) ---
+import 'block4_private_chat/private_chat_screen.dart';
+import 'block4_private_chat/recharge_gems_dialog.dart';
+
 void main() => runApp(const FizzLiveProApp());
 
 class FizzLiveProApp extends StatelessWidget {
@@ -39,6 +43,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/login': (context) => const LoginAuthScreenProfileBridge(),
         '/popups': (context) => const PopupsHomeWrapper(),
         '/main_shell': (context) => const MainShellNavigation(),
+        '/private_chat': (context) => const PrivateChatScreen(),
       },
     );
   }
@@ -136,4 +141,3 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
     return const MainShellNavigation();
   }
 }
-
