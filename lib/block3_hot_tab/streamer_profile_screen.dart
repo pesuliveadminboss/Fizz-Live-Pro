@@ -36,7 +36,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Big Photo & App Bar Navigation
             Stack(
               children: [
                 Container(
@@ -69,12 +68,23 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ),
                   ),
                 ),
-                // Like / Heartbeat Button bottom-right of big photo
                 Positioned(
                   bottom: 16,
                   right: 16,
                   child: GestureDetector(
-                    onTap: () => ProfileInteractionHandler.toggleLike(context, widget.streamer, () => setState(() {})),
+                    onTap: () {
+                      setState(() {
+                        widget.streamer.isLiked = !widget.streamer.isLiked;
+                      });
+                      String message = widget.streamer.isLiked ? 'Following' : 'Unfollowing';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(message),
+                          duration: const Duration(seconds: 2),
+                          backgroundColor: const Color(0xFF1D1B36),
+                        ),
+                      );
+                    },
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.black45,
@@ -88,8 +98,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                 ),
               ],
             ),
-
-            // Profile Details Section
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -128,8 +136,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-
-                  // Status & Country Row
                   Row(
                     children: [
                       Container(
@@ -170,8 +176,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Introduction Section
                   const Text('Introduction', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Container(
@@ -188,8 +192,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Speaking Language Section
                   const Text('Speaking language', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Wrap(
@@ -250,3 +252,4 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
     );
   }
 }
+
