@@ -1,4 +1,3 @@
-// Mapped to StreamerItem to ensure seamless compatibility across all blocks
 class StreamerItem {
   final String id;
   final String name;
@@ -34,4 +33,3 @@ final List<StreamerItem> kAllStreamers = [
   StreamerItem(id: '8', name: 'Offline User', country: 'India', flag: '🇮🇳', age: 26, status: 'offline', intro: 'Not active', language: 'Tamil'),
 ];
 
-final List<StreamerItem> kMockStreamers = kAllStreamers;
