@@ -21,9 +21,10 @@ import 'block3_hot_tab/streamer_profile_screen.dart';
 import 'block3_hot_tab/profile_actions_dialogs.dart';
 import 'block3_hot_tab/profile_interaction_handler.dart';
 
-// --- BLOCK 4 IMPORTS (Private Chat Area, Emojis & Recharge Gems Modal) ---
+// --- BLOCK 4 IMPORTS (Private Chat Area, Emojis, Voice Recorder & Recharge Gems Modal) ---
 import 'block4_private_chat/private_chat_screen.dart';
 import 'block4_private_chat/recharge_gems_dialog.dart';
+import 'block4_private_chat/voice_recorder_helper.dart';
 
 void main() => runApp(const FizzLiveProApp());
 
@@ -35,7 +36,6 @@ class FizzLiveProApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fizz Live Pro',
       debugShowCheckedModeBanner: false,
-      // Block 3-ன் உலகளாவிய Dribbble தீம் (Deep Purple & Indigo) ஆப் முழுமைக்கும் அப்ளை ஆகும்
       theme: DribbbleTheme.themeData,
       initialRoute: '/',
       routes: {
@@ -49,7 +49,6 @@ class FizzLiveProApp extends StatelessWidget {
   }
 }
 
-// --- SPLASH SCREEN ---
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -96,7 +95,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// --- BRIDGE FOR BLOCK 1 LOGIN ---
 class LoginAuthScreenProfileBridge extends StatelessWidget {
   const LoginAuthScreenProfileBridge({super.key});
 
@@ -106,7 +104,6 @@ class LoginAuthScreenProfileBridge extends StatelessWidget {
   }
 }
 
-// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
