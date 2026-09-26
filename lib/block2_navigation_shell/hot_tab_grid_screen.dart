@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'streamer_model_data.dart';
-// Block 3 Profile Screen மற்றும் Model-க்கான import
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 
@@ -49,7 +48,6 @@ class HotTabGridScreen extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            // Convert Block 2 StreamerItem to Block 3 StreamerProfileModel and open Profile Screen
             final profileModel = StreamerProfileModel(
               id: streamer.id,
               name: streamer.name,
@@ -104,7 +102,6 @@ class HotTabGridScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Video call shortcut directly from grid card if needed
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Connecting 1-to-1 Video Call with ${streamer.name}...')),
                           );
