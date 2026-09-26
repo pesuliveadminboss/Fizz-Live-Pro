@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'recharge_gems_dialog.dart';
+import 'voice_recorder_helper.dart';
+import '../block3_hot_tab/profile_actions_dialogs.dart';
+import '../block3_hot_tab/streamer_profile_model.dart';
 
 class PrivateChatScreen extends StatefulWidget {
   final String streamerName;
@@ -18,16 +21,17 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     '❤️', '👍', '💋', '🎉', '✨', '🌹', '💎', '🎁'
   ];
 
-  final List<Map<String, String>> _messages = [
-    {'sender': 'streamer', 'text': 'Hi! Welcome to my private chat ✨'},
-    {'sender': 'user', 'text': 'Hello! How are you doing?'},
+  final List<Map<String, dynamic>> _messages = [
+    {'sender': 'streamer', 'text': 'Hi! Welcome to my private chat ✨', 'type': 'text'},
+    {'sender': 'user', 'text': 'Hello! How are you doing?', 'type': 'text'},
   ];
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
+  void _sendMessage({String? customText, String type = 'text'}) {
+    final textToSend = customText ?? _messageController.text.trim();
+    if (textToSend.isEmpty) return;
     setState(() {
-      _messages.add({'sender': 'user', 'text': _messageController.text.trim()});
-      _messageController.clear();
+      _messages.add({'sender': 'user', 'text': textToSend, 'type': type});
+      if (customText == null) _messageController.clear();
     });
   }
 
@@ -35,6 +39,83 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     setState(() {
       _messageController.text += emoji;
     });
+  }
+
+  void _pickImageFromGallery() {
+    _sendMessage(customText: '[Photo Attachment 📷]', type: 'image');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Photo selected and sent from gallery!')),
+    );
+  }
+
+  void _showGiftBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1D1B36),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: 280,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text('Send Gift to Streamer 🎁', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Icon(Icons.diamond, color: Colors.amber),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  children: [
+                    _buildGiftItem('🌹 Rose', '10 Gems', Colors.redAccent),
+                    _buildGiftItem('💍 Ring', '100 Gems', Colors.blueAccent),
+                    _buildGiftItem('👑 Crown', '500 Gems', Colors.amber),
+                    _buildGiftItem('🏎️ Sports Car', '2000 Gems', Colors.purpleAccent),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGiftItem(String name, String price, Color color) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        _sendMessage(customText: 'Sent a gift: $name ($price) 🎁', type: 'gift');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Successfully sent $name!')),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF121026),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.5)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.card_giftcard, color: color, size: 28),
+            const SizedBox(height: 4),
+            Text(name, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+            Text(price, style: const TextStyle(color: Colors.amber, fontSize: 10)),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -66,7 +147,24 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_horiz, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              final dummyModel = StreamerProfileModel(
+                id: '1',
+                name: widget.streamerName,
+                country: 'Egypt',
+                flag: '🇪🇬',
+                age: 23,
+                status: 'live',
+                intro: 'Live streaming star',
+                language: 'Arabic, English',
+                isVerified: true,
+              );
+              ProfileActionsDialogs.showMoreOptionsSheet(
+                context,
+                dummyModel,
+                () => setState(() {}),
+              );
+            },
           ),
         ],
       ),
@@ -136,6 +234,8 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               itemBuilder: (context, index) {
                 final msg = _messages[index];
                 final isUser = msg['sender'] == 'user';
+                final isAudio = msg['type'] == 'audio';
+
                 return Align(
                   alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
@@ -145,9 +245,24 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                       color: isUser ? const Color(0xFF6366F1) : const Color(0xFF1D1B36),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(
-                      msg['text']!,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isAudio) ...[
+                          const Icon(Icons.play_arrow, color: Colors.white, size: 20),
+                          const SizedBox(width: 6),
+                          Container(
+                            width: 80,
+                            height: 4,
+                            color: Colors.white54,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Text(
+                          msg['text']!,
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -162,8 +277,12 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.mic, color: Colors.white70, size: 22),
-                      onPressed: () {},
+                      icon: const Icon(Icons.mic, color: Colors.redAccent, size: 24),
+                      onPressed: () {
+                        VoiceRecorderHelper.startRecording(context, (voiceText) {
+                          _sendMessage(customText: voiceText, type: 'audio');
+                        });
+                      },
                     ),
                     Expanded(
                       child: TextField(
@@ -184,7 +303,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                      onPressed: _sendMessage,
+                      onPressed: () => _sendMessage(),
                     ),
                   ],
                 ),
@@ -194,7 +313,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.image, color: Colors.greenAccent, size: 22),
-                      onPressed: () {},
+                      onPressed: _pickImageFromGallery,
                     ),
                     IconButton(
                       icon: const Icon(Icons.emoji_emotions, color: Colors.amber, size: 22),
@@ -231,7 +350,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent, size: 22),
-                      onPressed: () {},
+                      onPressed: _showGiftBottomSheet,
                     ),
                   ],
                 ),
@@ -271,4 +390,3 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     );
   }
 }
-
