@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../block3_hot_tab/hot_tab_grid_screen.dart';
-import '../block4_live_tab_filters/live_tab_screen.dart';
+import 'hot_tab_grid_screen.dart';
 import 'country_search_filter_helper.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
@@ -63,7 +62,7 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> {
             child: TabBarView(
               children: [
                 HotTabGridScreen(countryFilter: selectedCountryFilter),
-                const LiveTabScreen(),
+                const Center(child: Text('Live Tab Content', style: TextStyle(color: Colors.white))),
                 const Center(child: Text('Party Screen', style: TextStyle(color: Colors.white))),
                 const Center(child: Text('Match Screen', style: TextStyle(color: Colors.white))),
               ],
