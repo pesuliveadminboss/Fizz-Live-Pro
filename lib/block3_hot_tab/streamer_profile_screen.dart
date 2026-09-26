@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'streamer_profile_model.dart';
 import 'profile_actions_dialogs.dart';
 import 'profile_interaction_handler.dart';
+import '../block4_private_chat/private_chat_screen.dart';
 
 class StreamerProfileScreen extends StatefulWidget {
   final StreamerProfileModel streamer;
@@ -278,8 +279,11 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
               child: IconButton(
                 icon: const Icon(Icons.message, color: Colors.blueAccent),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Opening chat with streamer...')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PrivateChatScreen(streamerName: widget.streamer.name),
+                    ),
                   );
                 },
               ),
@@ -309,4 +313,3 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
     );
   }
 }
-
