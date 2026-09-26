@@ -45,7 +45,7 @@ class _SearchStreamerDialogState extends State<SearchStreamerDialog> {
                     onTap: () {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Selected ${streamer.name} from ${streamer.country}')),
+                        SnackBar(content: Text('Selected ${streamer.name} (${streamer.country})')),
                       );
                     },
                   );
@@ -99,3 +99,4 @@ class CountryFilterListModal extends StatelessWidget {
     );
   }
 }
+
