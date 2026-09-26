@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+
+// --- BLOCK 1 IMPORTS (Auth, Profile Setup & Popups) ---
 import 'block1_auth_onboarding/login_auth_screen.dart';
 import 'block1_auth_onboarding/profile_setup_screen.dart';
 import 'block1_auth_onboarding/daily_rewards_dialog.dart';
 import 'block1_auth_onboarding/authorization_settings_dialog.dart';
 import 'block1_auth_onboarding/call_reminder_dialog.dart';
-import 'block1_auth_onboarding/theme_config.dart';
+
+// --- BLOCK 2 IMPORTS (Navigation Shell, Hot & Live Tabs, Grid, Search) ---
 import 'block2_navigation_shell/main_shell_navigation.dart';
+import 'block2_navigation_shell/hot_and_live_container_tab.dart';
+import 'block2_navigation_shell/hot_tab_grid_screen.dart';
+import 'block2_navigation_shell/streamer_model_data.dart';
+import 'block2_navigation_shell/country_search_filter_helper.dart';
+
+// --- BLOCK 3 IMPORTS (Dribbble Theme & Streamer Profile Features) ---
+import 'block3_hot_tab/dribbble_theme_extension.dart';
+import 'block3_hot_tab/streamer_profile_model.dart';
+import 'block3_hot_tab/streamer_profile_screen.dart';
+import 'block3_hot_tab/profile_actions_dialogs.dart';
+import 'block3_hot_tab/profile_interaction_handler.dart';
 
 void main() => runApp(const FizzLiveProApp());
 
@@ -17,11 +31,12 @@ class FizzLiveProApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fizz Live Pro',
       debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
+      // Block 3-ன் உலகளாவிய Dribbble தீம் (Deep Purple & Indigo) ஆப் முழுமைக்கும் அப்ளை ஆகும்
+      theme: DribbbleTheme.themeData,
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginAuthScreen(),
+        '/login': (context) => const LoginAuthScreenProfileBridge(),
         '/popups': (context) => const PopupsHomeWrapper(),
         '/main_shell': (context) => const MainShellNavigation(),
       },
@@ -29,6 +44,7 @@ class FizzLiveProApp extends StatelessWidget {
   }
 }
 
+// --- SPLASH SCREEN ---
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -48,19 +64,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppThemeColors.backgroundDark,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             Text(
               'Fizz Live Pro',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppThemeColors.primaryPurple),
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: DribbbleTheme.primaryPurple,
+              ),
             ),
             SizedBox(height: 8),
             Text(
               'Live Streaming 18+',
-              style: TextStyle(fontSize: 16, color: AppThemeColors.textMuted),
+              style: TextStyle(
+                fontSize: 16,
+                color: DribbbleTheme.textMuted,
+              ),
             ),
           ],
         ),
@@ -69,6 +91,17 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+// --- BRIDGE FOR BLOCK 1 LOGIN ---
+class LoginAuthScreenProfileBridge extends StatelessWidget {
+  const LoginAuthScreenProfileBridge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const LoginAuthScreen();
+  }
+}
+
+// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
