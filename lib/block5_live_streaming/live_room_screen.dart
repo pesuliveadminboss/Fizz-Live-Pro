@@ -31,36 +31,39 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isMiniScreen) {
-      // Floating Mini Screen View
-      return Positioned(
-        top: 100,
-        right: 20,
-        child: GestureDetector(
-          onTap: () => setState(() => _isMiniScreen = false),
-          child: Container(
-            width: 120,
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.pinkAccent, width: 2),
-            ),
-            child: Stack(
-              children: [
-                const Center(child: Icon(Icons.person, color: Colors.white54, size: 40)),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.close, color: Colors.white, size: 16),
-                  ),
+      return Stack(
+        children: [
+          Positioned(
+            top: 100,
+            right: 20,
+            child: GestureDetector(
+              onTap: () => setState(() => _isMiniScreen = false),
+              child: Container(
+                width: 120,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.pinkAccent, width: 2),
                 ),
-                const Center(child: Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 10))),
-              ],
+                child: Stack(
+                  children: [
+                    const Center(child: Icon(Icons.person, color: Colors.white54, size: 40)),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.close, color: Colors.white, size: 16),
+                      ),
+                    ),
+                    const Center(child: Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 10))),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       );
     }
 
@@ -78,50 +81,49 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           ),
 
-          // Top Header (Streamer Profile, Viewers Count & Mini Screen / Close)
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.pinkAccent,
-                    child: const Icon(Icons.person, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.streamerName,
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                        '24.8k 👁️',
-                        style: TextStyle(color: Colors.white60, fontSize: 10),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  // Mini-Screen Button (2 x)
-                  IconButton(
-                    icon: const Text('2 x', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                    onPressed: () => setState(() => _isMiniScreen = true),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
+          // Top Header Area
+          Positioned(
+            top: 40,
+            left: 16,
+            right: 16,
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.pinkAccent,
+                  child: Icon(Icons.person, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.streamerName,
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      '24.8k 👁️',
+                      style: TextStyle(color: Colors.white60, fontSize: 10),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Text('2 x', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  onPressed: () => setState(() => _isMiniScreen = true),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             ),
           ),
 
-          // Top Follow Banner (Matching screenshot 3)
+          // Follow Banner Below Header
           Positioned(
-            top: 90,
+            top: 100,
             left: 16,
             right: 16,
             child: Container(
@@ -154,15 +156,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           ),
 
-          // Bottom Area (Live Chat Stream, Warning Message & Action Toolbar)
+          // Bottom Chat & Toolbar Area (Properly positioned at bottom)
           Positioned(
-            bottom: 16,
+            bottom: 20,
             left: 16,
             right: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Warning Message Box (Matching screenshot 4)
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -176,10 +178,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Live Chat Stream Box
                 SizedBox(
-                  height: 100,
+                  height: 90,
                   child: ListView.builder(
                     itemCount: _liveChats.length,
                     itemBuilder: (context, index) {
@@ -205,13 +205,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Bottom Action Toolbar (Chat Input, Gift, Follow, Video Call)
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.black54,
                           borderRadius: BorderRadius.circular(20),
@@ -220,7 +218,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Synced Follow Button on bottom bar
                     GestureDetector(
                       onTap: _toggleFollow,
                       child: CircleAvatar(
@@ -234,7 +231,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // 1-to-1 Video Call Button
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
@@ -253,4 +249,3 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 }
-
