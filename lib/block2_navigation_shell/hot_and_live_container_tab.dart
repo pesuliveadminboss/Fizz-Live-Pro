@@ -62,12 +62,9 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
                 ],
               ),
             ),
-            // Search & Country Filter Icons
             IconButton(
               icon: const Icon(Icons.search, color: Colors.white),
-              onPressed: () {
-                // Search action trigger
-              },
+              onPressed: () {},
             ),
             IconButton(
               icon: const Icon(Icons.public, color: Colors.white),
