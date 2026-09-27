@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'hot_tab_grid_screen.dart';
 import 'country_search_filter_helper.dart';
+import '../block5_live_streaming/live_tab_screen.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
   const HotAndLiveContainerTab({super.key});
@@ -9,62 +10,100 @@ class HotAndLiveContainerTab extends StatefulWidget {
   State<HotAndLiveContainerTab> createState() => _HotAndLiveContainerTabState();
 }
 
-class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> {
-  String selectedCountryFilter = 'All';
+class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCountry = 'All';
 
-  void _openSearchDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => const SearchStreamerDialog(),
-    );
+  @override
+  void initState() {
+    super.initState();
+    // 4 Tabs: Hot, Live, Party, Match
+    _tabController = TabController(length: 4, vsync: this);
   }
 
-  void _openCountryFilterModal() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1D1B36),
-      builder: (ctx) => CountryFilterListModal(
-        selectedCountry: selectedCountryFilter,
-        onSelected: (country) {
-          setState(() => selectedCountryFilter = country);
-          Navigator.pop(ctx);
-        },
-      ),
-    );
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _openCountryFilter() async {
+    final String? result = await CountrySearchFilterHelper.showCountryFilterDialog(context, _selectedCountry);
+    if (result != null) {
+      setState(() {
+        _selectedCountry = result;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Column(
+    return Scaffold(
+      backgroundColor: const Color(0xFF121026),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121026),
+        elevation: 0,
+        title: Row(
+          children: [
+            // Tabs Bar (Hot, Live, Party, Match)
+            Expanded(
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                indicatorColor: Colors.pinkAccent,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white60,
+                labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                tabs: const [
+                  Tab(text: 'Hot'),
+                  Tab(text: 'Live'),
+                  Tab(text: 'Party'),
+                  Tab(text: 'Match'),
+                ],
+              ),
+            ),
+            // Country Filter Button matching original Block 2 feature
+            IconButton(
+              icon: const Icon(Icons.filter_list, color: Colors.white),
+              onPressed: _openCountryFilter,
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          AppBar(
-            backgroundColor: const Color(0xFF121026),
-            title: const Text('Fizz Live Pro', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            actions: [
-              IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: _openSearchDialog),
-              IconButton(icon: const Icon(Icons.public, color: Colors.white), onPressed: _openCountryFilterModal),
-            ],
-            bottom: const TabBar(
-              indicatorColor: Color(0xFFF97316),
-              labelColor: Color(0xFFF97316),
-              unselectedLabelColor: Colors.white70,
-              tabs: [
-                Tab(text: 'Hot'),
-                Tab(text: 'Live'),
-                Tab(text: 'Party'),
-                Tab(text: 'Match'),
+          // 1. Hot Tab (Original Grid Screen with Search & Filter integrated)
+          HotTabGridScreen(
+            searchController: _searchController,
+            selectedCountry: _selectedCountry,
+          ),
+          
+          // 2. Live Tab (Block 5 Only Live Streamers Grid & Live Room)
+          const LiveTabScreen(),
+          
+          // 3. Party Tab Placeholder
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.party_mode, size: 64, color: Colors.white24),
+                SizedBox(height: 12),
+                Text('Party Rooms Coming Soon 🎉', style: TextStyle(color: Colors.white60, fontSize: 14)),
               ],
             ),
           ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                HotTabGridScreen(countryFilter: selectedCountryFilter),
-                const Center(child: Text('Live Tab Content', style: TextStyle(color: Colors.white))),
-                const Center(child: Text('Party Screen', style: TextStyle(color: Colors.white))),
-                const Center(child: Text('Match Screen', style: TextStyle(color: Colors.white))),
+          
+          // 4. Match Tab Placeholder
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.people_alt, size: 64, color: Colors.white24),
+                SizedBox(height: 12),
+                Text('Matchmaking Coming Soon 💖', style: TextStyle(color: Colors.white60, fontSize: 14)),
               ],
             ),
           ),
@@ -73,4 +112,3 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> {
     );
   }
 }
-
