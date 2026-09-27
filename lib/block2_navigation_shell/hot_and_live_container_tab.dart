@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'hot_tab_grid_screen.dart';
+import '../block5_live_streaming/live_tab_screen.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
   const HotAndLiveContainerTab({super.key});
@@ -14,6 +15,7 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
   @override
   void initState() {
     super.initState();
+    // 4 Tabs: Hot, Live, Party, Match
     _tabController = TabController(length: 4, vsync: this);
   }
 
@@ -48,17 +50,13 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
       body: TabBarView(
         controller: _tabController,
         children: [
+          // 1. Hot Tab (Original Grid Screen)
           const HotTabGridScreen(),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.live_tv, size: 64, color: Colors.white24),
-                SizedBox(height: 12),
-                Text('Live Streamers Tab', style: TextStyle(color: Colors.white60, fontSize: 14)),
-              ],
-            ),
-          ),
+          
+          // 2. Live Tab (Directly linked to Block 5 LiveTabScreen)
+          const LiveTabScreen(),
+          
+          // 3. Party Tab Placeholder
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,6 +67,8 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
               ],
             ),
           ),
+          
+          // 4. Match Tab Placeholder
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
