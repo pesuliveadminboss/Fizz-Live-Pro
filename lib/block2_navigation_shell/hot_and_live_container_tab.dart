@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'hot_tab_grid_screen.dart';
-import 'country_search_filter_helper.dart';
 import '../block5_live_streaming/live_tab_screen.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
@@ -12,7 +11,6 @@ class HotAndLiveContainerTab extends StatefulWidget {
 
 class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedCountry = 'All';
 
   @override
   void initState() {
@@ -27,15 +25,6 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
     super.dispose();
   }
 
-  void _openCountryFilter() async {
-    final String? result = await CountrySearchFilterHelper.showCountryFilterDialog(context, _selectedCountry);
-    if (result != null) {
-      setState(() {
-        _selectedCountry = result;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,38 +32,26 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
       appBar: AppBar(
         backgroundColor: const Color(0xFF121026),
         elevation: 0,
-        title: Row(
-          children: [
-            // Tabs Bar (Hot, Live, Party, Match)
-            Expanded(
-              child: TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                indicatorColor: Colors.pinkAccent,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
-                labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                tabs: const [
-                  Tab(text: 'Hot'),
-                  Tab(text: 'Live'),
-                  Tab(text: 'Party'),
-                  Tab(text: 'Match'),
-                ],
-              ),
-            ),
-            // Country Filter Button
-            IconButton(
-              icon: const Icon(Icons.filter_list, color: Colors.white),
-              onPressed: _openCountryFilter,
-            ),
+        title: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          indicatorColor: Colors.pinkAccent,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          tabs: const [
+            Tab(text: 'Hot'),
+            Tab(text: 'Live'),
+            Tab(text: 'Party'),
+            Tab(text: 'Match'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 1. Hot Tab Grid Screen with country filter parameter
-          HotTabGridScreen(countryFilter: _selectedCountry),
+          // 1. Hot Tab Grid Screen
+          const HotTabGridScreen(),
           
           // 2. Live Tab (Block 5 Only Live Streamers Grid & Live Room)
           const LiveTabScreen(),
