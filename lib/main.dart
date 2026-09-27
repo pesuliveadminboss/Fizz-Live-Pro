@@ -28,6 +28,10 @@ import 'block4_private_chat/voice_recorder_helper.dart';
 import 'block4_private_chat/image_picker_helper.dart';
 import 'block4_private_chat/audio_player_helper.dart';
 
+// --- BLOCK 5 IMPORTS (Live Streaming Room & Live Tab Screen) ---
+import 'block5_live_streaming/live_tab_screen.dart';
+import 'block5_live_streaming/live_room_screen.dart';
+
 void main() => runApp(const FizzLiveProApp());
 
 class FizzLiveProApp extends StatelessWidget {
@@ -46,11 +50,13 @@ class FizzLiveProApp extends StatelessWidget {
         '/popups': (context) => const PopupsHomeWrapper(),
         '/main_shell': (context) => const MainShellNavigation(),
         '/private_chat': (context) => const PrivateChatScreen(),
+        '/live_tab': (context) => const LiveTabScreen(),
       },
     );
   }
 }
 
+// --- SPLASH SCREEN ---
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -97,6 +103,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+// --- BRIDGE FOR BLOCK 1 LOGIN ---
 class LoginAuthScreenProfileBridge extends StatelessWidget {
   const LoginAuthScreenProfileBridge({super.key});
 
@@ -106,6 +113,7 @@ class LoginAuthScreenProfileBridge extends StatelessWidget {
   }
 }
 
+// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
@@ -140,4 +148,3 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
     return const MainShellNavigation();
   }
 }
-
