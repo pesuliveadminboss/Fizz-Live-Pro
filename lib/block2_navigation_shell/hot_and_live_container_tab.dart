@@ -12,7 +12,6 @@ class HotAndLiveContainerTab extends StatefulWidget {
 
 class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TextEditingController _searchController = TextEditingController();
   String _selectedCountry = 'All';
 
   @override
@@ -25,7 +24,6 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
   @override
   void dispose() {
     _tabController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -64,7 +62,7 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
                 ],
               ),
             ),
-            // Country Filter Button matching original Block 2 feature
+            // Country Filter Button
             IconButton(
               icon: const Icon(Icons.filter_list, color: Colors.white),
               onPressed: _openCountryFilter,
@@ -75,11 +73,8 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 1. Hot Tab (Original Grid Screen with Search & Filter integrated)
-          HotTabGridScreen(
-            searchController: _searchController,
-            selectedCountry: _selectedCountry,
-          ),
+          // 1. Hot Tab Grid Screen with country filter parameter
+          HotTabGridScreen(countryFilter: _selectedCountry),
           
           // 2. Live Tab (Block 5 Only Live Streamers Grid & Live Room)
           const LiveTabScreen(),
