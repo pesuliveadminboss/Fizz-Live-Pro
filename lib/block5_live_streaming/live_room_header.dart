@@ -19,7 +19,7 @@ class LiveRoomHeader extends StatefulWidget {
 }
 
 class _LiveRoomHeaderState extends State<LiveRoomHeader> {
-  int _viewerCount = 2;
+  final int _viewerCount = 2;
 
   @override
   Widget build(BuildContext context) {
