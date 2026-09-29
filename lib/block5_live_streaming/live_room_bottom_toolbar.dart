@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class LiveRoomBottomToolbar extends StatefulWidget {
-  final bool isFollowing;
-  final VoidCallback onToggleFollow;
   final VoidCallback onOpenTools;
   final VoidCallback onVideoCall;
+  final VoidCallback onGiftTap;
+  final VoidCallback onLikeTap;
   final ValueChanged<String> onSendMessage;
 
   const LiveRoomBottomToolbar({
     super.key,
-    required this.isFollowing,
-    required this.onToggleFollow,
     required this.onOpenTools,
     required this.onVideoCall,
+    required this.onGiftTap,
+    required this.onLikeTap,
     required this.onSendMessage,
   });
 
@@ -102,45 +102,41 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
 
         const Spacer(),
 
-        // Tools Menu Icon (Four dots / menu)
+        // Center Big Heart Like Button
         GestureDetector(
-          onTap: widget.onOpenTools,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(Icons.grid_view, color: Colors.white, size: 18),
-          ),
-        ),
-        const SizedBox(width: 8),
-
-        // Follow Heart Button
-        GestureDetector(
-          onTap: widget.onToggleFollow,
-          child: CircleAvatar(
+          onTap: widget.onLikeTap,
+          child: const CircleAvatar(
             radius: 18,
-            backgroundColor: widget.isFollowing ? Colors.black54 : Colors.pinkAccent,
-            child: Icon(
-              widget.isFollowing ? Icons.check : Icons.favorite,
-              color: Colors.white,
-              size: 16,
-            ),
+            backgroundColor: Colors.pinkAccent,
+            child: Icon(Icons.favorite, color: Colors.white, size: 18),
           ),
         ),
         const SizedBox(width: 8),
 
-        // Gift / Video Call Button
+        // Gift Box Icon
         GestureDetector(
-          onTap: widget.onVideoCall,
+          onTap: widget.onGiftTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        // Video Call Button (Red accent as in screenshot)
+        GestureDetector(
+          onTap: widget.onVideoCall,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.redAccent,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(Icons.videocam, color: Colors.white, size: 18),
           ),
         ),
       ],
