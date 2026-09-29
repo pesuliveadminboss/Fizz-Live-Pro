@@ -1,6 +1,32 @@
 import 'package:flutter/material.dart';
 
 class LiveAdsIntegrationHelper {
+  static Widget buildRightSideMiniAds() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.pinkAccent, width: 1.5),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.card_giftcard, color: Colors.pinkAccent, size: 18),
+              SizedBox(height: 2),
+              Text('Gems', style: TextStyle(color: Colors.white, fontSize: 8)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   static Widget buildSlidingMiniAd() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -40,3 +66,4 @@ class LiveAdsIntegrationHelper {
     );
   }
 }
+
