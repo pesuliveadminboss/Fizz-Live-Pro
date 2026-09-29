@@ -15,6 +15,9 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isFollowing = false;
+  bool _isMiniScreen = false;
+  int _currentIndex = 0;
+
   final List<Map<String, String>> _liveChats = [
     {'user': 'Maryam ❤️', 'message': 'Hi! Thanks for joining my live, feel free to talk with me'},
     {'user': 'guest', 'message': 'joined the room'},
@@ -26,102 +29,179 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
   }
 
+  void _addMessage(String msg) {
+    setState(() {
+      _liveChats.add({'user': 'You', 'message': msg});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121026),
-      body: Stack(
+    // Floating Mini Screen View
+    if (_isMiniScreen) {
+      return Stack(
         children: [
-          Positioned.fill(
-            child: Container(
-              color: const Color(0xFF1D1B36),
-              child: const Center(
-                child: Icon(Icons.person, size: 150, color: Colors.white10),
+          Positioned(
+            top: 100,
+            right: 20,
+            child: GestureDetector(
+              onTap: () => setState(() => _isMiniScreen = false),
+              child: Container(
+                width: 130,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.pinkAccent, width: 2),
+                ),
+                child: Stack(
+                  children: [
+                    const Center(child: Icon(Icons.person, color: Colors.white54, size: 50)),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.black54,
+                          child: Icon(Icons.close, color: Colors.white, size: 12),
+                        ),
+                      ),
+                    ),
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 120),
+                        child: Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-
-          // Top Header Bar
-          Positioned(
-            top: 40,
-            left: 16,
-            right: 16,
-            child: LiveRoomHeader(
-              streamer: widget.streamer,
-              onClose: () => Navigator.pop(context),
-            ),
-          ),
-
-          // Right Side Mini Ads Position
-          Positioned(
-            top: 100,
-            right: 16,
-            child: LiveAdsIntegrationHelper.buildRightSideMiniAds(),
-          ),
-
-          // Bottom Chat & Toolbar
-          Positioned(
-            bottom: 20,
-            left: 16,
-            right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.amber.withOpacity(0.5)),
-                  ),
-                  child: const Text(
-                    'Pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-                    style: TextStyle(color: Colors.amberAccent, fontSize: 10),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 90,
-                  child: ListView.builder(
-                    itemCount: _liveChats.length,
-                    itemBuilder: (context, index) {
-                      final chat = _liveChats[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2.0),
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '${chat['user']}: ',
-                                style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                              TextSpan(
-                                text: chat['message'],
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 8),
-                LiveRoomBottomToolbar(
-                  isFollowing: _isFollowing,
-                  onToggleFollow: _toggleFollow,
-                  onOpenTools: () => LiveToolsAndGiftsHelper.showToolsMenu(context, () {}),
-                  onVideoCall: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
         ],
+      );
+    }
+
+    // Full Screen with Vertical Reel-like PageView Scrolling
+    return Scaffold(
+      backgroundColor: const Color(0xFF121026),
+      body: PageView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: LiveStreamer.dummyStreamers.length,
+        controller: PageController(initialPage: LiveStreamer.dummyStreamers.indexWhere((s) => s.id == widget.streamer.id).clamp(0, LiveStreamer.dummyStreamers.length - 1)),
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        itemBuilder: (context, index) {
+          final currentStreamer = LiveStreamer.dummyStreamers[index];
+
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  color: const Color(0xFF1D1B36),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.person, size: 150, color: Colors.white10),
+                        const SizedBox(height: 10),
+                        Text('Live: ${currentStreamer.name}', style: const TextStyle(color: Colors.white38, fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Top Header Bar
+              Positioned(
+                top: 40,
+                left: 16,
+                right: 16,
+                child: LiveRoomHeader(
+                  streamer: currentStreamer,
+                  onMinimize: () => setState(() => _isMiniScreen = true),
+                  onClose: () => Navigator.pop(context),
+                ),
+              ),
+
+              // Bottom Chat & Toolbar
+              Positioned(
+                bottom: 20,
+                left: 16,
+                right: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.amber.withOpacity(0.5)),
+                      ),
+                      child: const Text(
+                        'Pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Compact Chat Box (Scrollable & auto-hiding)
+                    SizedBox(
+                      height: 90,
+                      child: ListView.builder(
+                        itemCount: _liveChats.length,
+                        itemBuilder: (context, chatIndex) {
+                          final chat = _liveChats[chatIndex];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${chat['user']}: ',
+                                    style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: chat['message'],
+                                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Sliding Mini Ad above bottom toolbar
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: LiveAdsIntegrationHelper.buildSlidingMiniAd(),
+                    ),
+                    const SizedBox(height: 8),
+                    LiveRoomBottomToolbar(
+                      isFollowing: _isFollowing,
+                      onToggleFollow: _toggleFollow,
+                      onOpenTools: () => LiveToolsAndGiftsHelper.showToolsMenu(context, () => setState(() => _isMiniScreen = true)),
+                      onVideoCall: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Opening Gift & Video Call options...'), duration: Duration(seconds: 1)),
+                        );
+                      },
+                      onSendMessage: _addMessage,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
