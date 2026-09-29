@@ -46,7 +46,6 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
 
   @override
   Widget build(BuildContext context) {
-    // Exact Country and Search filtering logic
     final searchedStreamers = LiveStreamer.dummyStreamers.where((streamer) {
       final matchesSearch = streamer.name.toLowerCase().contains(_searchQuery);
       final matchesCountry = _selectedCountry == 'All' || 
@@ -78,11 +77,11 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
               )
             : TabBar(
                 controller: _tabController,
-                isScrollable: true,
+                isScrollable: false,
                 indicatorColor: Colors.pinkAccent,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white60,
-                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 tabs: const [
                   Tab(text: 'Hot'),
                   Tab(text: 'Live'),
