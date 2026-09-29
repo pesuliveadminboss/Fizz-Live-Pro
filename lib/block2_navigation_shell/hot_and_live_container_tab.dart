@@ -81,7 +81,8 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
                 indicatorColor: Colors.pinkAccent,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white60,
-                labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 tabs: const [
                   Tab(text: 'Hot'),
                   Tab(text: 'Live'),
@@ -156,3 +157,4 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
     );
   }
 }
+
