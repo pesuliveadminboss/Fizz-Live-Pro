@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'hot_tab_grid_screen.dart';
 import 'country_search_filter_helper.dart';
 import '../block5_live_streaming/live_tab_screen.dart';
+import '../block5_live_streaming/live_streamer_model.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
   const HotAndLiveContainerTab({super.key});
@@ -12,8 +13,10 @@ class HotAndLiveContainerTab extends StatefulWidget {
 
 class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TextEditingController _searchController = TextEditingController();
   String _selectedCountry = 'All';
+  String _searchQuery = '';
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +37,9 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
       setState(() {
         _selectedCountry = result;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Country filtered by: $_selectedCountry'), duration: const Duration(seconds: 1)),
+      );
     }
   }
 
@@ -44,34 +50,61 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
       appBar: AppBar(
         backgroundColor: const Color(0xFF121026),
         elevation: 0,
-        title: Row(
-          children: [
-            Expanded(
-              child: TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                indicatorColor: Colors.pinkAccent,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
-                labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                tabs: const [
-                  Tab(text: 'Hot'),
-                  Tab(text: 'Live'),
-                  Tab(text: 'Party'),
-                  Tab(text: 'Match'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Search streamers...',
+                  hintStyle: TextStyle(color: Colors.white60),
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
+              )
+            : Row(
+                children: [
+                  // Fixed TabBar (Non-sliding / No movement)
+                  Expanded(
+                    child: TabBar(
+                      controller: _tabController,
+                      isScrollable: false,
+                      indicatorColor: Colors.pinkAccent,
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Colors.white60,
+                      labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      tabs: const [
+                        Tab(text: 'Hot'),
+                        Tab(text: 'Live'),
+                        Tab(text: 'Party'),
+                        Tab(text: 'Match'),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.public, color: Colors.white),
-              onPressed: _openCountryFilter,
-            ),
-          ],
-        ),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchQuery = '';
+                  _searchController.clear();
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.public, color: Colors.white),
+            onPressed: _openCountryFilter,
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
