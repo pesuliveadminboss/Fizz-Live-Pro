@@ -19,7 +19,20 @@ class LiveRoomHeader extends StatefulWidget {
 }
 
 class _LiveRoomHeaderState extends State<LiveRoomHeader> {
+  bool _isFollowing = false;
   final int _viewerCount = 2;
+
+  void _toggleFollow() {
+    setState(() {
+      _isFollowing = !_isFollowing;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isFollowing ? 'Following ${widget.streamer.name}' : 'Unfollowed ${widget.streamer.name}'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +42,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
+            // Profile Capsule with Heart Follow Button inside
             GestureDetector(
               onTap: () {
                 showModalBottomSheet(
@@ -57,12 +71,20 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                       style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.favorite, color: Colors.pinkAccent, size: 14),
+                    GestureDetector(
+                      onTap: _toggleFollow,
+                      child: Icon(
+                        _isFollowing ? Icons.favorite : Icons.favorite_border,
+                        color: _isFollowing ? Colors.pinkAccent : Colors.white70,
+                        size: 16,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
             const Spacer(),
+            // Viewer Count and 'X' Minimize/Close Button
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -118,3 +140,4 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
     );
   }
 }
+
