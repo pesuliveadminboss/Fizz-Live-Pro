@@ -75,7 +75,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Profile Capsule (Opens Full Profile on Tap)
         GestureDetector(
           onTap: () {
             showModalBottomSheet(
@@ -104,7 +103,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                // Clickable Viewer Count opening Viewers Popup
                 GestureDetector(
                   onTap: _showViewersPopup,
                   child: Row(
