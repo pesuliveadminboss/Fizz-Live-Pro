@@ -52,7 +52,6 @@ class _LiveTabScreenState extends State<LiveTabScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  // AdMob Banner between grid content
                   LiveAdsIntegrationHelper.buildGridBannerAd(),
                 ],
               ),
@@ -63,4 +62,3 @@ class _LiveTabScreenState extends State<LiveTabScreen> {
     );
   }
 }
-
