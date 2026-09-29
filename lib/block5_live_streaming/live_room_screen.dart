@@ -15,7 +15,6 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isFollowing = false;
-  bool _isMiniScreen = false;
   final List<Map<String, String>> _liveChats = [
     {'user': 'Maryam ❤️', 'message': 'Hi! Thanks for joining my live, feel free to talk with me'},
     {'user': 'guest', 'message': 'joined the room'},
@@ -25,53 +24,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     setState(() {
       _isFollowing = !_isFollowing;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isFollowing ? 'Following ${widget.streamer.name}' : 'Unfollowed ${widget.streamer.name}'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isMiniScreen) {
-      return Stack(
-        children: [
-          Positioned(
-            top: 100,
-            right: 20,
-            child: GestureDetector(
-              onTap: () => setState(() => _isMiniScreen = false),
-              child: Container(
-                width: 120,
-                height: 180,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.pinkAccent, width: 2),
-                ),
-                child: Stack(
-                  children: [
-                    const Center(child: Icon(Icons.person, color: Colors.white54, size: 40)),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.close, color: Colors.white, size: 16),
-                      ),
-                    ),
-                    const Center(child: Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 10))),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
       body: Stack(
@@ -85,59 +41,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           ),
 
-          // Top Header
+          // Top Header Bar
           Positioned(
             top: 40,
             left: 16,
             right: 16,
             child: LiveRoomHeader(
               streamer: widget.streamer,
-              onMinimize: () => setState(() => _isMiniScreen = true),
               onClose: () => Navigator.pop(context),
             ),
           ),
 
-          // Follow Banner & Sliding Mini Ad
+          // Right Side Mini Ads Position
           Positioned(
             top: 100,
-            left: 16,
             right: 16,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black45,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Follow ${widget.streamer.name} and Send Free Gift',
-                          style: const TextStyle(color: Colors.white, fontSize: 11),
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: _toggleFollow,
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: _isFollowing ? Colors.black : Colors.pinkAccent,
-                            child: Icon(
-                              _isFollowing ? Icons.check : Icons.favorite,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                LiveAdsIntegrationHelper.buildSlidingMiniAd(),
-              ],
-            ),
+            child: LiveAdsIntegrationHelper.buildRightSideMiniAds(),
           ),
 
           // Bottom Chat & Toolbar
@@ -192,10 +111,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 LiveRoomBottomToolbar(
                   isFollowing: _isFollowing,
                   onToggleFollow: _toggleFollow,
-                  onOpenTools: () => LiveToolsAndGiftsHelper.showToolsMenu(context, () => setState(() => _isMiniScreen = true)),
+                  onOpenTools: () => LiveToolsAndGiftsHelper.showToolsMenu(context, () {}),
                   onVideoCall: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Initiating Video Call with coins...'), duration: Duration(seconds: 1)),
+                      const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
                     );
                   },
                 ),
