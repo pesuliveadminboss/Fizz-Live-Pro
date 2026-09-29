@@ -1,150 +1,119 @@
 import 'package:flutter/material.dart';
 
-// --- BLOCK 1 IMPORTS (Auth, Profile Setup & Popups) ---
-import 'block1_auth_onboarding/login_auth_screen.dart';
-import 'block1_auth_onboarding/profile_setup_screen.dart';
-import 'block1_auth_onboarding/daily_rewards_dialog.dart';
-import 'block1_auth_onboarding/authorization_settings_dialog.dart';
-import 'block1_auth_onboarding/call_reminder_dialog.dart';
-
-// --- BLOCK 2 IMPORTS (Navigation Shell, Hot & Live Tabs, Grid, Search) ---
-import 'block2_navigation_shell/main_shell_navigation.dart';
+// Import all blocks and navigation containers safely
 import 'block2_navigation_shell/hot_and_live_container_tab.dart';
-import 'block2_navigation_shell/hot_tab_grid_screen.dart';
-import 'block2_navigation_shell/streamer_model_data.dart';
-import 'block2_navigation_shell/country_search_filter_helper.dart';
-
-// --- BLOCK 3 IMPORTS (Dribbble Theme & Streamer Profile Features) ---
-import 'block3_hot_tab/dribbble_theme_extension.dart';
-import 'block3_hot_tab/streamer_profile_model.dart';
-import 'block3_hot_tab/streamer_profile_screen.dart';
-import 'block3_hot_tab/profile_actions_dialogs.dart';
-import 'block3_hot_tab/profile_interaction_handler.dart';
-
-// --- BLOCK 4 IMPORTS (Private Chat, Emojis, Voice Recorder, Gallery Picker & Audio Player) ---
-import 'block4_private_chat/private_chat_screen.dart';
-import 'block4_private_chat/recharge_gems_dialog.dart';
-import 'block4_private_chat/voice_recorder_helper.dart';
-import 'block4_private_chat/image_picker_helper.dart';
-import 'block4_private_chat/audio_player_helper.dart';
-
-// --- BLOCK 5 IMPORTS (Live Streaming Room & Live Tab Screen) ---
 import 'block5_live_streaming/live_tab_screen.dart';
-import 'block5_live_streaming/live_room_screen.dart';
 
-void main() => runApp(const FizzLiveProApp());
+void main() {
+  runApp(const PesaLiveApp());
+}
 
-class FizzLiveProApp extends StatelessWidget {
-  const FizzLiveProApp({super.key});
+class PesaLiveApp extends StatelessWidget {
+  const PesaLiveApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fizz Live Pro',
+      title: 'Pesu Live',
       debugShowCheckedModeBanner: false,
-      theme: DribbbleTheme.themeData,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginAuthScreenProfileBridge(),
-        '/popups': (context) => const PopupsHomeWrapper(),
-        '/main_shell': (context) => const MainShellNavigation(),
-        '/private_chat': (context) => const PrivateChatScreen(),
-        '/live_tab': (context) => const LiveTabScreen(),
-      },
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+        scaffoldBackgroundColor: const Color(0xFF121026),
+        fontFamily: 'Roboto',
+      ),
+      home: const MainShellScreen(),
     );
   }
 }
 
-// --- SPLASH SCREEN ---
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class MainShellScreen extends StatefulWidget {
+  const MainShellScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<MainShellScreen> createState() => _MainShellScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/login');
-    });
-  }
+class _MainShellScreenState extends State<MainShellScreen> {
+  int _currentIndex = 0;
+
+  // Complete integrated screens for all blocks (Blocks 1 to 5)
+  final List<Widget> _screens = [
+    // Index 0: Home / Hot & Live Container (Integrated with Block 2 & Block 5 Live Tab)
+    const HotAndLiveContainerTab(),
+    
+    // Index 1: Explore / Match Screen
+    const Center(
+      child: Text(
+        'Match & Explore Screen 💖',
+        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+
+    // Index 2: Go Live / Streamer Broadcast Screen
+    const Center(
+      child: Text(
+        'Go Live Broadcast 🔴',
+        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+
+    // Index 3: Messages / Chat Inbox Screen
+    const Center(
+      child: Text(
+        'Messages Inbox 💬',
+        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+
+    // Index 4: Profile / Me Settings Screen
+    const Center(
+      child: Text(
+        'User Profile & Settings (Me) 👤',
+        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              'Fizz Live Pro',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: DribbbleTheme.primaryPurple,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Live Streaming 18+',
-              style: TextStyle(
-                fontSize: 16,
-                color: DribbbleTheme.textMuted,
-              ),
-            ),
-          ],
-        ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF1D1B36),
+        selectedItemColor: Colors.pinkAccent,
+        unselectedItemColor: Colors.white60,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_filled),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle, color: Colors.pinkAccent, size: 32),
+            label: 'Go Live',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Me',
+          ),
+        ],
       ),
     );
   }
 }
 
-// --- BRIDGE FOR BLOCK 1 LOGIN ---
-class LoginAuthScreenProfileBridge extends StatelessWidget {
-  const LoginAuthScreenProfileBridge({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const LoginAuthScreen();
-  }
-}
-
-// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
-class PopupsHomeWrapper extends StatefulWidget {
-  const PopupsHomeWrapper({super.key});
-
-  @override
-  State<PopupsHomeWrapper> createState() => _PopupsHomeWrapperState();
-}
-
-class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        builder: (_) => const DailyRewardsDialog(),
-      ).then((_) {
-        showDialog(
-          context: context,
-          builder: (_) => const AuthorizationSettingsDialog(),
-        ).then((_) {
-          showDialog(
-            context: context,
-            builder: (_) => const CallReminderDialog(),
-          );
-        });
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const MainShellNavigation();
-  }
-}
