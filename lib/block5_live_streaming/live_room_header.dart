@@ -22,7 +22,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
   @override
   void initState() {
     super.initState();
-    // Simulate live viewer count incrementing dynamically
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) setState(() => _viewerCount = 5);
     });
@@ -35,7 +34,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Small Box Profile Bar (As seen in reference screenshot)
         GestureDetector(
           onTap: () {
             showModalBottomSheet(
@@ -64,7 +62,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                // Eye Icon with adjacent live count numbers (1, 2, 3...)
                 const Icon(Icons.remove_red_eye_outlined, color: Colors.white70, size: 12),
                 const SizedBox(width: 2),
                 Text(
