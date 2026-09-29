@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class LiveAdsIntegrationHelper {
-  // Sliding Mini Banner Ad Widget for Live Room / Grid
   static Widget buildSlidingMiniAd() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -14,14 +13,13 @@ class LiveAdsIntegrationHelper {
         mainAxisSize: MainAxisSize.min,
         children: const [
           Icon(Icons.ads_click, color: Colors.white, size: 14),
-            SizedBox(width: 4),
-            Text('Ad • Extra Gems', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+          SizedBox(width: 4),
+          Text('Ad • Extra Gems', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 
-  // Grid Row Banner Ad placeholder
   static Widget buildGridBannerAd() {
     return Container(
       height: 60,
