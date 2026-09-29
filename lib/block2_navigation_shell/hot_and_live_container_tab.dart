@@ -46,10 +46,8 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
 
   @override
   Widget build(BuildContext context) {
-    // Filter streamers based on search query and selected country
     final searchedStreamers = LiveStreamer.dummyStreamers.where((streamer) {
       final matchesSearch = streamer.name.toLowerCase().contains(_searchQuery);
-      // Assuming a mock country property or category matching for demonstration
       final matchesCountry = _selectedCountry == 'All' || streamer.category.toLowerCase() == _selectedCountry.toLowerCase() || _selectedCountry == 'India';
       return matchesSearch && matchesCountry;
     }).toList();
@@ -127,7 +125,7 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
                       itemBuilder: (context, index) {
                         return LiveStreamerGridCard(streamer: searchedStreamers[index]);
                       },
-                    ,
+                    ),
             )
           : TabBarView(
               controller: _tabController,
@@ -158,5 +156,4 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
             ),
     );
   }
-      }
-      
+}
