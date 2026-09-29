@@ -34,7 +34,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Toggle Message Input / Small Message Icon
+        // Only Small Message Icon (Expands to text field on tap, collapses elsewhere)
         _isTypingOpen
             ? Expanded(
                 child: Container(
@@ -89,14 +89,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.chat_bubble_outline, color: Colors.white, size: 18),
-                      SizedBox(width: 4),
-                      Text('Say something...', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                    ],
-                  ),
+                  child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 20),
                 ),
               ),
 
@@ -127,7 +120,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         ),
         const SizedBox(width: 8),
 
-        // Video Call Button (Red accent as in screenshot)
+        // Video Call Button
         GestureDetector(
           onTap: widget.onVideoCall,
           child: Container(
