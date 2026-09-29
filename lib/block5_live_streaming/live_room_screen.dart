@@ -14,20 +14,13 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  bool _isFollowing = false;
   bool _isMiniScreen = false;
   int _currentIndex = 0;
 
   final List<Map<String, String>> _liveChats = [
-    {'user': 'Maryam ❤️', 'message': 'Hi! Thanks for joining my live, feel free to talk with me'},
+    {'user': 'Kamyla', 'message': 'Hello, Stay and enjoy the live with me!'},
     {'user': 'guest', 'message': 'joined the room'},
   ];
-
-  void _toggleFollow() {
-    setState(() {
-      _isFollowing = !_isFollowing;
-    });
-  }
 
   void _addMessage(String msg) {
     setState(() {
@@ -37,12 +30,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Floating Mini Screen View
+    // Floating Mini Screen View (Pip)
     if (_isMiniScreen) {
       return Stack(
         children: [
           Positioned(
-            top: 100,
+            top: 80,
             right: 20,
             child: GestureDetector(
               onTap: () => setState(() => _isMiniScreen = false),
@@ -84,7 +77,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       );
     }
 
-    // Full Screen with Vertical Reel-like PageView Scrolling
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
       body: PageView.builder(
@@ -129,6 +121,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
+              // Right Side Vertical Ads & Roulette Position
+              Positioned(
+                top: 100,
+                right: 12,
+                child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
+              ),
+
               // Bottom Chat & Toolbar
               Positioned(
                 bottom: 20,
@@ -151,7 +150,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Compact Chat Box (Scrollable & auto-hiding)
+                    // Compact Chat Box
                     SizedBox(
                       height: 90,
                       child: ListView.builder(
@@ -179,19 +178,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Sliding Mini Ad above bottom toolbar
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: LiveAdsIntegrationHelper.buildSlidingMiniAd(),
-                    ),
-                    const SizedBox(height: 8),
                     LiveRoomBottomToolbar(
-                      isFollowing: _isFollowing,
-                      onToggleFollow: _toggleFollow,
-                      onOpenTools: () => LiveToolsAndGiftsHelper.showToolsMenu(context, () => setState(() => _isMiniScreen = true)),
+                      onOpenTools: () {},
                       onVideoCall: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Opening Gift & Video Call options...'), duration: Duration(seconds: 1)),
+                          const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
+                        );
+                      },
+                      onGiftTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Opening Gift Panel...'), duration: Duration(seconds: 1)),
+                        );
+                      },
+                      onLikeTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Liked Streamer ❤️'), duration: Duration(milliseconds: 500)),
                         );
                       },
                       onSendMessage: _addMessage,
@@ -206,3 +207,4 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 }
+
