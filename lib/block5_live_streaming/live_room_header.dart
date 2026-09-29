@@ -29,7 +29,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule with Follow Heart inside
             GestureDetector(
               onTap: () {
                 showModalBottomSheet(
@@ -47,11 +46,10 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 12,
                       backgroundColor: Colors.pinkAccent,
-                      backgroundImage: widget.streamer.imageUrl.isNotEmpty ? NetworkImage(widget.streamer.imageUrl) : null,
-                      child: widget.streamer.imageUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 14) : null,
+                      child: Icon(Icons.person, color: Colors.white, size: 14),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -65,7 +63,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
               ),
             ),
             const Spacer(),
-            // Viewer Count and 'X' Minimize/Close Button
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
