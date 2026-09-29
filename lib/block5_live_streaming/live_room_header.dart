@@ -4,11 +4,13 @@ import 'streamer_profile_popup.dart';
 
 class LiveRoomHeader extends StatefulWidget {
   final LiveStreamer streamer;
+  final VoidCallback onMinimize;
   final VoidCallback onClose;
 
   const LiveRoomHeader({
     super.key,
     required this.streamer,
+    required this.onMinimize,
     required this.onClose,
   });
 
@@ -17,23 +19,63 @@ class LiveRoomHeader extends StatefulWidget {
 }
 
 class _LiveRoomHeaderState extends State<LiveRoomHeader> {
-  int _viewerCount = 1;
+  int _viewerCount = 3;
+  final List<Map<String, String>> _viewersList = [
+    {'name': 'Rahul Sharma', 'age': '24', 'country': 'India'},
+    {'name': 'Pooja Verma', 'age': '22', 'country': 'India'},
+    {'name': 'John Doe', 'age': '27', 'country': 'USA'},
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) setState(() => _viewerCount = 5);
-    });
-    Future.delayed(const Duration(seconds: 6), () {
-      if (mounted) setState(() => _viewerCount = 14);
-    });
+  void _showViewersPopup() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1D1B36),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Live Viewers List',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  itemCount: _viewersList.length,
+                  itemBuilder: (context, index) {
+                    final viewer = _viewersList[index];
+                    return ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.pinkAccent,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
+                      title: Text(viewer['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      subtitle: Text('Age: ${viewer['age']} | ${viewer['country']}', style: const TextStyle(color: Colors.white60, fontSize: 12)),
+                      trailing: const Icon(Icons.favorite, color: Colors.pinkAccent, size: 16),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // Profile Capsule (Opens Full Profile on Tap)
         GestureDetector(
           onTap: () {
             showModalBottomSheet(
@@ -62,17 +104,29 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.remove_red_eye_outlined, color: Colors.white70, size: 12),
-                const SizedBox(width: 2),
-                Text(
-                  '$_viewerCount',
-                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                // Clickable Viewer Count opening Viewers Popup
+                GestureDetector(
+                  onTap: _showViewersPopup,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.remove_red_eye_outlined, color: Colors.white70, size: 12),
+                      const SizedBox(width: 2),
+                      Text(
+                        '$_viewerCount',
+                        style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
         const Spacer(),
+        IconButton(
+          icon: const Icon(Icons.picture_in_picture_outlined, color: Colors.white, size: 20),
+          onPressed: widget.onMinimize,
+        ),
         IconButton(
           icon: const Icon(Icons.close, color: Colors.white, size: 20),
           onPressed: widget.onClose,
