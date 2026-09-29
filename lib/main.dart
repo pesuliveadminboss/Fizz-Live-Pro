@@ -1,174 +1,158 @@
 import 'package:flutter/material.dart';
 
-// Import all blocks and navigation containers fully without any shortcuts
+// --- BLOCK 1 IMPORTS (Auth, Profile Setup & Popups) ---
+import 'block1_auth_onboarding/login_auth_screen.dart';
+import 'block1_auth_onboarding/profile_setup_screen.dart';
+import 'block1_auth_onboarding/daily_rewards_dialog.dart';
+import 'block1_auth_onboarding/authorization_settings_dialog.dart';
+import 'block1_auth_onboarding/call_reminder_dialog.dart';
+
+// --- BLOCK 2 IMPORTS (Navigation Shell, Hot & Live Tabs, Grid, Search) ---
+import 'block2_navigation_shell/main_shell_navigation.dart';
 import 'block2_navigation_shell/hot_and_live_container_tab.dart';
+import 'block2_navigation_shell/hot_tab_grid_screen.dart';
+import 'block2_navigation_shell/streamer_model_data.dart';
+import 'block2_navigation_shell/country_search_filter_helper.dart';
+
+// --- BLOCK 3 IMPORTS (Dribbble Theme & Streamer Profile Features) ---
+import 'block3_hot_tab/dribbble_theme_extension.dart';
+import 'block3_hot_tab/streamer_profile_model.dart';
+import 'block3_hot_tab/streamer_profile_screen.dart';
+import 'block3_hot_tab/profile_actions_dialogs.dart';
+import 'block3_hot_tab/profile_interaction_handler.dart';
+
+// --- BLOCK 4 IMPORTS (Private Chat, Emojis, Voice Recorder, Gallery Picker & Audio Player) ---
+import 'block4_private_chat/private_chat_screen.dart';
+import 'block4_private_chat/recharge_gems_dialog.dart';
+import 'block4_private_chat/voice_recorder_helper.dart';
+import 'block4_private_chat/image_picker_helper.dart';
+import 'block4_private_chat/audio_player_helper.dart';
+
+// --- BLOCK 5 IMPORTS (10 Modular Files for Live Streaming & Monetization) ---
+import 'block5_live_streaming/live_streamer_model.dart';
+import 'block5_live_streaming/live_category_filter_bar.dart';
+import 'block5_live_streaming/live_ads_integration_helper.dart';
+import 'block5_live_streaming/live_streamer_grid_card.dart';
 import 'block5_live_streaming/live_tab_screen.dart';
+import 'block5_live_streaming/live_room_header.dart';
+import 'block5_live_streaming/streamer_profile_popup.dart';
+import 'block5_live_streaming/live_room_bottom_toolbar.dart';
+import 'block5_live_streaming/live_tools_and_gifts_helper.dart';
+import 'block5_live_streaming/live_room_screen.dart';
 
-void main() {
-  runApp(const PesaLiveApp());
-}
+void main() => runApp(const FizzLiveProApp());
 
-class PesaLiveApp extends StatelessWidget {
-  const PesaLiveApp({super.key});
+class FizzLiveProApp extends StatelessWidget {
+  const FizzLiveProApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pesu Live',
+      title: 'Fizz Live Pro',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-        scaffoldBackgroundColor: const Color(0xFF121026),
-        fontFamily: 'Roboto',
-      ),
-      // Starting point maintaining Block 1 Splash, Fast Login & Daily Rewards flow
-      home: const InitialAuthSplashScreen(),
+      theme: DribbbleTheme.themeData,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginAuthScreenProfileBridge(),
+        '/popups': (context) => const PopupsHomeWrapper(),
+        '/main_shell': (context) => const MainShellNavigation(),
+        '/private_chat': (context) => const PrivateChatScreen(),
+        '/live_tab': (context) => const LiveTabScreen(),
+      },
     );
   }
 }
 
-// 1. Block 1: Initial Splash & Fast Google Login / Rewards Screen Wrapper
-class InitialAuthSplashScreen extends StatelessWidget {
-  const InitialAuthSplashScreen({super.key});
+// --- SPLASH SCREEN ---
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/login');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121026),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.live_tv, size: 90, color: Colors.pinkAccent),
-              const SizedBox(height: 24),
-              const Text(
-                'Pesu Live 18+ Streaming',
-                style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              'Fizz Live Pro',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: DribbbleTheme.primaryPurple,
               ),
-              const SizedBox(height: 12),
-              const Text(
-                'Fast Google Login, Profile Setup & Daily Rewards Enabled',
-                style: TextStyle(color: Colors.white60, fontSize: 13),
-                textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Live Streaming 18+',
+              style: TextStyle(
+                fontSize: 16,
+                color: DribbbleTheme.textMuted,
               ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pinkAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                onPressed: () {
-                  // Navigate to Main App Shell after complete initial flow
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MainAppShellScreen()),
-                  );
-                },
-                child: const Text(
-                  'Enter App (Fast Login & Rewards)',
-                  style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// 2. Main App Shell integrating Blocks 1 through 5 fully without truncation
-class MainAppShellScreen extends StatefulWidget {
-  const MainAppShellScreen({super.key});
-
-  @override
-  State<MainAppShellScreen> createState() => _MainAppShellScreenState();
-}
-
-class _MainAppShellScreenState extends State<MainAppShellScreen> {
-  int _currentIndex = 0;
-
-  // Fully integrated navigation screens covering all blocks
-  final List<Widget> _screens = [
-    // Index 0: Home / Hot & Live Container (Block 2 & Block 5 Live Tab fully linked)
-    const HotAndLiveContainerTab(),
-    
-    // Index 1: Match & Explore Screen (Block 3)
-    const Center(
-      child: Text(
-        'Match & Explore Screen 💖',
-        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-    ),
-
-    // Index 2: Go Live / Streamer Broadcast Screen
-    const Center(
-      child: Text(
-        'Go Live Broadcast 🔴',
-        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-    ),
-
-    // Index 3: Messages / Chat Inbox Screen (Block 4)
-    const Center(
-      child: Text(
-        'Messages Inbox 💬',
-        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-    ),
-
-    // Index 4: User Profile & Settings Screen (Block 1 Profile & Me)
-    const Center(
-      child: Text(
-        'User Profile & Settings (Me) 👤',
-        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-    ),
-  ];
+// --- BRIDGE FOR BLOCK 1 LOGIN ---
+class LoginAuthScreenProfileBridge extends StatelessWidget {
+  const LoginAuthScreenProfileBridge({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF1D1B36),
-        selectedItemColor: Colors.pinkAccent,
-        unselectedItemColor: Colors.white60,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle, color: Colors.pinkAccent, size: 32),
-            label: 'Go Live',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Me',
-          ),
-        ],
-      ),
-    );
+    return const LoginAuthScreen();
+  }
+}
+
+// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
+class PopupsHomeWrapper extends StatefulWidget {
+  const PopupsHomeWrapper({super.key});
+
+  @override
+  State<PopupsHomeWrapper> createState() => _PopupsHomeWrapperState();
+}
+
+class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (_) => const DailyRewardsDialog(),
+      ).then((_) {
+        showDialog(
+          context: context,
+          builder: (_) => const AuthorizationSettingsDialog(),
+        ).then((_) {
+          showDialog(
+            context: context,
+            builder: (_) => const CallReminderDialog(),
+          );
+        });
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const MainShellNavigation();
   }
 }
