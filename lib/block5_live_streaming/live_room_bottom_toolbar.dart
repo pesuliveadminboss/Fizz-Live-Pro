@@ -34,26 +34,30 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Only Small Message Icon (Expands to text field on tap, collapses elsewhere)
+        // Small Message Button matching user's screenshot circle
         _isTypingOpen
             ? Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  height: 38,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: Colors.black87,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.pinkAccent),
                   ),
                   child: TextField(
                     controller: _messageController,
                     autofocus: true,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                     decoration: InputDecoration(
                       hintText: 'Say something...',
-                      hintStyle: const TextStyle(color: Colors.white54),
+                      hintStyle: const TextStyle(color: Colors.white54, fontSize: 12),
                       border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 18),
+                        icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 16),
+                        padding: EdgeInsets.zero,
                         onPressed: () {
                           if (_messageController.text.isNotEmpty) {
                             widget.onSendMessage(_messageController.text);
@@ -84,12 +88,20 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
-                  child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 20),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.chat_bubble_outline, color: Colors.white, size: 14),
+                      SizedBox(width: 6),
+                      Text('Say something...', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    ],
+                  ),
                 ),
               ),
 
@@ -99,9 +111,9 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         GestureDetector(
           onTap: widget.onLikeTap,
           child: const CircleAvatar(
-            radius: 18,
+            radius: 16,
             backgroundColor: Colors.pinkAccent,
-            child: Icon(Icons.favorite, color: Colors.white, size: 18),
+            child: Icon(Icons.favorite, color: Colors.white, size: 16),
           ),
         ),
         const SizedBox(width: 8),
@@ -110,12 +122,12 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         GestureDetector(
           onTap: widget.onGiftTap,
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+            child: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
           ),
         ),
         const SizedBox(width: 8),
@@ -124,12 +136,12 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         GestureDetector(
           onTap: widget.onVideoCall,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.redAccent,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.videocam, color: Colors.white, size: 18),
+            child: const Icon(Icons.videocam, color: Colors.white, size: 16),
           ),
         ),
       ],
