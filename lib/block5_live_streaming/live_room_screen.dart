@@ -17,15 +17,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isMiniScreen = false;
   int _currentIndex = 0;
 
-  final List<Map<String, String>> _liveChats = [
-    {'user': 'Kamyla', 'message': 'Hello, Stay and enjoy the live with me!'},
-    {'user': 'guest', 'message': 'joined the room'},
-  ];
-
-  void _addMessage(String msg) {
-    setState(() {
-      _liveChats.add({'user': 'You', 'message': msg});
-    });
+  void _handleNewMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Message sent: $msg'), duration: const Duration(seconds: 1)),
+    );
   }
 
   @override
@@ -128,11 +123,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
               ),
 
-              // Bottom Chat & Toolbar (Restricted width matching user's blue box screenshot)
+              // Bottom Warning Box & Toolbar (Live Chat feed completely removed as requested)
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 70, // Leaves space on right for clean look matching screenshot box
+                right: 70,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -149,35 +144,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         style: TextStyle(color: Colors.amberAccent, fontSize: 9),
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    // Compact Chat Box matching screenshot box size
-                    SizedBox(
-                      height: 80,
-                      child: ListView.builder(
-                        itemCount: _liveChats.length,
-                        itemBuilder: (context, chatIndex) {
-                          final chat = _liveChats[chatIndex];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${chat['user']}: ',
-                                    style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
-                                  ),
-                                  TextSpan(
-                                    text: chat['message'],
-                                    style: const TextStyle(color: Colors.white, fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
                     LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {
@@ -195,7 +162,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           const SnackBar(content: Text('Liked Streamer ❤️'), duration: Duration(milliseconds: 500)),
                         );
                       },
-                      onSendMessage: _addMessage,
+                      onSendMessage: _handleNewMessage,
                     ),
                   ],
                 ),
