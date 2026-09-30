@@ -128,17 +128,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
               ),
 
-              // Bottom Chat & Toolbar
+              // Bottom Chat & Toolbar (Restricted width matching user's blue box screenshot)
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 16,
+                right: 70, // Leaves space on right for clean look matching screenshot box
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Colors.amber.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -146,13 +146,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                       child: const Text(
                         'Pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-                        style: TextStyle(color: Colors.amberAccent, fontSize: 10),
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 9),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // Compact Chat Box
+                    const SizedBox(height: 6),
+                    // Compact Chat Box matching screenshot box size
                     SizedBox(
-                      height: 90,
+                      height: 80,
                       child: ListView.builder(
                         itemCount: _liveChats.length,
                         itemBuilder: (context, chatIndex) {
@@ -164,11 +164,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 children: [
                                   TextSpan(
                                     text: '${chat['user']}: ',
-                                    style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
                                     text: chat['message'],
-                                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                                    style: const TextStyle(color: Colors.white, fontSize: 11),
                                   ),
                                 ],
                               ),
@@ -177,7 +177,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {
