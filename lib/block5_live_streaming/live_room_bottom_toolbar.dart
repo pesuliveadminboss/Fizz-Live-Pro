@@ -43,7 +43,6 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
       },
       child: Row(
         children: [
-          // Left side: Message Icon & Four-dot Grid Menu Icon as circled in screenshot
           _isTypingOpen
               ? Expanded(
                   child: Container(
@@ -169,4 +168,3 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
     );
   }
 }
-
