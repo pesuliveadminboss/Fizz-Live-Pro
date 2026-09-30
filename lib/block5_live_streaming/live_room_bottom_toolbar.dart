@@ -43,7 +43,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
       },
       child: Row(
         children: [
-          // Capsule Message Button / Expanded Text Field matching screenshot
+          // Left side: Message Icon & Four-dot Grid Menu Icon as circled in screenshot
           _isTypingOpen
               ? Expanded(
                   child: Container(
@@ -90,29 +90,39 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
                     ),
                   ),
                 )
-              : GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isTypingOpen = true;
-                    });
-                  },
-                  child: Container(
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.white24, width: 0.5),
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isTypingOpen = true;
+                        });
+                      },
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
+                      ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.chat_bubble_outline, color: Colors.white, size: 14),
-                        SizedBox(width: 6),
-                        Text('Say something...', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                      ],
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: widget.onOpenTools,
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(Icons.grid_view, color: Colors.white, size: 16),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
 
           const Spacer(),
@@ -159,3 +169,4 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
     );
   }
 }
+
