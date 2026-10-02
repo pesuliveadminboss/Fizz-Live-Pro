@@ -42,7 +42,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule: Navigates using ProfileNavigationBridge
+            // Profile Capsule with Larger Heart Icon as requested
             GestureDetector(
               onTap: () {
                 ProfileNavigationBridge.openStreamerProfile(
@@ -52,31 +52,35 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black45,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const CircleAvatar(
-                      radius: 12,
+                      radius: 14,
                       backgroundColor: Colors.pinkAccent,
-                      child: Icon(Icons.person, color: Colors.white, size: 14),
+                      child: Icon(Icons.person, color: Colors.white, size: 16),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Text(
                       widget.streamer.name,
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 10),
                     GestureDetector(
                       onTap: _toggleFollow,
-                      child: Icon(
-                        _isFollowing ? Icons.favorite : Icons.favorite_border,
-                        color: _isFollowing ? Colors.pinkAccent : Colors.white70,
-                        size: 16,
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.black54,
+                        child: Icon(
+                          _isFollowing ? Icons.favorite : Icons.favorite_border,
+                          color: _isFollowing ? Colors.pinkAccent : Colors.white,
+                          size: 20, // Enlarged Heart icon as requested
+                        ),
                       ),
                     ),
                   ],
@@ -84,7 +88,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
               ),
             ),
             const Spacer(),
-            // Viewer Count and Minimize/Close Button
+            // Viewer Count and Close Button
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -104,7 +108,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
             ),
           ],
         ),
-        // Removed Lv7, Hourly Rank and More L... as requested
       ],
     );
   }
