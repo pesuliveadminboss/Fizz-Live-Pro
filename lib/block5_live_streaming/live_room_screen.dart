@@ -120,11 +120,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Warning Box, Narrow Chat Feed & Toolbar with increased right gap to shrink chat width and push buttons right
+              // Bottom Warning Box & Narrow Chat Feed with strict width boundary matching user's red mark
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 110, // Increased right constraint to make chat box narrower and push buttons to the right edge
+                right: 150, // Set to 150 to strictly constrain the chat width inside the left side as marked in screenshot
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -142,7 +142,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Narrow chat box
                     SizedBox(
                       height: 65,
                       child: ListView.builder(
@@ -169,8 +168,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    LiveRoomBottomToolbar(
+                  ],
+                ),
+              ),
+
+              // Bottom Toolbar with buttons pushed strictly to the right side corner
+              Positioned(
+                bottom: 20,
+                left: 16,
+                right: 16,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: SizedBox(
+                    width: 250, // Keeps the toolbar buttons compact and pushed to the right corner
+                    child: LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -189,7 +200,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       },
                       onSendMessage: _handleNewMessage,
                     ),
-                  ],
+                  ),
                 ),
               ),
 
