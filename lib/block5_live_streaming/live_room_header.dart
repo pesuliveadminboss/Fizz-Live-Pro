@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
-import 'streamer_profile_popup.dart';
+import '../block4_private_chat/profile_navigation_bridge.dart';
 
 class LiveRoomHeader extends StatefulWidget {
   final LiveStreamer streamer;
@@ -42,14 +42,13 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule: Navigates directly to Full Profile Screen on tap
+            // Profile Capsule: Navigates using ProfileNavigationBridge to Full Profile & Private Chat
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => StreamerProfilePopup(streamer: widget.streamer),
-                  ),
+                ProfileNavigationBridge.openStreamerProfile(
+                  context: context,
+                  streamerId: '340301087',
+                  streamerName: widget.streamer.name,
                 );
               },
               child: Container(
