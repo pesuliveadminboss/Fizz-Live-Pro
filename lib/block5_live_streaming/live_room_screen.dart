@@ -17,17 +17,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isMiniScreen = false;
   int _currentIndex = 0;
 
-  final List<Map<String, String>> _liveChats = [
-    {'user': 'Cute Princess', 'message': '@mystery too.... Hey, glad you\'re here!'},
-    {'user': 'guest', 'message': 'joined the room'},
-  ];
-
-  void _handleNewMessage(String msg) {
-    setState(() {
-      _liveChats.add({'user': 'You', 'message': msg});
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_isMiniScreen) {
@@ -108,7 +97,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Top Header Bar
+              // Top Header Bar (Cleaned up)
               Positioned(
                 top: 40,
                 left: 16,
@@ -117,96 +106,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   streamer: currentStreamer,
                   onMinimize: () => setState(() => _isMiniScreen = true),
                   onClose: () => Navigator.pop(context),
-                ),
-              ),
-
-              // Bottom Warning Box & Narrow Chat Feed strictly aligned to the left corner with reduced width
-              Positioned(
-                bottom: 20,
-                left: 16,
-                right: 180, // Narrowed further so warning and chat stay strictly on the left side
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.amber.withOpacity(0.5)),
-                      ),
-                      child: const Text(
-                        'pornographic, vulgar, violent and under age is forbidden in live.',
-                        style: TextStyle(color: Colors.amberAccent, fontSize: 7),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    SizedBox(
-                      height: 60,
-                      child: ListView.builder(
-                        itemCount: _liveChats.length,
-                        itemBuilder: (context, chatIndex) {
-                          final chat = _liveChats[chatIndex];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 1.0),
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${chat['user']}: ',
-                                    style: const TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold),
-                                  ),
-                                  TextSpan(
-                                    text: chat['message'],
-                                    style: const TextStyle(color: Colors.white, fontSize: 9),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Left Side Bottom Toolbar (Chat & Grid Menu buttons aligned strictly to the left corner)
-              Positioned(
-                bottom: 20,
-                left: 16,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        // Triggers chat input
-                      },
-                      child: Container(
-                        height: 36,
-                        width: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 36,
-                        width: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: const Icon(Icons.grid_view, color: Colors.white, size: 16),
-                      ),
-                    ),
-                  ],
                 ),
               ),
 
