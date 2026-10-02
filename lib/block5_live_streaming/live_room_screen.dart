@@ -120,30 +120,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Warning Box & Narrow Chat Feed with strict width boundary matching user's red mark
+              // Bottom Warning Box & Narrow Chat Feed strictly aligned to the left corner with reduced width
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 150, // Set to 150 to strictly constrain the chat width inside the left side as marked in screenshot
+                right: 180, // Narrowed further so warning and chat stay strictly on the left side
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.amber.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.amber.withOpacity(0.5)),
                       ),
                       child: const Text(
-                        'pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-                        style: TextStyle(color: Colors.amberAccent, fontSize: 8),
+                        'pornographic, vulgar, violent and under age is forbidden in live.',
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 7),
                       ),
                     ),
                     const SizedBox(height: 4),
                     SizedBox(
-                      height: 65,
+                      height: 60,
                       child: ListView.builder(
                         itemCount: _liveChats.length,
                         itemBuilder: (context, chatIndex) {
@@ -155,11 +155,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 children: [
                                   TextSpan(
                                     text: '${chat['user']}: ',
-                                    style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
                                     text: chat['message'],
-                                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                                    style: const TextStyle(color: Colors.white, fontSize: 9),
                                   ),
                                 ],
                               ),
@@ -172,34 +172,98 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Toolbar with buttons pushed strictly to the right side corner
+              // Left Side Bottom Toolbar (Chat & Grid Menu buttons aligned strictly to the left corner)
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 16,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 250, // Keeps the toolbar buttons compact and pushed to the right corner
-                    child: LiveRoomBottomToolbar(
-                      onOpenTools: () {},
-                      onVideoCall: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
-                        );
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Triggers chat input
                       },
-                      onGiftTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Opening Gift Panel...'), duration: Duration(seconds: 1)),
-                        );
-                      },
-                      onLikeTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Liked Streamer ❤️'), duration: Duration(milliseconds: 500)),
-                        );
-                      },
-                      onSendMessage: _handleNewMessage,
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
+                      ),
                     ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(Icons.grid_view, color: Colors.white, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Right Side Bottom Toolbar (Like, Gift, Video Call buttons strictly pinned to the right corner)
+              Positioned(
+                bottom: 20,
+                right: 16,
+                child: SizedBox(
+                  width: 150,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Liked Streamer ❤️'), duration: Duration(milliseconds: 500)),
+                          );
+                        },
+                        child: const CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.pinkAccent,
+                          child: Icon(Icons.favorite, color: Colors.white, size: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Opening Gift Panel...'), duration: Duration(seconds: 1)),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(Icons.videocam, color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
