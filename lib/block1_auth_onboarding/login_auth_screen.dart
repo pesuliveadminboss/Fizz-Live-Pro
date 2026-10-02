@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Import your main home screen or live screen here if needed
-// import '../block5_live_streaming/live_room_screen.dart';
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginAuthScreen extends StatefulWidget {
+  const LoginAuthScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginAuthScreen> createState() => _LoginAuthScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginAuthScreenState extends State<LoginAuthScreen> {
   bool _isLoading = false;
   final TextEditingController _nameController = TextEditingController();
 
@@ -29,10 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isProfileCompleted) {
       if (!mounted) return;
       // If already logged in, directly navigate to Main/Home screen
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (_) => const MainHomeScreen()),
-      // );
     }
   }
 
@@ -63,12 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Login & Profile Setup Successful!')),
     );
-
-    // Navigate to Main/Home screen after successful setup
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (_) => const MainHomeScreen()),
-    // );
   }
 
   @override
@@ -113,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.white10,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: Border.none,
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
