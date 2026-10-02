@@ -25,7 +25,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Floating Mini Screen View (Pip)
     if (_isMiniScreen) {
       return Stack(
         children: [
@@ -116,18 +115,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Right Side Vertical Ads & Roulette Position
-              Positioned(
-                top: 100,
-                right: 12,
-                child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
-              ),
-
-              // Bottom Warning Box & Toolbar (Live Chat feed completely removed as requested)
+              // Bottom Warning Box & Toolbar (Bottom Area)
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 70,
+                right: 16,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -166,6 +158,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ],
                 ),
+              ),
+
+              // Right Side Vertical Ads placed right above bottom area (as pointed in user screenshot)
+              Positioned(
+                bottom: 80,
+                right: 16,
+                child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
               ),
             ],
           );
