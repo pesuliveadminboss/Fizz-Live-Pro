@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'profile_setup_screen.dart';
+
+class GlobalAuthRegistry {
+  static final Set<String> registeredIdentifiers = {};
+  static String userGender = 'Female';
+}
 
 class LoginAuthScreen extends StatefulWidget {
   const LoginAuthScreen({super.key});
@@ -9,8 +15,7 @@ class LoginAuthScreen extends StatefulWidget {
 }
 
 class _LoginAuthScreenState extends State<LoginAuthScreen> {
-  bool _isLoading = false;
-  final TextEditingController _nameController = TextEditingController();
+  bool _isAgreementChecked = false;
 
   @override
   void initState() {
@@ -18,118 +23,219 @@ class _LoginAuthScreenState extends State<LoginAuthScreen> {
     _checkExistingLogin();
   }
 
-  // Check if the user has already completed profile setup previously
+  // Check if user has already completed profile previously using SharedPreferences
   Future<void> _checkExistingLogin() async {
     final prefs = await SharedPreferences.getInstance();
     bool isProfileCompleted = prefs.getBool('is_profile_completed') ?? false;
 
     if (isProfileCompleted) {
       if (!mounted) return;
-      // If already logged in, directly navigate to Main/Home screen
+      Navigator.pushReplacementNamed(context, '/main_shell');
     }
   }
 
-  // Save profile and mark as completed for new users
-  Future<void> _handleLoginAndSaveProfile() async {
-    if (_nameController.text.trim().isEmpty) {
+  void _handleLoginAction(String type, String identifier) async {
+    if (!_isAgreementChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your profile name!')),
+        const SnackBar(content: Text('Please click agree to User Agreement and Privacy Policy!')),
       );
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_profile_completed', true);
-    await prefs.setString('user_name', _nameController.text.trim());
+    bool isProfileCompleted = prefs.getBool('is_profile_completed') ?? false;
+    bool isAlreadyRegistered = GlobalAuthRegistry.registeredIdentifiers.contains(identifier);
 
-    await Future.delayed(const Duration(seconds: 1));
+    // If already registered and profile is completed, skip profile setup for returning users
+    if ((isAlreadyRegistered || isProfileCompleted) && type != 'fast') {
+      Navigator.pushReplacementNamed(context, '/main_shell');
+    } else {
+      // Mark profile as completed after setup
+      await prefs.setBool('is_profile_completed', true);
+      GlobalAuthRegistry.registeredIdentifiers.add(identifier);
 
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ProfileSetupScreen(
+            identifier: identifier,
+            defaultName: type == 'guest' ? 'Guest 001' : (type == 'google' ? 'Google User' : 'Fast User'),
+          ),
+        ),
+      );
+    }
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Login & Profile Setup Successful!')),
+  void _showGooglePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E2C),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Choose Google Email ID', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: const CircleAvatar(backgroundColor: Colors.pinkAccent, child: Text('G', style: TextStyle(color: Colors.white))),
+              title: const Text('streamer.macha@gmail.com', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Auto-fills Name, DOB, Gender & Country (18+)', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _handleLoginAction('google', 'streamer.macha@gmail.com');
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void _showPhoneOtpModal() {
+    final phoneController = TextEditingController();
+    final otpController = TextEditingController();
+    bool otpSent = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: const Color(0xFF1E1E2C),
+          title: Text(otpSent ? 'Enter OTP Code' : 'Phone Number Login', style: const TextStyle(color: Colors.white)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!otpSent)
+                TextField(
+                  controller: phoneController,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(hintText: 'Enter Mobile Number', hintStyle: TextStyle(color: Colors.white54)),
+                )
+              else
+                TextField(
+                  controller: otpController,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(hintText: 'Enter 4-digit OTP', hintStyle: TextStyle(color: Colors.white54)),
+                ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE94057)),
+                onPressed: () {
+                  if (!otpSent) {
+                    if (phoneController.text.isNotEmpty) {
+                      setDialogState(() => otpSent = true);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('OTP sent to mobile!')));
+                    }
+                  } else {
+                    Navigator.pop(ctx);
+                    _handleLoginAction('phone', phoneController.text);
+                  }
+                },
+                child: Text(otpSent ? 'Verify OTP & Enter' : 'Get OTP', style: const TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121026),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.lock_outline, size: 80, color: Colors.pinkAccent),
-                const SizedBox(height: 20),
-                const Text(
-                  'Welcome to Live App',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'First-time users please complete your profile setup',
-                  style: TextStyle(color: Colors.white60, fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 30),
+      backgroundColor: const Color(0xFF0F0F1A),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned(top: 30, left: 20, child: _circleBubble(Colors.pink, 'A')),
+            Positioned(top: 50, right: 30, child: _circleBubble(Colors.purple, 'B')),
+            Positioned(top: 140, left: 70, child: _circleBubble(Colors.deepOrange, 'C')),
+            Positioned(top: 120, right: 60, child: _circleBubble(Colors.pinkAccent, 'D')),
+            Positioned(top: 240, left: 40, child: _circleBubble(Colors.redAccent, 'E')),
+            Positioned(top: 220, right: 90, child: _circleBubble(Colors.purpleAccent, 'F')),
 
-                // Profile Setup Input Field (Shown only for new users)
-                TextField(
-                  controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Enter your profile name...',
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.white10,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Fast Login / Save Profile Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pinkAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE94057),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                        ),
+                        onPressed: () => _handleLoginAction('fast', 'fast_user_unique_id'),
+                        child: const Text('Fast Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                       ),
                     ),
-                    onPressed: _isLoading ? null : _handleLoginAndSaveProfile,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Fast Login / Continue',
-                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                  ),
+                    const SizedBox(height: 12),
+                    const Text('or', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Text('G', style: TextStyle(color: Colors.white))),
+                          onPressed: _showGooglePicker,
+                        ),
+                        const SizedBox(width: 25),
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.phone, color: Colors.white, size: 18)),
+                          onPressed: _showPhoneOtpModal,
+                        ),
+                        const SizedBox(width: 25),
+                        IconButton(
+                          icon: const CircleAvatar(backgroundColor: Colors.white12, child: Icon(Icons.person, color: Colors.white, size: 18)),
+                          onPressed: () => _handleLoginAction('guest', 'Guest_001'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: _isAgreementChecked,
+                          activeColor: const Color(0xFFE94057),
+                          onChanged: (val) => setState(() => _isAgreementChecked = val ?? false),
+                        ),
+                        const Text('Agree to User Agreement and Privacy Policy', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('Having login issues? Find help', style: TextStyle(color: Color(0xFFE94057), fontSize: 11, decoration: TextDecoration.underline)),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _circleBubble(Color color, String label) {
+    return Container(
+      width: 65,
+      height: 65,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 2),
+        color: Colors.white24,
+      ),
+      child: Center(
+        child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
       ),
     );
   }
