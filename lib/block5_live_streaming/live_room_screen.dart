@@ -120,11 +120,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Warning Box, Narrow Chat Feed & Toolbar
+              // Bottom Warning Box, Narrow Chat Feed & Toolbar - Moved closer to the right side edge
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 130, // Narrowed further as requested in user's latest screenshot red line mark
+                right: 80, // Adjusted to push the buttons and toolbar further to the right edge as requested
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -142,7 +142,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Narrow chat box matching user's exact boundary mark
+                    // Narrow chat box matching exact boundary
                     SizedBox(
                       height: 65,
                       child: ListView.builder(
