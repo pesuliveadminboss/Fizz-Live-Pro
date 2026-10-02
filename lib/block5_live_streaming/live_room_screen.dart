@@ -17,10 +17,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isMiniScreen = false;
   int _currentIndex = 0;
 
+  final List<Map<String, String>> _liveChats = [
+    {'user': 'Cute Princess', 'message': '@mystery too.... Hey, glad you\'re here!'},
+    {'user': 'guest', 'message': 'joined the room'},
+  ];
+
   void _handleNewMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Message sent: $msg'), duration: const Duration(seconds: 1)),
-    );
+    setState(() {
+      _liveChats.add({'user': 'You', 'message': msg});
+    });
   }
 
   @override
@@ -115,28 +120,56 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Warning Box & Toolbar (Bottom Area)
+              // Bottom Warning Box, Restricted Width Chat Feed & Toolbar
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 16,
+                right: 90, // Restricted width so it doesn't overlap right side ads as marked in screenshot
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.amber.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.amber.withOpacity(0.5)),
                       ),
                       child: const Text(
-                        'Pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-                        style: TextStyle(color: Colors.amberAccent, fontSize: 9),
+                        'pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 8.5),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
+                    // Compact restricted chat box matching user's red box area
+                    SizedBox(
+                      height: 70,
+                      child: ListView.builder(
+                        itemCount: _liveChats.length,
+                        itemBuilder: (context, chatIndex) {
+                          final chat = _liveChats[chatIndex];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 1.5),
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${chat['user']}: ',
+                                    style: const TextStyle(color: Colors.amber, fontSize: 10.5, fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: chat['message'],
+                                    style: const TextStyle(color: Colors.white, fontSize: 10.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 6),
                     LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {
@@ -160,7 +193,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Right Side Vertical Ads placed right above bottom area (as pointed in user screenshot)
+              // Right Side Vertical Ads placed right above bottom area
               Positioned(
                 bottom: 80,
                 right: 16,
