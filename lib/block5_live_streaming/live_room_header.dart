@@ -42,13 +42,14 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule with Heart Follow Button inside
+            // Profile Capsule: Navigates directly to Full Profile Screen on tap
             GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) => StreamerProfilePopup(streamer: widget.streamer),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StreamerProfilePopup(streamer: widget.streamer),
+                  ),
                 );
               },
               child: Container(
@@ -140,4 +141,3 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
     );
   }
 }
-
