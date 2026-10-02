@@ -120,11 +120,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
 
-              // Bottom Warning Box, Restricted Width Chat Feed & Toolbar
+              // Bottom Warning Box, Narrow Chat Feed & Toolbar
               Positioned(
                 bottom: 20,
                 left: 16,
-                right: 90, // Restricted width so it doesn't overlap right side ads as marked in screenshot
+                right: 130, // Narrowed further as requested in user's latest screenshot red line mark
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -138,29 +138,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ),
                       child: const Text(
                         'pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-                        style: TextStyle(color: Colors.amberAccent, fontSize: 8.5),
+                        style: TextStyle(color: Colors.amberAccent, fontSize: 8),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Compact restricted chat box matching user's red box area
+                    // Narrow chat box matching user's exact boundary mark
                     SizedBox(
-                      height: 70,
+                      height: 65,
                       child: ListView.builder(
                         itemCount: _liveChats.length,
                         itemBuilder: (context, chatIndex) {
                           final chat = _liveChats[chatIndex];
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(vertical: 1.0),
                             child: RichText(
                               text: TextSpan(
                                 children: [
                                   TextSpan(
                                     text: '${chat['user']}: ',
-                                    style: const TextStyle(color: Colors.amber, fontSize: 10.5, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
                                   ),
                                   TextSpan(
                                     text: chat['message'],
-                                    style: const TextStyle(color: Colors.white, fontSize: 10.5),
+                                    style: const TextStyle(color: Colors.white, fontSize: 10),
                                   ),
                                 ],
                               ),
