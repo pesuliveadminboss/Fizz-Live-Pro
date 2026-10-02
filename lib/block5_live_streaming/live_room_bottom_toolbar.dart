@@ -41,41 +41,31 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
           });
         }
       },
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _isTypingOpen
-              ? Expanded(
-                  child: Container(
-                    height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.pinkAccent),
-                    ),
+          // If typing is open, show the full clear text input bar right above or replacing the toolbar
+          if (_isTypingOpen)
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.pinkAccent, width: 1.5),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
                     child: TextField(
                       controller: _messageController,
                       autofocus: true,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                      decoration: InputDecoration(
-                        hintText: 'Say something...',
-                        hintStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
                         border: InputBorder.none,
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 16),
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            if (_messageController.text.isNotEmpty) {
-                              widget.onSendMessage(_messageController.text);
-                              _messageController.clear();
-                              setState(() {
-                                _isTypingOpen = false;
-                              });
-                            }
-                          },
-                        ),
                       ),
                       onSubmitted: (value) {
                         if (value.isNotEmpty) {
@@ -88,83 +78,107 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
                       },
                     ),
                   ),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () {
+                      if (_messageController.text.isNotEmpty) {
+                        widget.onSendMessage(_messageController.text);
+                        _messageController.clear();
                         setState(() {
-                          _isTypingOpen = true;
+                          _isTypingOpen = false;
                         });
-                      },
-                      child: Container(
-                        height: 36,
-                        width: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+          // Normal Toolbar Row
+          Row(
+            children: [
+              // Message Icon & Grid Menu Icon (No capsule, clean round buttons)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isTypingOpen = !_isTypingOpen;
+                      });
+                    },
+                    child: Container(
+                      height: 36,
+                      width: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(18),
                       ),
+                      child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 16),
                     ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: widget.onOpenTools,
-                      child: Container(
-                        height: 36,
-                        width: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: const Icon(Icons.grid_view, color: Colors.white, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: widget.onOpenTools,
+                    child: Container(
+                      height: 36,
+                      width: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(18),
                       ),
+                      child: const Icon(Icons.grid_view, color: Colors.white, size: 16),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+
+              const Spacer(),
+
+              // Center Big Heart Like Button
+              GestureDetector(
+                onTap: widget.onLikeTap,
+                child: const CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.pinkAccent,
+                  child: Icon(Icons.favorite, color: Colors.white, size: 16),
                 ),
-
-          const Spacer(),
-
-          // Center Big Heart Like Button
-          GestureDetector(
-            onTap: widget.onLikeTap,
-            child: const CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.pinkAccent,
-              child: Icon(Icons.favorite, color: Colors.white, size: 16),
-            ),
-          ),
-          const SizedBox(width: 8),
-
-          // Gift Box Icon
-          GestureDetector(
-            onTap: widget.onGiftTap,
-            child: Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
-                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
-            ),
-          ),
-          const SizedBox(width: 8),
+              const SizedBox(width: 8),
 
-          // Video Call Button
-          GestureDetector(
-            onTap: widget.onVideoCall,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.circular(16),
+              // Gift Box Icon
+              GestureDetector(
+                onTap: widget.onGiftTap,
+                child: Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
+                ),
               ),
-              child: const Icon(Icons.videocam, color: Colors.white, size: 16),
-            ),
+              const SizedBox(width: 8),
+
+              // Video Call Button
+              GestureDetector(
+                onTap: widget.onVideoCall,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.videocam, color: Colors.white, size: 16),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 }
+
