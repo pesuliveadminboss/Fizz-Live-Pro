@@ -42,7 +42,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule: Navigates using ProfileNavigationBridge to Full Profile & Private Chat
+            // Profile Capsule: Navigates using ProfileNavigationBridge
             GestureDetector(
               onTap: () {
                 ProfileNavigationBridge.openStreamerProfile(
@@ -84,7 +84,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
               ),
             ),
             const Spacer(),
-            // Viewer Count and 'X' Minimize/Close Button
+            // Viewer Count and Minimize/Close Button
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -104,38 +104,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
             ),
           ],
         ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text('Lv7', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.amber.withOpacity(0.6)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.local_fire_department, color: Colors.amber, size: 10),
-                  SizedBox(width: 2),
-                  Text('21 Hourly Rank', style: TextStyle(color: Colors.white, fontSize: 9)),
-                ],
-              ),
-            ),
-            const Spacer(),
-            const Text('More L...', style: TextStyle(color: Colors.white70, fontSize: 10)),
-          ],
-        ),
+        // Removed Lv7, Hourly Rank and More L... as requested
       ],
     );
   }
