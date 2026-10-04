@@ -18,7 +18,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
   bool _showFollowPopup = true;
-  static bool _globalIsFollowing = false; // Global sync state for follow across all UI elements
+  static bool _globalIsFollowing = false; // Fully synced global follow state across all screens
 
   final TextEditingController _chatController = TextEditingController();
 
@@ -48,7 +48,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_globalIsFollowing ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
+        content: Text(_globalIsFollowing ? 'Successfully Followed Streamer ❤️️' : 'Unfollowed Streamer'),
         duration: const Duration(milliseconds: 500),
       ),
     );
@@ -399,3 +399,4 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 }
+
