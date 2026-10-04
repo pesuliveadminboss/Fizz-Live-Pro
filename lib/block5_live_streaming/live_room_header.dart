@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
 import '../block4_private_chat/profile_navigation_bridge.dart';
 
-class LiveRoomHeader extends StatefulWidget {
+class LiveRoomHeader extends StatelessWidget {
   final LiveStreamer streamer;
   final VoidCallback onMinimize;
   final VoidCallback onClose;
@@ -19,13 +19,6 @@ class LiveRoomHeader extends StatefulWidget {
   });
 
   @override
-  State<LiveRoomHeader> createState() => _LiveRoomHeaderState();
-}
-
-class _LiveRoomHeaderState extends State<LiveRoomHeader> {
-  final int _viewerCount = 2;
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +31,7 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                 ProfileNavigationBridge.openStreamerProfile(
                   context: context,
                   streamerId: '340301087',
-                  streamerName: widget.streamer.name,
+                  streamerName: streamer.name,
                 );
               },
               child: Container(
@@ -57,18 +50,18 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      widget.streamer.name,
+                      streamer.name,
                       style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 10),
                     GestureDetector(
-                      onTap: widget.onToggleFollow,
+                      onTap: onToggleFollow,
                       child: CircleAvatar(
                         radius: 16,
                         backgroundColor: Colors.black54,
                         child: Icon(
-                          widget.isFollowing ? Icons.favorite : Icons.favorite_border,
-                          color: widget.isFollowing ? Colors.pinkAccent : Colors.white,
+                          isFollowing ? Icons.favorite : Icons.favorite_border,
+                          color: isFollowing ? Colors.pinkAccent : Colors.white,
                           size: 20,
                         ),
                       ),
@@ -81,13 +74,13 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '$_viewerCount',
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                const Text(
+                  '2',
+                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: widget.onMinimize,
+                  onTap: onMinimize,
                   child: const Text(
                     '×',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
