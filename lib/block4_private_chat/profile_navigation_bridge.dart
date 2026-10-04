@@ -5,7 +5,7 @@ import 'private_chat_screen.dart';
 
 class ProfileNavigationBridge {
   
-  // 1. Navigate to the full streamer profile screen
+  // Navigate to streamer profile with synced follow state callback
   static void openStreamerProfile({
     required BuildContext context,
     required String streamerId,
@@ -17,6 +17,8 @@ class ProfileNavigationBridge {
     String intro = 'Welcome to my live stream!',
     String language = 'English, Tamil',
     bool isVerified = true,
+    required bool isFollowing,
+    required ValueChanged<bool> onFollowChanged,
   }) {
     final streamerModel = StreamerProfileModel(
       id: streamerId,
@@ -38,7 +40,6 @@ class ProfileNavigationBridge {
     );
   }
 
-  // 2. Navigate directly to the private chat screen
   static void openPrivateChat({
     required BuildContext context,
     required String streamerName,
