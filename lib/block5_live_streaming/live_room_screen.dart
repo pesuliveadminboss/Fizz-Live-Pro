@@ -155,7 +155,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar with synced follow
+                  // Top Header Bar
                   Positioned(
                     top: 40,
                     left: 16,
