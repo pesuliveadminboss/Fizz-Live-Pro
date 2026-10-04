@@ -17,12 +17,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isMiniScreen = false;
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
-  bool _showFollowPopup = true; // Shows popup automatically when entering live room
-  bool _isFollowing = false; // Synced with header heart follow state
+  bool _showFollowPopup = true;
+  static bool _globalIsFollowing = false; // Global sync state for follow across all UI elements
 
   final TextEditingController _chatController = TextEditingController();
 
-  // Chat feed including scrolling warning message and user joining events
   final List<Map<String, String>> _liveChats = [
     {
       'user': 'System',
@@ -36,12 +35,23 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void initState() {
     super.initState();
-    // Automatically trigger follow popup on entering live room as seen in video
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _showFollowPopup = true;
       });
     });
+  }
+
+  void _toggleGlobalFollow() {
+    setState(() {
+      _globalIsFollowing = !_globalIsFollowing;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_globalIsFollowing ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
+        duration: const Duration(milliseconds: 500),
+      ),
+    );
   }
 
   void _handleNewMessage(String msg) {
@@ -157,7 +167,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Bottom Scrollable Live Chat Feed (Warning message scrolls up along with user chats)
+                  // Bottom Scrollable Live Chat Feed
                   Positioned(
                     bottom: 70,
                     left: 16,
@@ -208,7 +218,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Left Side Bottom Toolbar (Chat & Grid Tools Menu)
+                  // Left Side Bottom Toolbar
                   Positioned(
                     bottom: 16,
                     left: 16,
@@ -221,7 +231,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right Side Bottom Toolbar (Like, Gift, Video Call buttons)
+                  // Right Side Bottom Toolbar (Globally Synced Follow Heart Button)
                   Positioned(
                     bottom: 16,
                     right: 16,
@@ -231,22 +241,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isFollowing = !_isFollowing;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(_isFollowing ? 'Followed Streamer ❤️' : 'Unfollowed'),
-                                  duration: const Duration(milliseconds: 500),
-                                ),
-                              );
-                            },
+                            onTap: _toggleGlobalFollow,
                             child: CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.pinkAccent,
                               child: Icon(
-                                _isFollowing ? Icons.favorite : Icons.favorite_border,
+                                _globalIsFollowing ? Icons.favorite : Icons.favorite_border,
                                 color: Colors.white,
                                 size: 18,
                               ),
@@ -300,7 +300,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             },
           ),
 
-          // Follow & Gift Popup Card appearing automatically upon entering live room (Dismisses on outside tap)
+          // Follow & Gift Popup Card (Globally Synced)
           if (_showFollowPopup)
             Positioned.fill(
               child: GestureDetector(
@@ -309,7 +309,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   color: Colors.black54,
                   alignment: Alignment.center,
                   child: GestureDetector(
-                    onTap: () {}, // Prevent closing when tapping inside the popup card
+                    onTap: () {},
                     child: Container(
                       width: 280,
                       padding: const EdgeInsets.all(20),
@@ -341,7 +341,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _isFollowing = true;
+                                if (!_globalIsFollowing) _globalIsFollowing = true;
                                 _showFollowPopup = false;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -358,7 +358,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ),
             ),
 
-          // Keyboard Overlay when chat button is tapped
+          // Keyboard Overlay
           if (_isKeyboardOpen)
             Positioned.fill(
               child: GestureDetector(
