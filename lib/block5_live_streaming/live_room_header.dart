@@ -6,12 +6,16 @@ class LiveRoomHeader extends StatefulWidget {
   final LiveStreamer streamer;
   final VoidCallback onMinimize;
   final VoidCallback onClose;
+  final bool isFollowing;
+  final VoidCallback onToggleFollow;
 
   const LiveRoomHeader({
     super.key,
     required this.streamer,
     required this.onMinimize,
     required this.onClose,
+    required this.isFollowing,
+    required this.onToggleFollow,
   });
 
   @override
@@ -19,20 +23,7 @@ class LiveRoomHeader extends StatefulWidget {
 }
 
 class _LiveRoomHeaderState extends State<LiveRoomHeader> {
-  bool _isFollowing = false;
   final int _viewerCount = 2;
-
-  void _toggleFollow() {
-    setState(() {
-      _isFollowing = !_isFollowing;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isFollowing ? 'Following ${widget.streamer.name}' : 'Unfollowed ${widget.streamer.name}'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +33,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
       children: [
         Row(
           children: [
-            // Profile Capsule with Larger Heart Icon as requested
             GestureDetector(
               onTap: () {
                 ProfileNavigationBridge.openStreamerProfile(
@@ -72,14 +62,14 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
                     ),
                     const SizedBox(width: 10),
                     GestureDetector(
-                      onTap: _toggleFollow,
+                      onTap: widget.onToggleFollow,
                       child: CircleAvatar(
                         radius: 16,
                         backgroundColor: Colors.black54,
                         child: Icon(
-                          _isFollowing ? Icons.favorite : Icons.favorite_border,
-                          color: _isFollowing ? Colors.pinkAccent : Colors.white,
-                          size: 20, // Enlarged Heart icon as requested
+                          widget.isFollowing ? Icons.favorite : Icons.favorite_border,
+                          color: widget.isFollowing ? Colors.pinkAccent : Colors.white,
+                          size: 20,
                         ),
                       ),
                     ),
@@ -88,7 +78,6 @@ class _LiveRoomHeaderState extends State<LiveRoomHeader> {
               ),
             ),
             const Spacer(),
-            // Viewer Count and Close Button
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
