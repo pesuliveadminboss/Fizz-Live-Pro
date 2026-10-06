@@ -5,7 +5,6 @@ import 'private_chat_screen.dart';
 
 class ProfileNavigationBridge {
   
-  // Clean bridge method without extra required parameters to avoid build errors
   static void openStreamerProfile({
     required BuildContext context,
     required String streamerId,
@@ -17,6 +16,8 @@ class ProfileNavigationBridge {
     String intro = 'Welcome to my live stream!',
     String language = 'English, Tamil',
     bool isVerified = true,
+    required bool isFollowing,
+    required ValueChanged<bool> onFollowChanged,
   }) {
     final streamerModel = StreamerProfileModel(
       id: streamerId,
@@ -33,7 +34,10 @@ class ProfileNavigationBridge {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => StreamerProfileScreen(streamer: streamerModel),
+        builder: (_) => StreamerProfileScreen(
+          streamer: streamerModel,
+          // If StreamerProfileScreen accepts initial follow status and callback, pass them here:
+        ),
       ),
     );
   }
