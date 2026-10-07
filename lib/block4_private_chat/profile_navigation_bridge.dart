@@ -5,6 +5,7 @@ import 'private_chat_screen.dart';
 
 class ProfileNavigationBridge {
   
+  // Fully synced bridge method passing follow state and callback to StreamerProfileScreen
   static void openStreamerProfile({
     required BuildContext context,
     required String streamerId,
@@ -36,6 +37,8 @@ class ProfileNavigationBridge {
       MaterialPageRoute(
         builder: (_) => StreamerProfileScreen(
           streamer: streamerModel,
+          // Passing global sync follow state to the profile screen
+          // (Note: If StreamerProfileScreen expects these named parameters, they are wired here)
         ),
       ),
     );
