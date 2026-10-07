@@ -6,8 +6,7 @@ import '../block4_private_chat/profile_navigation_bridge.dart';
 
 class LiveRoomHeader extends StatelessWidget {
   final LiveStreamer streamer;
-  final VoidCallback onMinimize;
-  final VoidCallback onClose;
+  final VoidCallback onMinimize; // This is now triggered by the '×' button to minimize to floating mini-screen
   final int viewerCount;
   final List<String> viewersList;
 
@@ -15,7 +14,6 @@ class LiveRoomHeader extends StatelessWidget {
     super.key,
     required this.streamer,
     required this.onMinimize,
-    required this.onClose,
     required this.viewerCount,
     required this.viewersList,
   });
@@ -115,21 +113,12 @@ class LiveRoomHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Minimize Button triggering floating mini-screen
+                // Close/X button acts as minimize to floating screen
                 GestureDetector(
                   onTap: onMinimize,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Icon(Icons.minimize, color: Colors.white, size: 20),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Close Button
-                GestureDetector(
-                  onTap: onClose,
                   child: const Text(
                     '×',
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
