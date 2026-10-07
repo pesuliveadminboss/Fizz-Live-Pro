@@ -32,6 +32,12 @@ class LiveRoomHeader extends StatelessWidget {
                   context: context,
                   streamerId: '340301087',
                   streamerName: streamer.name,
+                  isFollowing: isFollowing,
+                  onFollowChanged: (val) {
+                    if (val != isFollowing) {
+                      onToggleFollow();
+                    }
+                  },
                 );
               },
               child: Container(
