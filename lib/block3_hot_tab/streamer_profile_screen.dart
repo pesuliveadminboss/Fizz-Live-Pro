@@ -93,7 +93,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Big Photo & App Bar Navigation
             Stack(
               children: [
                 Container(
@@ -126,7 +125,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ),
                   ),
                 ),
-                // Globally Synced Follow / Heartbeat Button bottom-right of big photo
                 Positioned(
                   bottom: 16,
                   right: 16,
@@ -154,8 +152,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                 ),
               ],
             ),
-
-            // Profile Details Section
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -194,8 +190,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-
-                  // Status & Country Row
                   Row(
                     children: [
                       Container(
@@ -236,8 +230,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Introduction Section
                   const Text('Introduction', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Container(
@@ -254,8 +246,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Speaking Language Section
                   const Text('Speaking language', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Wrap(
