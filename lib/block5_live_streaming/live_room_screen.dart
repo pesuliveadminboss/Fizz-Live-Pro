@@ -16,9 +16,17 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isMiniScreen = false;
+  Offset _miniScreenPosition = const Offset(20, 100);
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
   bool _showFollowPopup = true;
+
+  // Dynamic Viewers List mapping for live rooms
+  final Map<int, List<String>> _roomViewersMap = {
+    0: ['Guest_Llw6JP', 'PariUser_99'],
+    1: ['User_TamilNadu', 'Rahul_Live', 'Anitha_2026'],
+    2: ['Kavi_Speaker', 'Deepak_Raj'],
+  };
 
   final TextEditingController _chatController = TextEditingController();
 
@@ -59,51 +67,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isMiniScreen) {
-      return Stack(
-        children: [
-          Positioned(
-            top: 80,
-            right: 20,
-            child: GestureDetector(
-              onTap: () => setState(() => _isMiniScreen = false),
-              child: Container(
-                width: 130,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.pinkAccent, width: 2),
-                ),
-                child: Stack(
-                  children: [
-                    const Center(child: Icon(Icons.person, color: Colors.white54, size: 50)),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const CircleAvatar(
-                          radius: 10,
-                          backgroundColor: Colors.black54,
-                          child: Icon(Icons.close, color: Colors.white, size: 12),
-                        ),
-                      ),
-                    ),
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 120),
-                        child: Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 10)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+    final currentStreamer = LiveStreamer.dummyStreamers[_currentIndex];
+    final currentViewers = _roomViewersMap[_currentIndex] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
@@ -123,8 +88,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               });
             },
             itemBuilder: (context, index) {
-              final currentStreamer = LiveStreamer.dummyStreamers[index];
-              final followNotifier = StreamerFollowManager().getFollowNotifier(currentStreamer.name);
+              final streamerItem = LiveStreamer.dummyStreamers[index];
+              final roomViewers = _roomViewersMap[index] ?? [];
+              final followNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
 
               return Stack(
                 children: [
@@ -137,22 +103,24 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           children: [
                             const Icon(Icons.person, size: 150, color: Colors.white10),
                             const SizedBox(height: 10),
-                            Text('Live: ${currentStreamer.name}', style: const TextStyle(color: Colors.white38, fontSize: 14)),
+                            Text('Live: ${streamerItem.name}', style: const TextStyle(color: Colors.white38, fontSize: 14)),
                           ],
                         ),
                       ),
                     ),
                   ),
 
-                  // Top Header Bar
+                  // Top Header Bar with Dynamic Viewers Count & List Popup
                   Positioned(
                     top: 40,
                     left: 16,
                     right: 16,
                     child: LiveRoomHeader(
-                      streamer: currentStreamer,
+                      streamer: streamerItem,
                       onMinimize: () => setState(() => _isMiniScreen = true),
                       onClose: () => Navigator.pop(context),
+                      viewerCount: roomViewers.length,
+                      viewersList: roomViewers,
                     ),
                   ),
 
@@ -220,7 +188,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right Side Bottom Toolbar (Globally Synced Follow Heart Button)
+                  // Right Side Bottom Toolbar
                   Positioned(
                     bottom: 16,
                     right: 16,
@@ -231,8 +199,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              StreamerFollowManager().toggleFollow(currentStreamer.name);
-                              final status = StreamerFollowManager().isFollowing(currentStreamer.name);
+                              StreamerFollowManager().toggleFollow(streamerItem.name);
+                              final status = StreamerFollowManager().isFollowing(streamerItem.name);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(status ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
@@ -331,7 +299,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Follow ${widget.streamer.name} and Send Free Gift',
+                            'Follow ${currentStreamer.name} and Send Free Gift',
                             textAlign: TextAlign.center,
                             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                           ),
@@ -343,7 +311,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                             ),
                             onPressed: () {
-                              StreamerFollowManager().setFollowing(widget.streamer.name, true);
+                              StreamerFollowManager().setFollowing(currentStreamer.name, true);
                               setState(() {
                                 _showFollowPopup = false;
                               });
@@ -361,35 +329,66 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ),
             ),
 
-          // Keyboard Overlay
-          if (_isKeyboardOpen)
-            Positioned.fill(
+          // Floating & Draggable Mini-Screen Overlay
+          if (_isMiniScreen)
+            Positioned(
+              left: _miniScreenPosition.dx,
+              top: _miniScreenPosition.dy,
               child: GestureDetector(
-                onTap: () => setState(() => _isKeyboardOpen = false),
-                child: Container(
-                  color: Colors.black54,
-                  alignment: Alignment.bottomCenter,
+                onPanUpdate: (details) {
+                  setState(() {
+                    _miniScreenPosition += details.delta;
+                  });
+                },
+                child: Material(
+                  color: Colors.transparent,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    color: const Color(0xFF1E1E2C),
-                    child: Row(
+                    width: 140,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.pinkAccent, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
                       children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _chatController,
-                            autofocus: true,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
-                            decoration: const InputDecoration(
-                              hintText: 'Enter something...',
-                              hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
-                              border: InputBorder.none,
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _isMiniScreen = false),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.person, color: Colors.white54, size: 40),
+                                const SizedBox(height: 8),
+                                Text(
+                                  currentStreamer.name,
+                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                const Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                              ],
                             ),
-                            onSubmitted: _handleNewMessage,
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.send, color: Colors.pinkAccent),
-                          onPressed: () => _handleNewMessage(_chatController.text),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.black54,
+                              child: Icon(Icons.close, color: Colors.white, size: 14),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -402,4 +401,3 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 }
-
