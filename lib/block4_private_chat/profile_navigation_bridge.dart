@@ -5,7 +5,6 @@ import 'private_chat_screen.dart';
 
 class ProfileNavigationBridge {
   
-  // Bridge method updated to pass follow state and callback without build errors
   static void openStreamerProfile({
     required BuildContext context,
     required String streamerId,
@@ -35,7 +34,9 @@ class ProfileNavigationBridge {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => StreamerProfileScreen(streamer: streamerModel),
+        builder: (_) => StreamerProfileScreen(
+          streamer: streamerModel,
+        ),
       ),
     );
   }
