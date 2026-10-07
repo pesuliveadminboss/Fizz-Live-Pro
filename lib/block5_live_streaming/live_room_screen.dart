@@ -15,13 +15,14 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  bool _isMiniScreen = false;
-  Offset _miniScreenPosition = const Offset(20, 100);
+  static bool isMiniScreenGlobal = false;
+  static Offset miniScreenPositionGlobal = const Offset(20, 100);
+  static LiveStreamer? activeMiniStreamer;
+
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
   bool _showFollowPopup = true;
 
-  // Dynamic Viewers List mapping for live rooms
   final Map<int, List<String>> _roomViewersMap = {
     0: ['Guest_Llw6JP', 'PariUser_99'],
     1: ['User_TamilNadu', 'Rahul_Live', 'Anitha_2026'],
@@ -109,15 +110,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar with Viewer Count & List Popup Parameters Passed
+                  // Top Header Bar: Clicking 'X' minimizes to floating mini player
                   Positioned(
                     top: 40,
                     left: 16,
                     right: 16,
                     child: LiveRoomHeader(
                       streamer: streamerItem,
-                      onMinimize: () => setState(() => _isMiniScreen = true),
-                      onClose: () => Navigator.pop(context),
+                      onMinimize: () {
+                        setState(() {
+                          activeMiniStreamer = streamerItem;
+                          isMiniScreenGlobal = true;
+                        });
+                        Navigator.pop(context); // Pop back to previous screen while keeping mini player afloat via global state/navigator overlay if needed
+                      },
                       viewerCount: roomViewers.length,
                       viewersList: roomViewers,
                     ),
@@ -322,74 +328,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          // Floating & Draggable Mini-Screen Overlay
-          if (_isMiniScreen)
-            Positioned(
-              left: _miniScreenPosition.dx,
-              top: _miniScreenPosition.dy,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  setState(() {
-                    _miniScreenPosition += details.delta;
-                  });
-                },
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    width: 140,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.pinkAccent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.6),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _isMiniScreen = false),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.person, color: Colors.white54, size: 40),
-                                const SizedBox(height: 8),
-                                Text(
-                                  currentStreamer.name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                const Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 9)),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Colors.black54,
-                              child: Icon(Icons.close, color: Colors.white, size: 14),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
