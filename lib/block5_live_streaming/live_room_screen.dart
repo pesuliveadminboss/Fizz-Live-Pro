@@ -122,7 +122,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           activeMiniStreamer = streamerItem;
                           isMiniScreenGlobal = true;
                         });
-                        Navigator.pop(context); // Pop back to previous screen while keeping mini player afloat via global state/navigator overlay if needed
+                        Navigator.pop(context);
                       },
                       viewerCount: roomViewers.length,
                       viewersList: roomViewers,
@@ -321,20 +321,5 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 _showFollowPopup = false;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Successfully Followed & Gift Sent!')),
-                              );
-                            },
-                            child: const Text('Follow and send gifts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
+                                const SnackBar(content: Text('Successfully Followed &
+                                
