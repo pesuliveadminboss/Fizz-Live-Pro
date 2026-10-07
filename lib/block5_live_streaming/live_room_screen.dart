@@ -15,10 +15,6 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  static bool isMiniScreenGlobal = false;
-  static Offset miniScreenPositionGlobal = const Offset(20, 100);
-  static LiveStreamer? activeMiniStreamer;
-
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
   bool _showFollowPopup = true;
@@ -69,6 +65,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final currentStreamer = LiveStreamer.dummyStreamers[_currentIndex];
+    final followNotifier = StreamerFollowManager().getFollowNotifier(currentStreamer.name);
 
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
@@ -90,7 +87,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             itemBuilder: (context, index) {
               final streamerItem = LiveStreamer.dummyStreamers[index];
               final roomViewers = _roomViewersMap[index] ?? [];
-              final followNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
+              final itemFollowNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
 
               return Stack(
                 children: [
@@ -110,7 +107,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar: Clicking 'X' minimizes to floating mini player
+                  // Top Header Bar: Clicking 'X' pops the live room (can be handled via global overlay for floating mini player)
                   Positioned(
                     top: 40,
                     left: 16,
@@ -118,10 +115,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: LiveRoomHeader(
                       streamer: streamerItem,
                       onMinimize: () {
-                        setState(() {
-                          activeMiniStreamer = streamerItem;
-                          isMiniScreenGlobal = true;
-                        });
+                        // Triggers minimize/close back to previous screen
                         Navigator.pop(context);
                       },
                       viewerCount: roomViewers.length,
@@ -193,7 +187,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right Side Bottom Toolbar
+                  // Right Side Bottom Toolbar (Globally Synced Follow Heart Button)
                   Positioned(
                     bottom: 16,
                     right: 16,
@@ -214,7 +208,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               );
                             },
                             child: ValueListenableBuilder<bool>(
-                              valueListenable: followNotifier,
+                              valueListenable: itemFollowNotifier,
                               builder: (context, isFollowing, child) {
                                 return CircleAvatar(
                                   radius: 18,
@@ -276,7 +270,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             },
           ),
 
-          // Follow & Gift Popup Card
+          // Follow & Gift Popup Card (Synced with StreamerFollowManager)
           if (_showFollowPopup)
             Positioned.fill(
               child: GestureDetector(
@@ -309,25 +303,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.pinkAccent,
-                              minimumSize: const Size(double.infinity, 44),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-                            ),
-                            onPressed: () {
-                              StreamerFollowManager().setFollowing(currentStreamer.name, true);
-                              setState(() {
-                                _showFollowPopup = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Successfully Followed & Gift Sent!')),
+                          ValueListenableBuilder<bool>(
+                            valueListenable: followNotifier,
+                            builder: (context, isFollowing, child) {
+                              return ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isFollowing ? Colors.grey.withOpacity(0.4) : Colors.pinkAccent,
+                                  minimumSize: const Size(double.infinity, 44),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                                ),
+                                onPressed: () {
+                                  StreamerFollowManager().setFollowing(currentStreamer.name, true);
+                                  setState(() {
+                                    _showFollowPopup = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Successfully Followed & Gift Sent! ❤️')),
+                                  );
+                                },
+                                child: Text(
+                                  isFollowing ? 'Following & Gift Sent' : 'Follow and send gifts',
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
                               );
                             },
-                            child: const Text(
-                              'Follow and send gifts',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
                           ),
                         ],
                       ),
