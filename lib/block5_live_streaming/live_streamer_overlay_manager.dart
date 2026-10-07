@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
+import 'dart:async';
 
 class LiveStreamerOverlayManager {
   static OverlayEntry? _overlayEntry;
@@ -17,6 +18,23 @@ class LiveStreamerOverlayManager {
     _overlayEntry = OverlayEntry(
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
+          bool showCloseButton = false;
+          Timer? hideTimer;
+
+          void triggerCloseButtonVisibility() {
+            setState(() {
+              showCloseButton = true;
+            });
+            hideTimer?.cancel();
+            hideTimer = Timer(const Duration(seconds: 2), () {
+              if (context.mounted) {
+                setState(() {
+                  showCloseButton = false;
+                });
+              }
+            });
+          }
+
           return Positioned(
             left: position.dx,
             top: position.dy,
@@ -28,63 +46,60 @@ class LiveStreamerOverlayManager {
               },
               child: Material(
                 color: Colors.transparent,
-                child: Container(
-                  width: 140,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.pinkAccent, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.6),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Tap center to expand back to full live room
-                      Positioned.fill(
-                        child: GestureDetector(
-                          onTap: () {
-                            hideOverlay();
-                            onExpand();
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.person, color: Colors.white54, size: 40),
-                              const SizedBox(height: 8),
-                              Text(
-                                streamer.name,
-                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
+                child: GestureDetector(
+                  onTap: () {
+                    // Tapping anywhere on the mini screen shows close button momentarily OR expands if tapped center, 
+                    // but let's make a dedicated tap to show close button and center to expand, or tap triggers close button visibility
+                    triggerCloseButtonVisibility();
+                  },
+                  child: Container(
+                    width: 140,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1D1B36),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.pinkAccent, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Clean live stream view: Tapping the center expands to full screen
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onTap: () {
+                              hideOverlay();
+                              onExpand();
+                            },
+                            child: const Center(
+                              child: Icon(Icons.person, color: Colors.white54, size: 50),
+                            ),
+                          ),
+                        ),
+                        // Auto-hiding Close button (Visible for 2 seconds when tapped, then fades out)
+                        if (showCloseButton)
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () {
+                                hideOverlay();
+                                onClose();
+                              },
+                              child: const CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.black54,
+                                child: Icon(Icons.close, color: Colors.white, size: 14),
                               ),
-                              const SizedBox(height: 4),
-                              const Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 9)),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      // Close button inside mini player to kill live completely
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            hideOverlay();
-                            onClose();
-                          },
-                          child: const CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.black54,
-                            child: Icon(Icons.close, color: Colors.white, size: 14),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
