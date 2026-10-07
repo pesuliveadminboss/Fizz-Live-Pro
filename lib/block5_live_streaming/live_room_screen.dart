@@ -324,5 +324,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 const SnackBar(content: Text('Successfully Followed & Gift Sent!')),
                               );
                             },
-                            child: const Text('Follow and send gifts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            
+                            child: const Text(
+                              'Follow and send gifts',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
