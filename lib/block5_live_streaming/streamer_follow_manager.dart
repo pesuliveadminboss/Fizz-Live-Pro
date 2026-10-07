@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 class StreamerFollowManager {
-  // Singleton instance
   static final StreamerFollowManager _instance = StreamerFollowManager._internal();
   factory StreamerFollowManager() => _instance;
   StreamerFollowManager._internal();
 
-  // Map to store follow state for each streamer by ID/Name
   final Map<String, ValueNotifier<bool>> _followNotifiers = {};
 
   ValueNotifier<bool> getFollowNotifier(String streamerKey) {
