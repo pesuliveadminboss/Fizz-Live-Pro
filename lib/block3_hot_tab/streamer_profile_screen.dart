@@ -85,7 +85,6 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
       );
     }
 
-    // Connects with Global Follow Manager to sync with live room header and popup buttons
     final followNotifier = StreamerFollowManager().getFollowNotifier(widget.streamer.name);
 
     return Scaffold(
@@ -127,7 +126,7 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                     ),
                   ),
                 ),
-                // Globally Synced Like / Heartbeat Button bottom-right of big photo
+                // Globally Synced Follow / Heartbeat Button bottom-right of big photo
                 Positioned(
                   bottom: 16,
                   right: 16,
@@ -164,12 +163,159 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 28,
-                        backgroundColor: const Color(0xFF6366F1),
-                        child: const Icon(Icons.person, color: Colors.white),
+                        backgroundColor: Color(0xFF6366F1),
+                        child: Icon(Icons.person, color: Colors.white),
                       ),
                       const SizedBox(width: 12),
                       Column(
-                        cross
-                        
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                widget.streamer.name,
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              if (widget.streamer.isVerified) ...[
+                                const SizedBox(width: 6),
+                                const Icon(Icons.verified, color: Colors.blueAccent, size: 16),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'ID: 340301087',
+                            style: TextStyle(color: Colors.white60, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Status & Country Row
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: widget.streamer.status == 'live' ? Colors.pinkAccent : Colors.green,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          widget.streamer.status.toUpperCase(),
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1D1B36),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${widget.streamer.flag} ${widget.streamer.country}',
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1D1B36),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${widget.streamer.age} yrs',
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Introduction Section
+                  const Text('Introduction', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1D1B36),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Text(
+                      widget.streamer.intro,
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Speaking Language Section
+                  const Text('Speaking language', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: widget.streamer.language.split(',').map((lang) {
+                      return Chip(
+                        backgroundColor: const Color(0xFF1D1B36),
+                        label: Text(lang.trim(), style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        color: const Color(0xFF121026),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: const Color(0xFF1D1B36),
+              child: IconButton(
+                icon: const Icon(Icons.message, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PrivateChatScreen(streamerName: widget.streamer.name),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFEC4899),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                onPressed: () => ProfileInteractionHandler.startVideoCall(context, widget.streamer.name),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.videocam, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text('Video • 1800 coins/min', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
