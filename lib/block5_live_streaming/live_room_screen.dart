@@ -15,9 +15,10 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
+  bool _isMiniScreen = false;
+  Offset _miniScreenPosition = const Offset(20, 100);
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
-  bool _showFollowPopup = true;
 
   final Map<int, List<String>> _roomViewersMap = {
     0: ['Guest_Llw6JP', 'PariUser_99'],
@@ -37,16 +38,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     {'user': 'Guest_Llw6JP', 'message': 'joined the room'},
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _showFollowPopup = true;
-      });
-    });
-  }
-
   void _handleNewMessage(String msg) {
     if (msg.trim().isEmpty) return;
     setState(() {
@@ -65,7 +56,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final currentStreamer = LiveStreamer.dummyStreamers[_currentIndex];
-    final followNotifier = StreamerFollowManager().getFollowNotifier(currentStreamer.name);
 
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
@@ -87,7 +77,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             itemBuilder: (context, index) {
               final streamerItem = LiveStreamer.dummyStreamers[index];
               final roomViewers = _roomViewersMap[index] ?? [];
-              final itemFollowNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
+              final followNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
 
               return Stack(
                 children: [
@@ -107,7 +97,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar: Clicking 'X' pops the live room (can be handled via global overlay for floating mini player)
+                  // Top Header Bar: Clicking 'X' minimizes to floating mini player inside screen
                   Positioned(
                     top: 40,
                     left: 16,
@@ -115,8 +105,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: LiveRoomHeader(
                       streamer: streamerItem,
                       onMinimize: () {
-                        // Triggers minimize/close back to previous screen
-                        Navigator.pop(context);
+                        setState(() {
+                          _isMiniScreen = true;
+                        });
                       },
                       viewerCount: roomViewers.length,
                       viewersList: roomViewers,
@@ -187,7 +178,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right Side Bottom Toolbar (Globally Synced Follow Heart Button)
+                  // Right Side Bottom Toolbar
                   Positioned(
                     bottom: 16,
                     right: 16,
@@ -208,7 +199,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               );
                             },
                             child: ValueListenableBuilder<bool>(
-                              valueListenable: itemFollowNotifier,
+                              valueListenable: followNotifier,
                               builder: (context, isFollowing, child) {
                                 return CircleAvatar(
                                   radius: 18,
@@ -270,66 +261,68 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             },
           ),
 
-          // Follow & Gift Popup Card (Synced with StreamerFollowManager)
-          if (_showFollowPopup)
-            Positioned.fill(
+          // Draggable Floating Mini-Screen Overlay (When minimized)
+          if (_isMiniScreen)
+            Positioned(
+              left: _miniScreenPosition.dx,
+              top: _miniScreenPosition.dy,
               child: GestureDetector(
-                onTap: () => setState(() => _showFollowPopup = false),
-                child: Container(
-                  color: Colors.black54,
-                  alignment: Alignment.center,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: 280,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E2C),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.pinkAccent.withOpacity(0.5)),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const CircleAvatar(
-                            radius: 35,
-                            backgroundColor: Colors.pinkAccent,
-                            child: Icon(Icons.person, size: 40, color: Colors.white),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Follow ${currentStreamer.name} and Send Free Gift',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 16),
-                          ValueListenableBuilder<bool>(
-                            valueListenable: followNotifier,
-                            builder: (context, isFollowing, child) {
-                              return ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFollowing ? Colors.grey.withOpacity(0.4) : Colors.pinkAccent,
-                                  minimumSize: const Size(double.infinity, 44),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                onPanUpdate: (details) {
+                  setState(() {
+                    _miniScreenPosition += details.delta;
+                  });
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    width: 140,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.pinkAccent, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _isMiniScreen = false),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.person, color: Colors.white54, size: 40),
+                                const SizedBox(height: 8),
+                                Text(
+                                  currentStreamer.name,
+                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                onPressed: () {
-                                  StreamerFollowManager().setFollowing(currentStreamer.name, true);
-                                  setState(() {
-                                    _showFollowPopup = false;
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Successfully Followed & Gift Sent! ❤️')),
-                                  );
-                                },
-                                child: Text(
-                                  isFollowing ? 'Following & Gift Sent' : 'Follow and send gifts',
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            },
+                                const SizedBox(height: 4),
+                                const Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.black54,
+                              child: Icon(Icons.close, color: Colors.white, size: 14),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
