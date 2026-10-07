@@ -321,5 +321,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 _showFollowPopup = false;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Successfully Followed &
-                                
+                                const SnackBar(content: Text('Successfully Followed & Gift Sent!')),
+                              );
+                            },
+                            child: const Text('Follow and send gifts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            
