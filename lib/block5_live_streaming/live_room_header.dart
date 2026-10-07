@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
 import 'streamer_follow_manager.dart';
+import 'live_viewers_list_helper.dart';
 import '../block4_private_chat/profile_navigation_bridge.dart';
 
 class LiveRoomHeader extends StatelessWidget {
   final LiveStreamer streamer;
   final VoidCallback onMinimize;
   final VoidCallback onClose;
+  final int viewerCount;
+  final List<String> viewersList;
 
   const LiveRoomHeader({
     super.key,
     required this.streamer,
     required this.onMinimize,
     required this.onClose,
+    required this.viewerCount,
+    required this.viewersList,
   });
 
   @override
@@ -87,13 +92,31 @@ class LiveRoomHeader extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  '2',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
+                // Clickable Viewer Count Badge next to close button
                 GestureDetector(
-                  onTap: onMinimize,
+                  onTap: () => LiveViewersListHelper.showViewersModal(context, viewersList),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.visibility, color: Colors.white70, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$viewerCount',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: onClose,
                   child: const Text(
                     '×',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
