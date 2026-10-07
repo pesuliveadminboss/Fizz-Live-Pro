@@ -92,7 +92,7 @@ class LiveRoomHeader extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Clickable Viewer Count Badge next to close button
+                // Clickable Viewer Count Badge
                 GestureDetector(
                   onTap: () => LiveViewersListHelper.showViewersModal(context, viewersList),
                   child: Container(
@@ -115,6 +115,16 @@ class LiveRoomHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Minimize Button triggering floating mini-screen
+                GestureDetector(
+                  onTap: onMinimize,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Icon(Icons.minimize, color: Colors.white, size: 20),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Close Button
                 GestureDetector(
                   onTap: onClose,
                   child: const Text(
