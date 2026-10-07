@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
-import 'streamer_follow_manager.dart';
 
 class LiveStreamerOverlayManager {
   static OverlayEntry? _overlayEntry;
