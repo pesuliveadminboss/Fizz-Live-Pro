@@ -4,6 +4,7 @@ import 'live_room_header.dart';
 import 'live_room_bottom_toolbar.dart';
 import 'live_tools_and_gifts_helper.dart';
 import 'live_ads_integration_helper.dart';
+import 'streamer_follow_manager.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -18,7 +19,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
   bool _showFollowPopup = true;
-  static bool _globalIsFollowing = false;
 
   final TextEditingController _chatController = TextEditingController();
 
@@ -40,18 +40,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         _showFollowPopup = true;
       });
     });
-  }
-
-  void _toggleGlobalFollow() {
-    setState(() {
-      _globalIsFollowing = !_globalIsFollowing;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_globalIsFollowing ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
-        duration: const Duration(milliseconds: 500),
-      ),
-    );
   }
 
   void _handleNewMessage(String msg) {
@@ -136,6 +124,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             },
             itemBuilder: (context, index) {
               final currentStreamer = LiveStreamer.dummyStreamers[index];
+              final followNotifier = StreamerFollowManager().getFollowNotifier(currentStreamer.name);
 
               return Stack(
                 children: [
@@ -164,8 +153,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       streamer: currentStreamer,
                       onMinimize: () => setState(() => _isMiniScreen = true),
                       onClose: () => Navigator.pop(context),
-                      isFollowing: _globalIsFollowing,
-                      onToggleFollow: _toggleGlobalFollow,
                     ),
                   ),
 
@@ -233,7 +220,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right Side Bottom Toolbar
+                  // Right Side Bottom Toolbar (Globally Synced Follow Heart Button)
                   Positioned(
                     bottom: 16,
                     right: 16,
@@ -243,15 +230,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                            onTap: _toggleGlobalFollow,
-                            child: CircleAvatar(
-                              radius: 18,
-                              backgroundColor: Colors.pinkAccent,
-                              child: Icon(
-                                _globalIsFollowing ? Icons.favorite : Icons.favorite_border,
-                                color: Colors.white,
-                                size: 18,
-                              ),
+                            onTap: () {
+                              StreamerFollowManager().toggleFollow(currentStreamer.name);
+                              final status = StreamerFollowManager().isFollowing(currentStreamer.name);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(status ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
+                                  duration: const Duration(milliseconds: 500),
+                                ),
+                              );
+                            },
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: followNotifier,
+                              builder: (context, isFollowing, child) {
+                                return CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: Colors.pinkAccent,
+                                  child: Icon(
+                                    isFollowing ? Icons.favorite : Icons.favorite_border,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -342,8 +343,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                             ),
                             onPressed: () {
+                              StreamerFollowManager().setFollowing(widget.streamer.name, true);
                               setState(() {
-                                if (!_globalIsFollowing) _globalIsFollowing = true;
                                 _showFollowPopup = false;
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -401,3 +402,4 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 }
+
