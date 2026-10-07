@@ -5,6 +5,7 @@ import 'live_room_bottom_toolbar.dart';
 import 'live_tools_and_gifts_helper.dart';
 import 'live_ads_integration_helper.dart';
 import 'streamer_follow_manager.dart';
+import 'live_streamer_overlay_manager.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -15,8 +16,6 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  bool _isMiniScreen = false;
-  Offset _miniScreenPosition = const Offset(20, 100);
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
 
@@ -97,7 +96,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar: Clicking 'X' minimizes to floating mini player inside screen
+                  // Top Header Bar: Clicking 'X' triggers Global Floating Mini Player & pops room
                   Positioned(
                     top: 40,
                     left: 16,
@@ -105,9 +104,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: LiveRoomHeader(
                       streamer: streamerItem,
                       onMinimize: () {
-                        setState(() {
-                          _isMiniScreen = true;
-                        });
+                        Navigator.pop(context);
+                        LiveStreamerOverlayManager.showFloatingMiniPlayer(
+                          context: context,
+                          streamer: streamerItem,
+                          onExpand: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LiveRoomScreen(streamer: streamerItem),
+                              ),
+                            );
+                          },
+                          onClose: () {
+                            // Live completely closed
+                          },
+                        );
                       },
                       viewerCount: roomViewers.length,
                       viewersList: roomViewers,
@@ -260,74 +272,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               );
             },
           ),
-
-          // Draggable Floating Mini-Screen Overlay (When minimized)
-          if (_isMiniScreen)
-            Positioned(
-              left: _miniScreenPosition.dx,
-              top: _miniScreenPosition.dy,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  setState(() {
-                    _miniScreenPosition += details.delta;
-                  });
-                },
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    width: 140,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.pinkAccent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.6),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: GestureDetector(
-                            onTap: () => setState(() => _isMiniScreen = false),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.person, color: Colors.white54, size: 40),
-                                const SizedBox(height: 8),
-                                Text(
-                                  currentStreamer.name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                const Text('Tap to Expand', style: TextStyle(color: Colors.white70, fontSize: 9)),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Colors.black54,
-                              child: Icon(Icons.close, color: Colors.white, size: 14),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
