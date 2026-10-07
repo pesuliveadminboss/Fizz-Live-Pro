@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
+import 'streamer_follow_manager.dart';
 import '../block4_private_chat/profile_navigation_bridge.dart';
 
 class LiveRoomHeader extends StatelessWidget {
   final LiveStreamer streamer;
   final VoidCallback onMinimize;
   final VoidCallback onClose;
-  final bool isFollowing;
-  final VoidCallback onToggleFollow;
 
   const LiveRoomHeader({
     super.key,
     required this.streamer,
     required this.onMinimize,
     required this.onClose,
-    required this.isFollowing,
-    required this.onToggleFollow,
   });
 
   @override
   Widget build(BuildContext context) {
+    final followNotifier = StreamerFollowManager().getFollowNotifier(streamer.name);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -32,12 +31,6 @@ class LiveRoomHeader extends StatelessWidget {
                   context: context,
                   streamerId: '340301087',
                   streamerName: streamer.name,
-                  isFollowing: isFollowing,
-                  onFollowChanged: (val) {
-                    if (val != isFollowing) {
-                      onToggleFollow();
-                    }
-                  },
                 );
               },
               child: Container(
@@ -61,15 +54,29 @@ class LiveRoomHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     GestureDetector(
-                      onTap: onToggleFollow,
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.black54,
-                        child: Icon(
-                          isFollowing ? Icons.favorite : Icons.favorite_border,
-                          color: isFollowing ? Colors.pinkAccent : Colors.white,
-                          size: 20,
-                        ),
+                      onTap: () {
+                        StreamerFollowManager().toggleFollow(streamer.name);
+                        final status = StreamerFollowManager().isFollowing(streamer.name);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(status ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
+                            duration: const Duration(milliseconds: 500),
+                          ),
+                        );
+                      },
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: followNotifier,
+                        builder: (context, isFollowing, child) {
+                          return CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.black54,
+                            child: Icon(
+                              isFollowing ? Icons.favorite : Icons.favorite_border,
+                              color: isFollowing ? Colors.pinkAccent : Colors.white,
+                              size: 20,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
