@@ -68,7 +68,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final currentStreamer = LiveStreamer.dummyStreamers[_currentIndex];
-    final currentViewers = _roomViewersMap[_currentIndex] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
@@ -110,7 +109,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar with Dynamic Viewers Count & List Popup
+                  // Top Header Bar with Viewer Count & List Popup Parameters Passed
                   Positioned(
                     top: 40,
                     left: 16,
