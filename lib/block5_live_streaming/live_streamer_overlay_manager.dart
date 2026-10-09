@@ -23,6 +23,7 @@ class LiveStreamerOverlayManager {
             child: Material(
               color: Colors.transparent,
               child: GestureDetector(
+                // Only dragging happens here on pan update
                 onPanUpdate: (details) {
                   setState(() {
                     position += details.delta;
@@ -45,25 +46,27 @@ class LiveStreamerOverlayManager {
                   ),
                   child: Stack(
                     children: [
-                      // Center area tap to expand to Big Screen
+                      // Center area: Tapping here ONLY expands to Big Screen
                       Positioned.fill(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            hideOverlay();
-                            onExpand();
-                          },
-                          child: const Center(
-                            child: Icon(Icons.person, color: Colors.white54, size: 50),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () {
+                              hideOverlay();
+                              onExpand();
+                            },
+                            child: const Center(
+                              child: Icon(Icons.person, color: Colors.white54, size: 50),
+                            ),
                           ),
                         ),
                       ),
-                      // Top-right close button to kill the mini player
+                      // Top-right close button: Tapping here ONLY closes the mini player
                       Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
+                        top: 6,
+                        right: 6,
+                        child: InkWell(
                           onTap: () {
                             hideOverlay();
                             onClose();
@@ -93,3 +96,4 @@ class LiveStreamerOverlayManager {
     _overlayEntry = null;
   }
 }
+
