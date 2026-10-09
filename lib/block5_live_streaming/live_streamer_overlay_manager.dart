@@ -20,14 +20,14 @@ class LiveStreamerOverlayManager {
           return Positioned(
             left: position.dx,
             top: position.dy,
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  position += details.delta;
-                });
-              },
-              child: Material(
-                color: Colors.transparent,
+            child: Material(
+              color: Colors.transparent,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    position += details.delta;
+                  });
+                },
                 child: Container(
                   width: 140,
                   height: 220,
@@ -45,26 +45,25 @@ class LiveStreamerOverlayManager {
                   ),
                   child: Stack(
                     children: [
-                      // 1. Tapping the center area expands back to Full Screen
+                      // Center area tap to expand to Big Screen
                       Positioned.fill(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              hideOverlay();
-                              onExpand();
-                            },
-                            child: const Center(
-                              child: Icon(Icons.person, color: Colors.white54, size: 50),
-                            ),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            hideOverlay();
+                            onExpand();
+                          },
+                          child: const Center(
+                            child: Icon(Icons.person, color: Colors.white54, size: 50),
                           ),
                         ),
                       ),
-                      // 2. Tapping the 'X' button strictly closes/kills the live completely
+                      // Top-right close button to kill the mini player
                       Positioned(
                         top: 4,
                         right: 4,
                         child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () {
                             hideOverlay();
                             onClose();
@@ -85,6 +84,7 @@ class LiveStreamerOverlayManager {
         },
       ),
     );
+
     Overlay.of(context).insert(_overlayEntry!);
   }
 
