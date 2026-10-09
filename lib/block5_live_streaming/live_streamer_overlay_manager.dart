@@ -10,7 +10,8 @@ class LiveStreamerOverlayManager {
     required VoidCallback onExpand,
     required VoidCallback onClose,
   }) {
-    if (_overlayEntry != null) return;
+    // If a mini player is already showing, remove it first so old streamer's mini player doesn't persist!
+    hideOverlay();
 
     Offset position = const Offset(20, 100);
 
@@ -22,35 +23,35 @@ class LiveStreamerOverlayManager {
             top: position.dy,
             child: Material(
               color: Colors.transparent,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  setState(() {
-                    position += details.delta;
-                  });
-                },
-                child: Container(
-                  width: 140,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1D1B36),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.pinkAccent, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.6),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Center area: Tapping here ONLY expands to Big Screen
-                      Positioned.fill(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(14),
+              child: Listener(
+                // Using Listener and GestureDetector together for flawless touch detection
+                child: GestureDetector(
+                  onPanUpdate: (details) {
+                    setState(() {
+                      position += details.delta;
+                    });
+                  },
+                  child: Container(
+                    width: 140,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1D1B36),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.pinkAccent, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Center area: Tapping here expands to Big Screen
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
                               hideOverlay();
                               onExpand();
@@ -60,24 +61,25 @@ class LiveStreamerOverlayManager {
                             ),
                           ),
                         ),
-                      ),
-                      // Top-right close button: Tapping here ONLY closes the mini player
-                      Positioned(
-                        top: 6,
-                        right: 6,
-                        child: InkWell(
-                          onTap: () {
-                            hideOverlay();
-                            onClose();
-                          },
-                          child: const CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.black54,
-                            child: Icon(Icons.close, color: Colors.white, size: 14),
+                        // Top-right close button: Tapping here closes the mini player completely
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              hideOverlay();
+                              onClose();
+                            },
+                            child: const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.black54,
+                              child: Icon(Icons.close, color: Colors.white, size: 14),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
