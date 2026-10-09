@@ -23,7 +23,6 @@ class LiveStreamerOverlayManager {
             child: Material(
               color: Colors.transparent,
               child: GestureDetector(
-                // Only dragging happens here on pan update
                 onPanUpdate: (details) {
                   setState(() {
                     position += details.delta;
@@ -96,4 +95,3 @@ class LiveStreamerOverlayManager {
     _overlayEntry = null;
   }
 }
-
