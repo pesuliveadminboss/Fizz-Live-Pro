@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
-import 'live_room_screen.dart';
 
 class LiveStreamerOverlayManager {
   static OverlayEntry? _overlayEntry;
@@ -8,8 +7,9 @@ class LiveStreamerOverlayManager {
   static void showFloatingMiniPlayer({
     required BuildContext context,
     required LiveStreamer streamer,
+    required VoidCallback onExpand,
+    required VoidCallback onClose,
   }) {
-    // வேறு ஸ்ட்ரீமரின் மினி ஸ்கிரீன் இருந்தால் அதை ஆட்டோமேட்டிக்காக கட் செய்துவிடும்
     hideOverlay();
 
     Offset position = const Offset(20, 100);
@@ -45,25 +45,18 @@ class LiveStreamerOverlayManager {
                   ),
                   child: Stack(
                     children: [
-                      // மினி ஸ்கிரீனின் சென்டரில் தொட்டால் ஃபுல் ஸ்கிரீன் ஓபன் ஆகும்
                       Positioned.fill(
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
                             hideOverlay();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LiveRoomScreen(streamer: streamer),
-                              ),
-                            );
+                            onExpand();
                           },
                           child: const Center(
                             child: Icon(Icons.person, color: Colors.white54, size: 50),
                           ),
                         ),
                       ),
-                      // மேல் உள்ள '×' பட்டனைத் தொட்டால் மினி ஸ்கிரீன் கட் ஆகிவிடும்
                       Positioned(
                         top: 6,
                         right: 6,
@@ -71,6 +64,7 @@ class LiveStreamerOverlayManager {
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
                             hideOverlay();
+                            onClose();
                           },
                           child: const CircleAvatar(
                             radius: 12,
