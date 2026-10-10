@@ -54,8 +54,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentStreamer = LiveStreamer.dummyStreamers[_currentIndex];
-
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
       body: Stack(
@@ -96,7 +94,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar: Minimize triggers floating mini player & pops room
+                  // Top Header Bar
                   Positioned(
                     top: 40,
                     left: 16,
@@ -124,5 +122,145 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       height: 130,
                       child: ListView.builder(
                         reverse: false,
+                        itemCount: _liveChats.length,
+                        itemBuilder: (context, chatIndex) {
+                          final chat = _liveChats[chatIndex];
+                          final isWarning = chat['type'] == 'warning';
 
-                        
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isWarning ? Colors.amber.withOpacity(0.2) : Colors.black26,
+                                borderRadius: BorderRadius.circular(10),
+                                border: isWarning ? Border.all(color: Colors.amber.withOpacity(0.5)) : null,
+                              ),
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: isWarning ? 'Room: ' : '${chat['user']}: ',
+                                      style: TextStyle(
+                                        color: isWarning ? Colors.amberAccent : Colors.amber,
+                                        fontSize: isWarning ? 8 : 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: chat['message'] ?? '',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: isWarning ? 8 : 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // Left Side Bottom Toolbar
+                  Positioned(
+                    bottom: 16,
+                    left: 16,
+                    child: LiveRoomBottomToolbar(
+                      onOpenTools: () {},
+                      onVideoCall: () {},
+                      onGiftTap: () {},
+                      onLikeTap: () {},
+                      onSendMessage: _handleNewMessage,
+                    ),
+                  ),
+
+                  // Right Side Bottom Toolbar
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: SizedBox(
+                      width: 150,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              StreamerFollowManager().toggleFollow(streamerItem.name);
+                              final status = StreamerFollowManager().isFollowing(streamerItem.name);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(status ? 'Successfully Followed Streamer ❤️' : 'Unfollowed Streamer'),
+                                  duration: const Duration(milliseconds: 500),
+                                ),
+                              );
+                            },
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: followNotifier,
+                              builder: (context, isFollowing, child) {
+                                return CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: Colors.pinkAccent,
+                                  child: Icon(
+                                    isFollowing ? Icons.favorite : Icons.favorite_border,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Opening Gift Panel...'), duration: Duration(seconds: 1)),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: const Icon(Icons.videocam, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Right Side Vertical Ads
+                  Positioned(
+                    bottom: 80,
+                    right: 16,
+                    child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
