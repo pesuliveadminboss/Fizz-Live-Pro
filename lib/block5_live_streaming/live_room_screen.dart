@@ -96,7 +96,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Top Header Bar: Clicking 'X' triggers Global Floating Mini Player & pops room
+                  // Top Header Bar: Minimize triggers floating mini player & pops room
                   Positioned(
                     top: 40,
                     left: 16,
@@ -104,22 +104,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: LiveRoomHeader(
                       streamer: streamerItem,
                       onMinimize: () {
-                        Navigator.pop(context);
                         LiveStreamerOverlayManager.showFloatingMiniPlayer(
                           context: context,
                           streamer: streamerItem,
-                          onExpand: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LiveRoomScreen(streamer: streamerItem),
-                              ),
-                            );
-                          },
-                          onClose: () {
-                            // Live completely closed
-                          },
                         );
+                        Navigator.pop(context);
                       },
                       viewerCount: roomViewers.length,
                       viewersList: roomViewers,
