@@ -51,7 +51,7 @@ class _PartyRoomCreatorScreenState extends State<PartyRoomCreatorScreen> {
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
                 fillColor: const Color(0xFF1D1B36),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: Border.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),
             ),
             const SizedBox(height: 20),
@@ -65,7 +65,7 @@ class _PartyRoomCreatorScreenState extends State<PartyRoomCreatorScreen> {
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
                 fillColor: const Color(0xFF1D1B36),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: Border.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),
             ),
             const SizedBox(height: 20),
@@ -78,7 +78,7 @@ class _PartyRoomCreatorScreenState extends State<PartyRoomCreatorScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFF1D1B36),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: Border.none),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
               ),
               items: _themes.map((theme) {
                 return DropdownMenuItem<String>(
