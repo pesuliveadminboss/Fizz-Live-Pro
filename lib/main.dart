@@ -28,7 +28,7 @@ import 'block4_private_chat/voice_recorder_helper.dart';
 import 'block4_private_chat/image_picker_helper.dart';
 import 'block4_private_chat/audio_player_helper.dart';
 
-// --- BLOCK 5 IMPORTS (10 Modular Files for Live Streaming & Monetization) ---
+// --- BLOCK 5 IMPORTS (Complete 13 Modular Files for Live Streaming & Monetization) ---
 import 'block5_live_streaming/live_streamer_model.dart';
 import 'block5_live_streaming/live_category_filter_bar.dart';
 import 'block5_live_streaming/live_ads_integration_helper.dart';
@@ -39,6 +39,19 @@ import 'block5_live_streaming/streamer_profile_popup.dart';
 import 'block5_live_streaming/live_room_bottom_toolbar.dart';
 import 'block5_live_streaming/live_tools_and_gifts_helper.dart';
 import 'block5_live_streaming/live_room_screen.dart';
+import 'block5_live_streaming/streamer_follow_manager.dart';
+import 'block5_live_streaming/live_streamer_overlay_manager.dart';
+import 'block5_live_streaming/live_room_hub.dart';
+
+// --- BLOCK 6 IMPORTS (Party Room Features, Hub, Creator & Navigation Bridge) ---
+import 'block6_party_room/party_room_hub.dart';
+import 'block6_party_room/party_room_model.dart';
+import 'block6_party_room/party_room_list_screen.dart';
+import 'block6_party_room/party_room_screen.dart';
+import 'block6_party_room/party_room_creator_screen.dart';
+import 'block6_party_room/party_room_overlay_manager.dart';
+import 'block6_party_room/party_gift_animation_helper.dart';
+import 'block6_party_room/party_room_navigation_bridge.dart';
 
 void main() => runApp(const FizzLiveProApp());
 
@@ -59,6 +72,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/main_shell': (context) => const MainShellNavigation(),
         '/private_chat': (context) => const PrivateChatScreen(),
         '/live_tab': (context) => const LiveTabScreen(),
+        '/party_room': (context) => const PartyRoomHub(),
       },
     );
   }
