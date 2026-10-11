@@ -9,6 +9,7 @@ class LiveStreamerOverlayManager {
     required BuildContext context,
     required LiveStreamer streamer,
   }) {
+    // புதிய மினி-பிளேயர் ஓபன் ஆகும் முன், பழையது எதுவடி இருந்தாலும் உடனடியாகக் கட் ஆகிவிடும்
     hideOverlay();
 
     Offset position = const Offset(20, 100);
@@ -44,7 +45,7 @@ class LiveStreamerOverlayManager {
                   ),
                   child: Stack(
                     children: [
-                      // Center tap to open Big Screen
+                      // Center tap to open Big Screen & hide mini player
                       Positioned.fill(
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
@@ -62,7 +63,7 @@ class LiveStreamerOverlayManager {
                           ),
                         ),
                       ),
-                      // Close button to kill mini player
+                      // Close button to kill mini player completely
                       Positioned(
                         top: 6,
                         right: 6,
