@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'party_room_model.dart';
 import 'party_room_overlay_manager.dart';
@@ -18,8 +19,35 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     {'user': 'PariHub', 'message': '✨ Grab your mic and join the chat!'},
   ];
 
+  // Dynamic Theme Rotation List
+  late String _currentTheme;
+  Timer? _themeTimer;
+  final List<String> _themesList = ['cruise', 'couple', 'dj', 'retro'];
+  int _themeIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentTheme = widget.room.themeType;
+    _themeIndex = _themesList.indexOf(_currentTheme);
+    if (_themeIndex == -1) _themeIndex = 0;
+
+    // 10-Minute (or demo interval) Auto Theme Switcher Timer
+    _themeTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
+      if (!mounted) return;
+      setState(() {
+        _themeIndex = (_themeIndex + 1) % _themesList.length;
+        _currentTheme = _themesList[_themeIndex];
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('✨ Party Theme Automatically Switched to: ${_currentTheme.toUpperCase()}!'), duration: const Duration(seconds: 2)),
+      );
+    });
+  }
+
   @override
   void dispose() {
+    _themeTimer?.cancel();
     _chatController.dispose();
     super.dispose();
   }
@@ -32,6 +60,46 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     });
   }
 
+  // Seat Action Dialog (Mute, Lock, Invite to Seat)
+  void _showSeatActionDialog(int seatIndex) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1D1B36),
+        title: Text('Seat ${seatIndex + 1} Management', style: const TextStyle(color: Colors.white, fontSize: 16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.mic_off, color: Colors.orangeAccent),
+              title: const Text('Mute Seat Mic', style: TextStyle(color: Colors.white, fontSize: 14)),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seat Muted Successfully')));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock, color: Colors.redAccent),
+              title: const Text('Lock / Unlock Seat', style: TextStyle(color: Colors.white, fontSize: 14)),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seat Lock Status Updated')));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_add, color: Colors.cyanAccent),
+              title: const Text('Invite User to Seat', style: TextStyle(color: Colors.white, fontSize: 14)),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invitation Sent to User')));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final followNotifier = StreamerFollowManager().getFollowNotifier(widget.room.hostName);
@@ -40,7 +108,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       backgroundColor: const Color(0xFF121026),
       body: Stack(
         children: [
-          // Cinematic Background Theme
+          // Cinematic Background Theme (Dynamically changes every 10 mins)
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -52,13 +120,19 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               ),
               child: Center(
                 child: Opacity(
-                  opacity: 0.15,
+                  opacity: 0.18,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.nightlife, size: 180, color: Colors.cyanAccent),
+                      Icon(
+                        _currentTheme == 'cruise' ? Icons.directions_boat :
+                        _currentTheme == 'couple' ? Icons.favorite :
+                        _currentTheme == 'dj' ? Icons.nightlife : Icons.audiotrack,
+                        size: 180,
+                        color: Colors.cyanAccent,
+                      ),
                       const SizedBox(height: 10),
-                      Text('Theme: ${widget.room.themeType.toUpperCase()}', style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 2)),
+                      Text('Active Theme: ${_currentTheme.toUpperCase()} (Auto-Rotating)', style: const TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 1.5)),
                     ],
                   ),
                 ),
@@ -171,7 +245,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
             ),
           ),
 
-          // Multi-Seat Audio Grid (10 Seats for 10 Members)
+          // Multi-Seat Audio Grid (10 Seats with Tap Management)
           Positioned(
             top: 110,
             left: 16,
@@ -190,33 +264,36 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                   bool isOccupied = index < widget.room.seats.length && widget.room.seats[index] != 'Empty';
                   String seatLabel = isOccupied ? widget.room.seats[index] : 'Seat ${index + 1}';
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: isOccupied ? const Color(0xFF1D1B36) : Colors.white10,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isOccupied ? Colors.cyanAccent : Colors.white24,
-                        width: 1.5,
+                  return GestureDetector(
+                    onTap: () => _showSeatActionDialog(index),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isOccupied ? const Color(0xFF1D1B36) : Colors.white10,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isOccupied ? Colors.cyanAccent : Colors.white24,
+                          width: 1.5,
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isOccupied ? Icons.mic : Icons.mic_none,
-                          color: isOccupied ? Colors.cyanAccent : Colors.white38,
-                          size: 20,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          seatLabel,
-                          style: TextStyle(
-                            color: isOccupied ? Colors.white : Colors.white38,
-                            fontSize: 9,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isOccupied ? Icons.mic : Icons.mic_none,
+                            color: isOccupied ? Colors.cyanAccent : Colors.white38,
+                            size: 20,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            seatLabel,
+                            style: TextStyle(
+                              color: isOccupied ? Colors.white : Colors.white38,
+                              fontSize: 9,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -323,4 +400,3 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     );
   }
 }
-
