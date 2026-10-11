@@ -37,6 +37,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     {'user': 'Guest_Llw6JP', 'message': 'joined the room'},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // புதிய லைவ் ரூமிற்கு உள்ளே நுழையும் போதே, ஏற்கனவே உள்ள மினி-பிளேயரை ஆட்டோமேட்டிக்காக கட் செய்துவிடும்!
+    LiveStreamerOverlayManager.hideOverlay();
+  }
+
   void _handleNewMessage(String msg) {
     if (msg.trim().isEmpty) return;
     setState(() {
