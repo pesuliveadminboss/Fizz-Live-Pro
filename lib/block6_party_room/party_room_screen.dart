@@ -19,7 +19,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     {'user': 'PariHub', 'message': '✨ Grab your mic and join the chat!'},
   ];
 
-  // Dynamic Theme Rotation List
   late String _currentTheme;
   Timer? _themeTimer;
   final List<String> _themesList = ['cruise', 'couple', 'dj', 'retro'];
@@ -32,7 +31,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     _themeIndex = _themesList.indexOf(_currentTheme);
     if (_themeIndex == -1) _themeIndex = 0;
 
-    // 10-Minute (or demo interval) Auto Theme Switcher Timer
     _themeTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
       if (!mounted) return;
       setState(() {
@@ -60,7 +58,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
     });
   }
 
-  // Seat Action Dialog (Mute, Lock, Invite to Seat)
   void _showSeatActionDialog(int seatIndex) {
     showDialog(
       context: context,
@@ -108,7 +105,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       backgroundColor: const Color(0xFF121026),
       body: Stack(
         children: [
-          // Cinematic Background Theme (Dynamically changes every 10 mins)
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -139,8 +135,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               ),
             ),
           ),
-
-          // Top Header Bar (Capsule Profile, Follow Sync, Minimize Button)
           Positioned(
             top: 40,
             left: 16,
@@ -148,7 +142,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Capsule Host Profile
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
@@ -172,7 +165,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                         ],
                       ),
                       const SizedBox(width: 10),
-                      // Follow Sync Button
                       GestureDetector(
                         onTap: () {
                           StreamerFollowManager().toggleFollow(widget.room.hostName);
@@ -198,8 +190,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                     ],
                   ),
                 ),
-
-                // Right Icons: Online Count & Compact Mini-Player Minimize Button
                 Row(
                   children: [
                     Container(
@@ -214,7 +204,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Minimize to Compact Audio Mini-Player
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -230,7 +219,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    // Close Room Button
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: const CircleAvatar(
@@ -244,8 +232,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               ],
             ),
           ),
-
-          // Multi-Seat Audio Grid (10 Seats with Tap Management)
           Positioned(
             top: 110,
             left: 16,
@@ -253,7 +239,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
             child: SizedBox(
               height: 220,
               child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics,
+                physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5,
                   mainAxisSpacing: 10,
@@ -300,8 +286,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               ),
             ),
           ),
-
-          // Bottom Scrollable Party Chat Feed
           Positioned(
             bottom: 70,
             left: 16,
@@ -340,8 +324,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
               ),
             ),
           ),
-
-          // Bottom Action Toolbar (Mic, Gift, Chat Input)
           Positioned(
             bottom: 16,
             left: 16,
@@ -369,14 +351,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Mic Control Toggle
                 const CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.cyanAccent,
                   child: Icon(Icons.mic, color: Color(0xFF121026), size: 20),
                 ),
                 const SizedBox(width: 8),
-                // Cinematic Gift Button
                 GestureDetector(
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
