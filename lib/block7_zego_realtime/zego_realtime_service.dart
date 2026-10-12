@@ -12,7 +12,7 @@ class ZegoRealtimeService {
       ZegoEngineProfile profile = ZegoEngineProfile(
         appID,
         appSign,
-        ZegoScenario.defaultScenario,
+        ZegoScenario.StandardLiveRoom,
       );
       await ZegoExpressEngine.createEngineWithProfile(profile);
       debugPrint("Zego Express Engine Initialized Successfully");
