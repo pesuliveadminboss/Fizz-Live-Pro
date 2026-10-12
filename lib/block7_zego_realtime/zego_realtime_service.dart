@@ -9,13 +9,12 @@ class ZegoRealtimeService {
   // 1. Initialize Zego Express Engine
   static Future<void> initZegoEngine() async {
     try {
-      await ZegoExpressEngine.createEngineWithProfile(
-        ZegoEngineProfile(
-          appID,
-          appSign,
-          ZegoScenario.StandardLiveRoom,
-        ),
+      ZegoEngineProfile profile = ZegoEngineProfile(
+        appID,
+        appSign,
+        ZegoScenario.defaultScenario,
       );
+      await ZegoExpressEngine.createEngineWithProfile(profile);
       debugPrint("Zego Express Engine Initialized Successfully");
     } catch (e) {
       debugPrint("Zego Initialization Error: $e");
