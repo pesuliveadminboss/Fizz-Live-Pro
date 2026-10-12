@@ -6,15 +6,17 @@ class ZegoRealtimeService {
   static const int appID = 776678716;
   static const String appSign = "337f7cb4bcf663ab5becd89ddd7b37aa412a3f226c5fecc27c688c5b9c90351e";
 
-  // 1. Initialize Zego Express Engine
+  // 1. Initialize Zego Express Engine (Fixed with zero-error syntax for v3.25.0)
   static Future<void> initZegoEngine() async {
     try {
-      ZegoEngineProfile profile = ZegoEngineProfile(
-        appID,
-        appSign,
-        ZegoScenario.StandardLiveRoom,
+      // Using standard engine creation without invalid scenario enums
+      await ZegoExpressEngine.createEngineWithProfile(
+        ZegoEngineProfile(
+          appID,
+          appSign,
+          ZegoScenario.General,
+        ),
       );
-      await ZegoExpressEngine.createEngineWithProfile(profile);
       debugPrint("Zego Express Engine Initialized Successfully");
     } catch (e) {
       debugPrint("Zego Initialization Error: $e");
