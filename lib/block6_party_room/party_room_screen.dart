@@ -344,4 +344,39 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Say something to the party...',
                         hintStyle: TextStyle(color: Colors.white54, fontSize: 12),
-                        
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: _handleSendMessage,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.cyanAccent,
+                  child: Icon(Icons.mic, color: Color(0xFF121026), size: 20),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('🎁 Sending Cinematic Gift Effect!'), duration: Duration(seconds: 1)),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
