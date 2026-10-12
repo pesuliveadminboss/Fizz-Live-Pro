@@ -4,6 +4,7 @@ import 'country_search_filter_helper.dart';
 import '../block5_live_streaming/live_tab_screen.dart';
 import '../block5_live_streaming/live_streamer_model.dart';
 import '../block5_live_streaming/live_streamer_grid_card.dart';
+import '../block6_party_room/party_room_hub.dart';
 
 class HotAndLiveContainerTab extends StatefulWidget {
   const HotAndLiveContainerTab({super.key});
@@ -129,23 +130,14 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
             )
           : TabBarView(
               controller: _tabController,
-              children: [
-                const HotTabGridScreen(),
-                const LiveTabScreen(),
+              children: const [
+                HotTabGridScreen(),
+                LiveTabScreen(),
+                PartyRoomHub(), // Connected properly to PartyRoomHub
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.party_mode, size: 64, color: Colors.white24),
-                      SizedBox(height: 12),
-                      Text('Party Rooms Coming Soon 🎉', style: TextStyle(color: Colors.white60, fontSize: 14)),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(Icons.people_alt, size: 64, color: Colors.white24),
                       SizedBox(height: 12),
                       Text('Matchmaking Coming Soon 💖', style: TextStyle(color: Colors.white60, fontSize: 14)),
@@ -157,4 +149,3 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
     );
   }
 }
-
