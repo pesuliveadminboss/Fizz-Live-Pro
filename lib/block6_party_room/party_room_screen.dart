@@ -284,4 +284,64 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                   );
                 },
               ),
-              
+            ),
+          ),
+          Positioned(
+            bottom: 70,
+            left: 16,
+            right: 80,
+            child: SizedBox(
+              height: 140,
+              child: ListView.builder(
+                itemCount: _partyChats.length,
+                itemBuilder: (context, index) {
+                  final chat = _partyChats[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${chat['user']}: ',
+                              style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: chat['message'],
+                              style: const TextStyle(color: Colors.white, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextField(
+                      controller: _chatController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: const InputDecoration(
+                        hintText: 'Say something to the party...',
+                        hintStyle: TextStyle(color: Colors.white54, fontSize: 12),
+                        
