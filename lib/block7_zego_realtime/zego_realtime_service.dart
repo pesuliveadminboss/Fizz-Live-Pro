@@ -2,28 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ZegoRealtimeService {
-  // ZegoCloud Credentials provided for Fizz Live Pro
-  static const int appID = 776678716;
-  static const String appSign = "337f7cb4bcf663ab5becd89ddd7b37aa412a3f226c5fecc27c688c5b9c90351e";
+  // Updated Group Call & Live Streaming Credentials for Fizz Live Pro
+  static const int appID = 821340860;
+  static const String appSign = "9d54b18680b7bd20f42dc3b7cdd1680e63b420a1e64aa0168cd7b167d1bb72dd";
 
-  // 1. Initialize Zego Express Engine (Fixed with zero-error syntax for v3.25.0)
+  // 1. Initialize Zego Express Engine with Group Call & Live Profile
   static Future<void> initZegoEngine() async {
     try {
-      // Using standard engine creation without invalid scenario enums
-      await ZegoExpressEngine.createEngineWithProfile(
-        ZegoEngineProfile(
-          appID,
-          appSign,
-          ZegoScenario.General,
-        ),
+      ZegoEngineProfile profile = ZegoEngineProfile(
+        appID,
+        appSign,
+        ZegoScenario.StandardLiveRoom,
       );
-      debugPrint("Zego Express Engine Initialized Successfully");
+      await ZegoExpressEngine.createEngineWithProfile(profile);
+      debugPrint("Zego Express Engine Initialized Successfully with Group Call Support");
     } catch (e) {
       debugPrint("Zego Initialization Error: $e");
     }
   }
 
-  // 2. Login to Live or Party Room
+  // 2. Login to Live or Party Room (Group Call)
   static Future<bool> loginRoom(String roomID, String userID, String userName) async {
     try {
       ZegoUser user = ZegoUser(userID, userName);
@@ -32,7 +30,7 @@ class ZegoRealtimeService {
       ZegoRoomLoginResult result = await ZegoExpressEngine.instance.loginRoom(roomID, user, config: roomConfig);
       
       if (result.errorCode == 0) {
-        debugPrint("Successfully Logged into Zego Room: $roomID");
+        debugPrint("Successfully Logged into Zego Group Room: $roomID");
         return true;
       } else {
         debugPrint("Failed to Login Room. Error Code: ${result.errorCode}");
@@ -54,12 +52,12 @@ class ZegoRealtimeService {
     }
   }
 
-  // 4. Start Publishing Stream (Camera & Microphone)
+  // 4. Start Publishing Stream (Camera & Microphone for Group/Live)
   static Future<void> startPublishing(String streamID) async {
     try {
       ZegoExpressEngine.instance.startPreview();
       await ZegoExpressEngine.instance.startPublishingStream(streamID);
-      debugPrint("Started Publishing Stream: $streamID");
+      debugPrint("Started Publishing Group Stream: $streamID");
     } catch (e) {
       debugPrint("Zego Publish Error: $e");
     }
@@ -82,3 +80,4 @@ class ZegoRealtimeService {
     debugPrint("Microphone Mute Status: $isMuted");
   }
 }
+
