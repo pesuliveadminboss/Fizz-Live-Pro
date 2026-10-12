@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ZegoRealtimeService {
-  // Updated Group Call & Live Streaming Credentials for Fizz Live Pro
+  // ZegoCloud Credentials for Fizz Live Pro
   static const int appID = 821340860;
   static const String appSign = "9d54b18680b7bd20f42dc3b7cdd1680e63b420a1e64aa0168cd7b167d1bb72dd";
 
-  // 1. Initialize Zego Express Engine with Group Call & Live Profile
+  // 1. Initialize Zego Express Engine
   static Future<void> initZegoEngine() async {
     try {
+      // SDK requires exactly 2 positional arguments: appID and scenario
       ZegoEngineProfile profile = ZegoEngineProfile(
         appID,
-        appSign,
-        ZegoScenario.StandardLiveRoom,
+        ZegoScenario.Default,
       );
       await ZegoExpressEngine.createEngineWithProfile(profile);
-      debugPrint("Zego Express Engine Initialized Successfully with Group Call Support");
+      debugPrint("Zego Express Engine Initialized Successfully");
     } catch (e) {
       debugPrint("Zego Initialization Error: $e");
     }
   }
 
-  // 2. Login to Live or Party Room (Group Call)
+  // 2. Login to Live or Party Room
   static Future<bool> loginRoom(String roomID, String userID, String userName) async {
     try {
       ZegoUser user = ZegoUser(userID, userName);
@@ -30,8 +30,8 @@ class ZegoRealtimeService {
       ZegoRoomLoginResult result = await ZegoExpressEngine.instance.loginRoom(roomID, user, config: roomConfig);
       
       if (result.errorCode == 0) {
-        debugPrint("Successfully Logged into Zego Group Room: $roomID");
-        return true;
+        debugPrint("Successfully Logged into Zego Room: $roomID");
+        return tice;
       } else {
         debugPrint("Failed to Login Room. Error Code: ${result.errorCode}");
         return false;
@@ -52,12 +52,12 @@ class ZegoRealtimeService {
     }
   }
 
-  // 4. Start Publishing Stream (Camera & Microphone for Group/Live)
+  // 4. Start Publishing Stream
   static Future<void> startPublishing(String streamID) async {
     try {
       ZegoExpressEngine.instance.startPreview();
       await ZegoExpressEngine.instance.startPublishingStream(streamID);
-      debugPrint("Started Publishing Group Stream: $streamID");
+      debugPrint("Started Publishing Stream: $streamID");
     } catch (e) {
       debugPrint("Zego Publish Error: $e");
     }
@@ -74,10 +74,9 @@ class ZegoRealtimeService {
     }
   }
 
-  // 6. Party Room Seat Microphone Control (Mute / Unmute)
+  // 6. Party Room Seat Microphone Control
   static void setMicrophoneMuted(bool isMuted) {
     ZegoExpressEngine.instance.muteMicrophone(isMuted);
     debugPrint("Microphone Mute Status: $isMuted");
   }
 }
-
