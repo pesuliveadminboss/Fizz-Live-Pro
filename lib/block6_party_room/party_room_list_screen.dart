@@ -58,10 +58,10 @@ class PartyRoomListScreen extends StatelessWidget {
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: CircleAvatar(
+              leading: const CircleAvatar(
                 backgroundColor: Colors.pinkAccent,
                 radius: 24,
-                child: const Icon(Icons.mic, color: Colors.white, size: 22),
+                child: Icon(Icons.mic, color: Colors.white, size: 22),
               ),
               title: Text(
                 room.roomName,
