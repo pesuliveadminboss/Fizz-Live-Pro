@@ -9,7 +9,6 @@ class ZegoRealtimeService {
   // 1. Initialize Zego Express Engine
   static Future<void> initZegoEngine() async {
     try {
-      // SDK requires exactly 2 positional arguments: appID and scenario
       ZegoEngineProfile profile = ZegoEngineProfile(
         appID,
         ZegoScenario.Default,
@@ -31,7 +30,7 @@ class ZegoRealtimeService {
       
       if (result.errorCode == 0) {
         debugPrint("Successfully Logged into Zego Room: $roomID");
-        return tice;
+        return true;
       } else {
         debugPrint("Failed to Login Room. Error Code: ${result.errorCode}");
         return false;
