@@ -9,10 +9,10 @@ class ZegoRealtimeService {
   // 1. Initialize Zego Express Engine
   static Future<void> initZegoEngine() async {
     try {
-      // SDK rule fix: Passing correct parameters according to ZegoEngineProfile definition
       ZegoEngineProfile profile = ZegoEngineProfile(
         appID,
-        ZegoScenario.defaultScenario,
+        appSign,
+        ZegoScenario.StandardLiveRoom,
       );
       await ZegoExpressEngine.createEngineWithProfile(profile);
       debugPrint("Zego Express Engine Initialized Successfully");
