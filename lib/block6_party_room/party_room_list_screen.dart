@@ -4,7 +4,6 @@ import 'party_room_model.dart';
 class PartyRoomListScreen extends StatelessWidget {
   const PartyRoomListScreen({super.key});
 
-  @byte
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> sampleRooms = [
