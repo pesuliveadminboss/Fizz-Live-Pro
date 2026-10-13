@@ -14,16 +14,17 @@ class PartyRoomDetailScreen extends StatefulWidget {
 class _PartyRoomDetailScreenState extends State<PartyRoomDetailScreen> {
   bool _isJoined = false;
   bool _isMuted = false;
-  final List<Map<String, dynamic>> _seats = List.generate(8, (index) => {
-        'seatIndex': index + 1,
-        'userName': index == 0 ? 'Host (${widget.room.hostName})' : 'Empty Seat',
-        'isOccupied': index == 0,
-        'isMuted': false,
-      });
+  late final List<Map<String, dynamic>> _seats;
 
   @override
   void initState() {
     super.initState();
+    _seats = List.generate(8, (index) => {
+          'seatIndex': index + 1,
+          'userName': index == 0 ? 'Host (${widget.room.hostName})' : 'Empty Seat',
+          'isOccupied': index == 0,
+          'isMuted': false,
+        });
     _joinZegoRoom();
   }
 
@@ -167,7 +168,7 @@ class _PartyRoomDetailScreenState extends State<PartyRoomDetailScreen> {
                   ),
                   onPressed: _toggleMute,
                   icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
-                  label: Text(_isMuted, style: const TextStyle(color: Colors.white)),
+                  label: Text(_isMuted ? 'Muted' : 'Mute', style: const TextStyle(color: Colors.white)),
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
