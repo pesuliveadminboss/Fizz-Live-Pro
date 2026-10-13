@@ -42,8 +42,35 @@ import 'block5_live_streaming/live_room_screen.dart';
 import 'block5_live_streaming/streamer_follow_manager.dart';
 import 'block5_live_streaming/live_streamer_overlay_manager.dart';
 
+// --- BLOCK 6 IMPORTS (Party Room Module - All 15 Files) ---
+import 'block6_party_room/party_room_model.dart';
+import 'block6_party_room/party_room_list_screen.dart';
+import 'block6_party_room/party_room_hub.dart';
+import 'block6_party_room/party_room_detail_screen.dart';
+import 'block6_party_room/party_room_screen.dart';
+import 'block6_party_room/party_room_capsule_header.dart';
+import 'block6_party_room/party_room_creator_screen.dart';
+import 'block6_party_room/party_room_overlay_manager.dart';
+import 'block6_party_room/party_gift_animation_helper.dart';
+import 'block6_party_room/party_room_navigation_bridge.dart';
+import 'block6_party_room/party_raise_hand_helper.dart';
+import 'block6_party_room/party_ads_integration_helper.dart';
+import 'block6_party_room/party_room_audio_manager.dart';
+import 'block6_party_room/party_room_members_helper.dart';
+import 'block6_party_room/party_room_theme_helper.dart';
+
+// --- BLOCK 7 IMPORTS (ZegoCloud Integration - File 1) ---
+import 'block7_zego_integration/zego_party_room_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize ZegoCloud Engine with Official Production Credentials
+  await ZegoPartyRoomService.initZegoEngine(
+    userID: 'user_chandran_007',
+    userName: 'Chandran S',
+  );
+
   runApp(const FizzLiveProApp());
 }
 
@@ -64,6 +91,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/main_shell': (context) => const MainShellNavigation(),
         '/private_chat': (context) => const PrivateChatScreen(),
         '/live_tab': (context) => const LiveTabScreen(),
+        '/party_room_hub': (context) => const PartyRoomHub(),
       },
     );
   }
