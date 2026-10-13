@@ -42,25 +42,8 @@ import 'block5_live_streaming/live_room_screen.dart';
 import 'block5_live_streaming/streamer_follow_manager.dart';
 import 'block5_live_streaming/live_streamer_overlay_manager.dart';
 
-// --- BLOCK 6 IMPORTS (Party Room Features, Hub, Creator, Helpers & Summary) ---
-import 'block6_party_room/party_room_hub.dart';
-import 'block6_party_room/party_room_model.dart';
-import 'block6_party_room/party_room_list_screen.dart';
-import 'block6_party_room/party_room_screen.dart';
-import 'block6_party_room/party_room_creator_screen.dart';
-import 'block6_party_room/party_room_overlay_manager.dart';
-import 'block6_party_room/party_gift_animation_helper.dart';
-import 'block6_party_room/party_room_navigation_bridge.dart';
-import 'block6_party_room/party_raise_hand_helper.dart';
-import 'block6_party_room/party_room_summary_screen.dart';
-
-// --- BLOCK 7 IMPORTS (ZegoCloud Real-time Integration Service) ---
-import 'block7_zego_realtime/zego_realtime_service.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Zego Cloud Real-Time Engine on App Startup
-  await ZegoRealtimeService.initZegoEngine();
   runApp(const FizzLiveProApp());
 }
 
@@ -81,7 +64,6 @@ class FizzLiveProApp extends StatelessWidget {
         '/main_shell': (context) => const MainShellNavigation(),
         '/private_chat': (context) => const PrivateChatScreen(),
         '/live_tab': (context) => const LiveTabScreen(),
-        '/party_room': (context) => const PartyRoomHub(),
       },
     );
   }
