@@ -59,7 +59,7 @@ import 'block6_party_room/party_room_audio_manager.dart';
 import 'block6_party_room/party_room_members_helper.dart';
 import 'block6_party_room/party_room_theme_helper.dart';
 
-// --- BLOCK 7 IMPORTS (ZegoCloud Integration - File 1) ---
+// --- BLOCK 7 IMPORTS (ZegoCloud Integration Service) ---
 import 'block7_zego_integration/zego_party_room_service.dart';
 
 void main() async {
