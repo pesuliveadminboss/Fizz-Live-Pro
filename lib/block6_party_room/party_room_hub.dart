@@ -48,7 +48,6 @@ class _PartyRoomHubState extends State<PartyRoomHub> with SingleTickerProviderSt
       ),
       body: Column(
         children: [
-          // Compact AdMob Safe Slot
           Container(
             height: 35,
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
