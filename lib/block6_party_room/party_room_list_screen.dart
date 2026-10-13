@@ -7,6 +7,7 @@ class PartyRoomListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     final List<PartyRoomModel> sampleRooms = [
       PartyRoomModel(
         roomID: "room_101",
@@ -45,6 +46,7 @@ class PartyRoomListScreen extends StatelessWidget {
         itemCount: sampleRooms.length,
         itemBuilder: (context, index) {
           final room = sampleRooms[index];
+          
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
