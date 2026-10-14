@@ -170,6 +170,53 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    // 👉 If minimized, pop the screen and show floating overlay cleanly
+    if (isMinimized) {
+      return WillPopScope(
+        onWillPop: () async {
+          setState(() {
+            isMinimized = false;
+          });
+          return false;
+        },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              // Transparent background so previous screen remains visible
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isMinimized = false;
+                  });
+                },
+                child: Container(color: Colors.black54),
+              ),
+              AnimatedBuilder(
+                animation: _glowAnimation,
+                builder: (context, child) {
+                  return PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
+                    offset: floatingOffset,
+                    onPanUpdate: (details) {
+                      setState(() {
+                        floatingOffset += details.delta;
+                      });
+                    },
+                    onTap: () {
+                      setState(() {
+                        isMinimized = false;
+                      });
+                    },
+                    glowAnimation: _glowAnimation,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -449,26 +496,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   );
                 },
               ),
-            ),
-          if (isMinimized)
-            AnimatedBuilder(
-              animation: _glowAnimation,
-              builder: (context, child) {
-                return PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
-                  offset: floatingOffset,
-                  onPanUpdate: (details) {
-                    setState(() {
-                      floatingOffset += details.delta;
-                    });
-                  },
-                  onTap: () {
-                    setState(() {
-                      isMinimized = false;
-                    });
-                  },
-                  glowAnimation: _glowAnimation,
-                );
-              },
             ),
         ],
       ),
