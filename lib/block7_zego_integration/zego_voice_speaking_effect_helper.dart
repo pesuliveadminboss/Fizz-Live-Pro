@@ -71,7 +71,9 @@ class _ZegoVoiceSpeakingEffectHelperState extends State<ZegoVoiceSpeakingEffectH
                 ),
                 child: CircleAvatar(
                   radius: 24,
-                  backgroundColor: widget.isMuted ? Colors.redAccent.withOpacity(0.4) : Colors.pinkAccent.withOpacity(0.4),
+                  backgroundColor: widget.isMuted
+                      ? Colors.redAccent.withOpacity(0.4)
+                      : Colors.pinkAccent.withOpacity(0.4),
                   child: Icon(
                     widget.isMuted ? Icons.mic_off : Icons.mic,
                     color: widget.isMuted ? Colors.white54 : Colors.white,
