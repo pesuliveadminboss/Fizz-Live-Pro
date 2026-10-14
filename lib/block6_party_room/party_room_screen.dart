@@ -29,7 +29,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with all required parameters including intro
+  // Function to navigate to Full Streamer Profile Screen with ALL required parameters including language
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
@@ -39,6 +39,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       age: 22,
       status: 'Online',
       intro: 'Welcome to my party room! Enjoy the music & vibes 🎉',
+      language: 'Tamil / English', // Required language parameter provided successfully
     );
 
     Navigator.push(
