@@ -473,7 +473,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
-                            isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
+                            isSystem ? "${msg['text']}" : "${msg['user']} :${msg['text']}",
                             style: TextStyle(
                               color: isSystem ? Colors.amberAccent : Colors.white70,
                               fontSize: 11,
@@ -497,4 +497,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              content
+                              contentP
