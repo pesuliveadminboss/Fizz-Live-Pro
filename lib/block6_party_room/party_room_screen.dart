@@ -259,59 +259,62 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       return AnimatedBuilder(
         animation: _glowAnimation,
         builder: (context, child) {
-          return Stack(
-            children: [
-              Positioned(
-                left: floatingOffset.dx,
-                top: floatingOffset.dy,
-                child: GestureDetector(
-                  onPanUpdate: (details) {
-                    setState(() {
-                      floatingOffset += details.delta;
-                    });
-                  },
-                  onTap: () {
-                    setState(() {
-                      isMinimized = false; // Restore full screen party room
-                    });
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10), // Square box with smooth corners
-                      border: Border.all(color: Colors.cyanAccent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.cyanAccent.withOpacity(0.8),
-                          blurRadius: 10,
-                          spreadRadius: _glowAnimation.value,
-                        )
-                      ],
-                      color: Colors.black87,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
-                        Positioned(
-                          bottom: 2,
-                          right: 2,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              children: [
+                Positioned(
+                  left: floatingOffset.dx,
+                  top: floatingOffset.dy,
+                  child: GestureDetector(
+                    onPanUpdate: (details) {
+                      setState(() {
+                        floatingOffset += details.delta;
+                      });
+                    },
+                    onTap: () {
+                      setState(() {
+                        isMinimized = false; // Restore full screen party room
+                      });
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10), // Square box with smooth corners
+                        border: Border.all(color: Colors.cyanAccent, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.cyanAccent.withOpacity(0.8),
+                            blurRadius: 10,
+                            spreadRadius: _glowAnimation.value,
+                          )
+                        ],
+                        color: Colors.black87,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
+                          Positioned(
+                            bottom: 2,
+                            right: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
                             ),
-                            child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       );
@@ -496,8 +499,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListView.builder(
-                  itemCount: chatMessages.length,
-                  itemBuilder: (context, in
+                
