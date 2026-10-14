@@ -1,28 +1,42 @@
 import 'package:flutter/material.dart';
 import 'party_room_model.dart';
+import 'party_room_screen.dart';
+import 'party_room_creator_screen.dart';
 
-class PartyRoomListScreen extends StatelessWidget {
+class PartyRoomListScreen extends StatefulWidget {
   const PartyRoomListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> sampleRooms = [
-      {
-        'roomID': 'room_101',
-        'roomName': 'Party Ship Cinematic Voyage 🚢✨',
-        'hostName': 'Captain Chandran',
-        'onlineCount': 25,
-        'theme': 'party_ship_cinematic',
-      },
-      {
-        'roomID': 'room_102',
-        'roomName': 'Royal Night Celebration 🌙🎉',
-        'hostName': 'Aisha Live',
-        'onlineCount': 14,
-        'theme': 'royal_night',
-      },
-    ];
+  State<PartyRoomListScreen> createState() => _PartyRoomListScreenState();
+}
 
+class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
+  final List<Map<String, dynamic>> sampleRooms = [
+    {
+      'roomID': 'room_101',
+      'roomName': 'Party Ship Cinematic Voyage 🚢✨',
+      'hostName': 'Captain Chandran',
+      'onlineCount': 25,
+      'theme': 'party_ship_cinematic',
+    },
+    {
+      'roomID': 'room_102',
+      'roomName': 'Royal Night Celebration 🌙🎉',
+      'hostName': 'Aisha Live',
+      'onlineCount': 14,
+      'theme': 'royal_night',
+    },
+    {
+      'roomID': 'room_103',
+      'roomName': 'DJ Club Night 🎧🔥',
+      'hostName': 'DJ Rahul',
+      'onlineCount': 42,
+      'theme': 'dj_club',
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
       body: Column(
@@ -47,7 +61,8 @@ class PartyRoomListScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               itemCount: sampleRooms.length,
               itemBuilder: (context, index) {
-                final room = sampleRooms[index];
+                final roomMap = sampleRooms[index];
+                final room = PartyRoomModel.fromJson(roomMap);
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
@@ -67,7 +82,7 @@ class PartyRoomListScreen extends StatelessWidget {
                       child: Icon(Icons.directions_boat, color: Colors.white, size: 22),
                     ),
                     title: Text(
-                      room['roomName'],
+                      room.roomName,
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     subtitle: Padding(
@@ -75,13 +90,13 @@ class PartyRoomListScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Host: ${room['hostName']}", style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                          Text("Host: ${room.hostName}", style: const TextStyle(color: Colors.white70, fontSize: 12)),
                           const SizedBox(height: 4),
                           Row(
                             children: [
                               const Icon(Icons.person, color: Colors.cyanAccent, size: 14),
                               const SizedBox(width: 4),
-                              Text("${room['onlineCount']} Online", style: const TextStyle(color: Colors.cyanAccent, fontSize: 11)),
+                              Text("${room.onlineCount} Online", style: const TextStyle(color: Colors.cyanAccent, fontSize: 11)),
                               const SizedBox(width: 10),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -89,7 +104,7 @@ class PartyRoomListScreen extends StatelessWidget {
                                   color: Colors.pinkAccent.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Text("Theme: ${room['theme']}", style: const TextStyle(color: Colors.pinkAccent, fontSize: 10)),
+                                child: Text("Theme: ${room.theme}", style: const TextStyle(color: Colors.pinkAccent, fontSize: 10)),
                               ),
                             ],
                           ),
@@ -98,8 +113,11 @@ class PartyRoomListScreen extends StatelessWidget {
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening Party Room Details...')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PartyRoomScreen(room: room),
+                        ),
                       );
                     },
                   ),
@@ -108,6 +126,28 @@ class PartyRoomListScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.pinkAccent,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Create Room 🚢', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PartyRoomCreatorScreen()),
+          );
+          if (result != null && result is Map<String, dynamic>) {
+            setState(() {
+              sampleRooms.insert(0, {
+                'roomID': 'room_${DateTime.now().millisecondsSinceEpoch}',
+                'roomName': result['roomName'],
+                'hostName': 'Chandran S',
+                'onlineCount': 1,
+                'theme': result['theme'],
+              });
+            });
+          }
+        },
       ),
     );
   }
