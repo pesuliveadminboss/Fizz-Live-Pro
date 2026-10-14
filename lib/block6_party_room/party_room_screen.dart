@@ -496,7 +496,80 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
                               contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              border: OutlineInputBorder(
-  borderRadius: BorderRadius.circular(20),
-  borderSide: BorderSide.none,
-),     
+                                                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.send, color: Colors.cyanAccent, size: 18),
+                          onPressed: _sendMessage,
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent),
+                          onPressed: () => _showGiftBottomSheet(context),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            isMuted ? Icons.mic_off : Icons.mic,
+                            color: isMuted ? Colors.redAccent : Colors.cyanAccent,
+                          ),
+                          onPressed: _toggleMute,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (activeGiftEffect != null)
+                Center(
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.2, end: 1.2),
+                    duration: const Duration(milliseconds: 600),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.amberAccent, width: 2),
+                            boxShadow: [
+                              BoxShadow(color: Colors.amberAccent.withOpacity(0.6), blurRadius: 20, spreadRadius: 5)
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
+                              const SizedBox(width: 12),
+                              Text(
+                                activeGiftEffect!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+  
