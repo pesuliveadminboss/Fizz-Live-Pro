@@ -117,7 +117,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       language: 'Tamil / English',
     );
 
-    // Synchronize follow state back from full profile if modified
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -140,12 +139,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     }
   }
 
-  // Trigger Cinematic Gift Effects
   void _triggerGiftEffect(String giftName) {
     setState(() {
       activeGiftEffect = giftName;
     });
-    // Auto-dismiss after 3 seconds as requested
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
@@ -155,18 +152,17 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     });
   }
 
-  // Show Gift Bottom Sheet with rich options (Plane, Ship, Rocket, Bomb, Kiss, Heart, Handshake, Rose, Smiley)
   void _showGiftBottomSheet(BuildContext context) {
     final List<Map<String, dynamic>> gifts = [
       {'name': 'Rocket 🚀', 'icon': Icons.rocket_launch, 'color': Colors.orangeAccent},
       {'name': 'Airplane ✈️', 'icon': Icons.flight, 'color': Colors.lightBlueAccent},
       {'name': 'Cruise Ship 🚢', 'icon': Icons.directions_boat, 'color': Colors.cyanAccent},
       {'name': 'Bomb 💣', 'icon': Icons.local_fire_department, 'color': Colors.redAccent},
-      {'name': 'Kiss 😘', 'icon': Icons.风ing, 'color': Colors.pinkAccent},
+      {'name': 'Kiss 😘', 'icon': Icons.favorite_border, 'color': Colors.pinkAccent},
       {'name': 'Heart ❤', 'icon': Icons.favorite, 'color': Colors.pink},
       {'name': 'Handshake 🤝', 'icon': Icons.handshake, 'color': Colors.amberAccent},
       {'name': 'Red Rose 🌹', 'icon': Icons.local_florist, 'color': Colors.red},
-      {'name': 'Smiley ', 'icon': Icons.emoji_emotions, 'color': Colors.yellowAccent},
+      {'name': 'Smiley 😊', 'icon': Icons.emoji_emotions, 'color': Colors.yellowAccent},
     ];
 
     showModalBottomSheet(
@@ -208,12 +204,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: gift['color'].withOpacity(0.4)),
+                          border: Border.all(color: (gift['color'] as Color).withOpacity(0.4)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(gift['icon'], color: gift['color'], size: 18),
+                            Icon(gift['icon'] as IconData, color: gift['color'] as Color, size: 18),
                             const SizedBox(width: 6),
                             Text(
                               gift['name'].toString().split(' ')[0],
@@ -235,7 +231,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    // MINIMIZED FLOATING SQUARE WIDGET WITH BASS GLOW
     if (isMinimized) {
       return AnimatedBuilder(
         animation: _glowAnimation,
@@ -312,7 +307,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
             children: [
               Column(
                 children: [
-                  // Top Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
@@ -402,7 +396,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       ],
                     ),
                   ),
-                  // Voice Seats Grid
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
@@ -454,7 +447,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       },
                     ),
                   ),
-                  // Center visual placeholder
                   Expanded(
                     flex: 3,
                     child: Center(
@@ -465,7 +457,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       ),
                     ),
                   ),
-                  // Chat Area
                   Container(
                     height: 100,
                     margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -492,7 +483,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       },
                     ),
                   ),
-                  // Bottom Input
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -500,4 +490,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         Expanded(
                           child: TextField(
                             controller: _messageController,
-                            style: const TextStyle(color: Col
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            onSubmitted: (_) => _sendMessage(),
+                            decoration: InputDecoration(
+                              hintText: 'Type a message...',
+                              hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.1),
+                              content
