@@ -4,6 +4,111 @@ import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 
+// ---------------------------------------------------------
+// 1. DEDICATED ROOM VIEWERS SCREEN (Numbered Long Capsule List)
+// ---------------------------------------------------------
+class RoomViewersScreen extends StatefulWidget {
+  final List<Map<String, String>> viewers;
+
+  const RoomViewersScreen({super.key, required this.viewers});
+
+  @override
+  State<RoomViewersScreen> createState() => _RoomViewersScreenState();
+}
+
+class _RoomViewersScreenState extends State<RoomViewersScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F051D),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1A0B2E),
+        title: Text('Room Viewers (${widget.viewers.length})', style: const TextStyle(color: Colors.white, fontSize: 16)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: widget.viewers.isEmpty
+          ? const Center(
+              child: Text('No viewers in the room', style: TextStyle(color: Colors.white54, fontSize: 14)),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: widget.viewers.length,
+              itemBuilder: (context, index) {
+                final viewer = widget.viewers[index];
+                final serialNumber = index + 1;
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: InkWell(
+                    onTap: () {
+                      final streamerModel = StreamerProfileModel(
+                        name: viewer['name']!,
+                        id: 'user_id_$serialNumber',
+                        country: 'India',
+                        flag: '🇮🇳',
+                        age: 23,
+                        status: viewer['status']!,
+                        intro: 'Hello! Welcome to my profile.',
+                        language: 'Tamil / English',
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StreamerProfileScreen(streamer: streamerModel),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(30),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Colors.cyanAccent.withOpacity(0.3), width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            '$serialNumber.',
+                            style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          const SizedBox(width: 12),
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundColor: Colors.pinkAccent.withOpacity(0.4),
+                            child: Text(viewer['name']![0], style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  viewer['name']!,
+                                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  viewer['status']!,
+                                  style: const TextStyle(color: Colors.white60, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// 2. MAIN PARTY ROOM SCREEN
+// ---------------------------------------------------------
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
 
@@ -21,8 +126,25 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  // Follow State Synchronization Variable
+  // Follow State & Mic Mute State
   bool isFollowing = false;
+  bool isMuted = false;
+
+  // Live Chat Messages List (Shows sent messages dynamically)
+  final List<Map<String, String>> chatMessages = [
+    {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful."},
+    {"user": "Raj Shukla", "text": "Nice to meet you! Grab the mic."},
+    {"user": "System", "text": "Karthik Kumar joined the Party Room 🚀"},
+  ];
+
+  // Dynamic Viewers List (Automatically updates count and list)
+  final List<Map<String, String>> roomViewers = [
+    {"name": "Raj Shukla", "status": "Active Listener"},
+    {"name": "Alsha Live (Host)", "status": "Broadcaster"},
+    {"name": "Karthik Kumar", "status": "Joined via For You"},
+    {"name": "Priya Ramesh", "status": "Active Listener"},
+    {"name": "Suresh Babu", "status": "Active Listener"},
+  ];
 
   // Animation Controller for Square Minimized Floating Bass Glow Effect
   late AnimationController _glowController;
@@ -55,7 +177,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     super.dispose();
   }
 
-  // Function to toggle Follow state synchronized with Profile & Show Popup
+  // Function to toggle Follow state synchronized
   void _toggleFollow() {
     setState(() {
       isFollowing = !isFollowing;
@@ -67,6 +189,30 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         backgroundColor: Colors.pinkAccent,
       ),
     );
+  }
+
+  // Function to toggle Mic Mute/Unmute
+  void _toggleMute() {
+    setState(() {
+      isMuted = !isMuted;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isMuted ? 'Mic Muted 🔇' : 'Mic Unmuted 🎙️'),
+        duration: const Duration(milliseconds: 800),
+      ),
+    );
+  }
+
+  // Function to navigate to the Dedicated Viewers List Screen
+  void _openViewersScreen(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RoomViewersScreen(viewers: roomViewers),
+      ),
+    );
+    setState(() {});
   }
 
   // Function to navigate to Full Streamer Profile Screen with synchronized follow state
@@ -88,14 +234,19 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         builder: (context) => StreamerProfileScreen(streamer: streamerModel),
       ),
     ).then((_) {
-      // Refresh state when returning from profile page in case follow changed there
       setState(() {});
     });
   }
 
-  // Send message action
+  // Send message action & display in live chat view
   void _sendMessage() {
     if (_messageController.text.trim().isNotEmpty) {
+      setState(() {
+        chatMessages.add({
+          "user": "You",
+          "text": _messageController.text.trim(),
+        });
+      });
       _messageController.clear();
       FocusScope.of(context).unfocus();
     }
@@ -108,59 +259,62 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       return AnimatedBuilder(
         animation: _glowAnimation,
         builder: (context, child) {
-          return Stack(
-            children: [
-              Positioned(
-                left: floatingOffset.dx,
-                top: floatingOffset.dy,
-                child: GestureDetector(
-                  onPanUpdate: (details) {
-                    setState(() {
-                      floatingOffset += details.delta;
-                    });
-                  },
-                  onTap: () {
-                    setState(() {
-                      isMinimized = false; // Restore full screen
-                    });
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10), // Square box with smooth corners
-                      border: Border.all(color: Colors.cyanAccent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.cyanAccent.withOpacity(0.8),
-                          blurRadius: 10,
-                          spreadRadius: _glowAnimation.value,
-                        )
-                      ],
-                      color: Colors.black87,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
-                        Positioned(
-                          bottom: 2,
-                          right: 2,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              children: [
+                Positioned(
+                  left: floatingOffset.dx,
+                  top: floatingOffset.dy,
+                  child: GestureDetector(
+                    onPanUpdate: (details) {
+                      setState(() {
+                        floatingOffset += details.delta;
+                      });
+                    },
+                    onTap: () {
+                      setState(() {
+                        isMinimized = false; // Restore full screen party room
+                      });
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10), // Square box with smooth corners
+                        border: Border.all(color: Colors.cyanAccent, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.cyanAccent.withOpacity(0.8),
+                            blurRadius: 10,
+                            spreadRadius: _glowAnimation.value,
+                          )
+                        ],
+                        color: Colors.black87,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
+                          Positioned(
+                            bottom: 2,
+                            right: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
                             ),
-                            child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       );
@@ -178,7 +332,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Top Header with Clickable Host Profile, Capsule Heart Follow Button, Viewer Count & Square Minimize ('X')
+              // 1. Top Header with Clickable Host Profile, Capsule Heart Follow Button, Dynamic Viewer Count, & Square Minimize ('X')
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
@@ -198,16 +352,16 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                 child: const Icon(Icons.person, color: Colors.white, size: 20),
                               ),
                               const SizedBox(width: 8),
-                              const Column(
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Alsha Live',
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                                   ),
                                   Text(
-                                    '14 Online • Party Room',
-                                    style: TextStyle(color: Colors.white60, fontSize: 10),
+                                    '${roomViewers.length} Online • Party Room',
+                                    style: const TextStyle(color: Colors.white60, fontSize: 10),
                                   ),
                                 ],
                               ),
@@ -244,13 +398,20 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       ),
                     ),
                     const SizedBox(width: 6),
-                    // Viewer Count (Eye Icon + Count)
-                    const Row(
-                      children: [
-                        Icon(Icons.remove_red_eye, color: Colors.white60, size: 14),
-                        SizedBox(width: 3),
-                        Text('14', style: TextStyle(color: Colors.white, fontSize: 11)),
-                      ],
+                    // Dynamic Viewer Count (Eye Icon + Count -> Opens Viewers Screen)
+                    InkWell(
+                      onTap: () => _openViewersScreen(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
+                            const SizedBox(width: 3),
+                            Text('${roomViewers.length}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 4),
                     // Square Minimize / Floating Button ('X')
@@ -331,74 +492,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                 ),
               ),
 
-              // 4. Live Chat & Rules Area
+              // 4. Live Chat & Room Joining Notifications Area
               Container(
                 height: 100,
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListView(
-                  children: const [
-                    Text(
-                      "Welcome to Party Room! Keep it clean and respectful.",
-                      style: TextStyle(color: Colors.amberAccent, fontSize: 11),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Raj Shukla : Nice to meet you! Grab the mic.",
-                      style: TextStyle(color: Colors.white70, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-
-              // 5. Bottom Message Input Bar with Send Button & Toolbar
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
-                        onSubmitted: (_) => _sendMessage(),
-                        decoration: InputDecoration(
-                          hintText: 'Type a message...',
-                          hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.1),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none,
-                          ),
-                          // SEND BUTTON INSIDE MESSAGE BAR
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.send, color: Colors.cyanAccent, size: 18),
-                            onPressed: _sendMessage,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.mic_off, color: Colors.white70),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
