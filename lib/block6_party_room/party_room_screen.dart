@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
+import '../block5_live_streaming/streamer_follow_manager.dart'; // 👉 ஒரிஜினல் குளோபல் மேனேஜர் இம்போர்ட்
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_minimize_helper.dart';
@@ -23,7 +24,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  static final ValueNotifier<bool> globalFollowNotifier = ValueNotifier<bool>(false);
+  // 👉 Universal Streamer Key to sync globally across all screens
+  final String streamerKey = 'alsha_live_007';
 
   bool isMuted = false;
   String? activeGiftEffect;
@@ -72,10 +74,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _toggleFollow() {
-    globalFollowNotifier.value = !globalFollowNotifier.value;
+    StreamerFollowManager().toggleFollow(streamerKey);
+    final bool currentStatus = StreamerFollowManager().isFollowing(streamerKey);
+    setState(() {}); // Refresh state to update UI immediately
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(globalFollowNotifier.value ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        content: Text(currentStatus ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -107,7 +111,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   void _openFullHostProfile(BuildContext context) async {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
-      id: 'alsha_live_007',
+      id: streamerKey,
       country: 'India',
       flag: '🇮🇳',
       age: 22,
@@ -122,6 +126,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         builder: (context) => StreamerProfileScreen(streamer: streamerModel),
       ),
     );
+    // Refresh state when coming back from profile to sync follow button
     setState(() {});
   }
 
@@ -168,11 +173,14 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    // Check global follow status for this streamer
+    final bool isFollowing = StreamerFollowManager().isFollowing(streamerKey);
+
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -183,7 +191,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -191,7 +199,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             onTap: () => _openFullHostProfile(context),
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                               child: Row(
                                 children: [
                                   CircleAvatar(
@@ -209,7 +217,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                       ),
                                       Text(
                                         '${roomViewers.length} Online • Party Room',
-                                        style: TextStyle(color: Colors.white60, fontSize: 10),
+                                        style: const TextStyle(color: Colors.white60, fontSize: 10),
                                       ),
                                     ],
                                   ),
@@ -218,43 +226,39 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: globalFollowNotifier,
-                          builder: (context, isFollowing, child) {
-                            return InkWell(
-                              onTap: _toggleFollow,
+                        // 👉 Synced Follow Button using global StreamerFollowManager
+                        InkWell(
+                          onTap: _toggleFollow,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
                               borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
-                                  borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isFollowing ? Icons.check : Icons.favorite,
+                                  size: 14,
+                                  color: isFollowing ? Colors.white70 : Colors.white,
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      isFollowing ? Icons.check : Icons.favorite,
-                                      size: 14,
-                                      color: isFollowing ? Colors.white70 : Colors.white,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      isFollowing ? 'Following' : 'Follow',
-                                      style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  isFollowing ? 'Following' : 'Follow',
+                                  style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                            );
-                          },
+                              ],
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 6),
                         InkWell(
                           onTap: () => _openViewersScreen(context),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: Row(
                               children: [
                                 const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
@@ -279,7 +283,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 5,
@@ -295,7 +299,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(2),
+                              padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -339,8 +343,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                   Container(
                     height: 100,
-                    margin: EdgeInsets.symmetric(horizontal: 12),
-                    padding: EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -351,7 +355,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         final msg = chatMessages[index];
                         bool isSystem = msg['user'] == "System";
                         return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
                             style: TextStyle(
@@ -377,7 +381,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide.none,
@@ -418,7 +422,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   return Transform.scale(
                     scale: value,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.85),
                         borderRadius: BorderRadius.circular(30),
@@ -434,7 +438,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           const SizedBox(width: 12),
                           Text(
                             activeGiftEffect!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
