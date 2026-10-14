@@ -5,7 +5,7 @@ import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 
 // ---------------------------------------------------------
-// 1. DEDICATED ROOM VIEWERS SCREEN (Numbered Long Capsule List)
+// PART 1: DEDICATED ROOM VIEWERS SCREEN (Numbered Long Capsule List)
 // ---------------------------------------------------------
 class RoomViewersScreen extends StatefulWidget {
   final List<Map<String, String>> viewers;
@@ -107,7 +107,7 @@ class _RoomViewersScreenState extends State<RoomViewersScreen> {
 }
 
 // ---------------------------------------------------------
-// 2. MAIN PARTY ROOM SCREEN
+// PART 2: MAIN PARTY ROOM SCREEN
 // ---------------------------------------------------------
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -499,4 +499,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.3),
-                
+      
