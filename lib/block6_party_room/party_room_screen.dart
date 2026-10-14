@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
-import 'room_viewers_screen.dart'; // Import the separated viewers screen
+import 'room_viewers_screen.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
