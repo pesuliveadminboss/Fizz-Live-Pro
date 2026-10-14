@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-// Import Block 3 Full Streamer Profile Screen & Model
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 
-// ---------------------------------------------------------
-// 1. DEDICATED ROOM VIEWERS SCREEN (Numbered Long Capsule List)
-// ---------------------------------------------------------
 class RoomViewersScreen extends StatefulWidget {
   final List<Map<String, String>> viewers;
 
@@ -106,9 +102,6 @@ class _RoomViewersScreenState extends State<RoomViewersScreen> {
   }
 }
 
-// ---------------------------------------------------------
-// 2. MAIN PARTY ROOM SCREEN
-// ---------------------------------------------------------
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
 
@@ -126,18 +119,15 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  // Follow State & Mic Mute State
   bool isFollowing = false;
   bool isMuted = false;
 
-  // Live Chat Messages List
   final List<Map<String, String>> chatMessages = [
     {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful."},
     {"user": "Raj Shukla", "text": "Nice to meet you! Grab the mic."},
     {"user": "System", "text": "Karthik Kumar joined the Party Room 🚀"},
   ];
 
-  // Dynamic Viewers List
   final List<Map<String, String>> roomViewers = [
     {"name": "Raj Shukla", "status": "Active Listener"},
     {"name": "Alsha Live (Host)", "status": "Broadcaster"},
@@ -146,11 +136,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     {"name": "Suresh Babu", "status": "Active Listener"},
   ];
 
-  // Animation Controller for Square Minimized Floating Bass Glow Effect
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
 
-  // Simulated 10 Voice Seats Data
   final List<Map<String, dynamic>> voiceSeats = List.generate(10, (index) => {
         'index': index + 1,
         'name': index == 0 ? 'Host' : 'User ${index + 1}',
@@ -177,7 +165,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     super.dispose();
   }
 
-  // Function to toggle Follow state synchronized
   void _toggleFollow() {
     setState(() {
       isFollowing = !isFollowing;
@@ -191,7 +178,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 
-  // Function to toggle Mic Mute/Unmute
   void _toggleMute() {
     setState(() {
       isMuted = !isMuted;
@@ -204,7 +190,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 
-  // Function to navigate to the Dedicated Viewers List Screen
   void _openViewersScreen(BuildContext context) async {
     await Navigator.push(
       context,
@@ -215,7 +200,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     setState(() {});
   }
 
-  // Function to navigate to Full Streamer Profile Screen with synchronized follow state
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
@@ -238,7 +222,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     });
   }
 
-  // Send message action & display in live chat view
   void _sendMessage() {
     if (_messageController.text.trim().isNotEmpty) {
       setState(() {
@@ -254,7 +237,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    // 1. SQUARE FLOATING MINIMIZED WIDGET WITH BASS GLOW EFFECT
     if (isMinimized) {
       return AnimatedBuilder(
         animation: _glowAnimation,
@@ -274,14 +256,14 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                     },
                     onTap: () {
                       setState(() {
-                        isMinimized = false; // Restore full screen party room
+                        isMinimized = false;
                       });
                     },
                     child: Container(
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10), // Square box with smooth corners
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.cyanAccent, width: 2),
                         boxShadow: [
                           BoxShadow(
@@ -332,12 +314,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Top Header with Clickable Host Profile, Capsule Heart Follow Button, Dynamic Viewer Count, & Square Minimize ('X')
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    // Clickable Host Profile Area -> Opens Full Profile Screen
                     Expanded(
                       child: InkWell(
                         onTap: () => _openFullHostProfile(context),
@@ -370,7 +350,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         ),
                       ),
                     ),
-                    // Capsule Heart Follow Button (Synced)
                     InkWell(
                       onTap: _toggleFollow,
                       borderRadius: BorderRadius.circular(16),
@@ -398,7 +377,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       ),
                     ),
                     const SizedBox(width: 6),
-                    // Dynamic Viewer Count (Eye Icon + Count -> Opens Viewers Screen)
                     InkWell(
                       onTap: () => _openViewersScreen(context),
                       borderRadius: BorderRadius.circular(8),
@@ -414,20 +392,17 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       ),
                     ),
                     const SizedBox(width: 4),
-                    // Square Minimize / Floating Button ('X')
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                       onPressed: () {
                         setState(() {
-                          isMinimized = true; // Switch to square bass-glow floating widget
+                          isMinimized = true;
                         });
                       },
                     ),
                   ],
                 ),
               ),
-
-              // 2. 10 Voice Seats Grid Layout
               Expanded(
                 flex: 3,
                 child: GridView.builder(
@@ -479,8 +454,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   },
                 ),
               ),
-
-              // 3. Cinematic Graphic / Cruise Placeholder area
               Expanded(
                 flex: 3,
                 child: Center(
@@ -491,12 +464,45 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                 ),
               ),
-
-              // 4. Live Chat & Room Joining Notifications Area
               Container(
                 height: 100,
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.3),
-                
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListView.builder(
+                  itemCount: chatMessages.length,
+                  itemBuilder: (context, index) {
+                    final msg = chatMessages[index];
+                    bool isSystem = msg['user'] == "System";
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(
+                        isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
+                        style: TextStyle(
+                          color: isSystem ? Colors.amberAccent : Colors.white70,
+                          fontSize: 11,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        onSubmitted: (_) => _sendMessage(),
+                        decoration: InputDecoration(
+                          hintText: 'Type a message...',
+                          hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.1),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              
