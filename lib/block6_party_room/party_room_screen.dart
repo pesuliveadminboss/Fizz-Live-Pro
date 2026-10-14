@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 
-class PartyRoomScreenEnhanced extends StatefulWidget {
-  final String roomID;
-  final String hostName;
+class PartyRoomScreen extends StatefulWidget {
+  final dynamic room; // Can accept room model or roomID
 
-  const PartyRoomScreenEnhanced({
+  const PartyRoomScreen({
     super.key,
-    required this.roomID,
-    required this.hostName,
+    this.room,
   });
 
   @override
-  State<PartyRoomScreenEnhanced> createState() => _PartyRoomScreenEnhancedState();
+  State<PartyRoomScreen> createState() => _PartyRoomScreenState();
 }
 
-class _PartyRoomScreenEnhancedState extends State<PartyRoomScreenEnhanced> {
+class _PartyRoomScreenState extends State<PartyRoomScreen> {
   bool isMinimized = false;
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
@@ -102,7 +100,7 @@ class _PartyRoomScreenEnhancedState extends State<PartyRoomScreenEnhanced> {
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Top Header with Follow Button & Close (Minimize)
+              // 1. Top Header with Follow Button & Minimize ('X')
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
@@ -113,15 +111,15 @@ class _PartyRoomScreenEnhancedState extends State<PartyRoomScreenEnhanced> {
                       child: const Icon(Icons.person, color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 8),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.hostName,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            'Alsha Live',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                           ),
-                          const Text(
+                          Text(
                             '14 Online • Party Room',
                             style: TextStyle(color: Colors.white60, fontSize: 10),
                           ),
