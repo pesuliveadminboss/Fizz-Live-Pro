@@ -3,6 +3,7 @@ import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import 'room_viewers_screen.dart';
+import 'gift_bottom_sheet.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -151,77 +152,15 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _showGiftBottomSheet(BuildContext context) {
-    final List<Map<String, dynamic>> gifts = [
-      {'name': 'Rocket 🚀', 'icon': Icons.rocket_launch, 'color': Colors.orangeAccent},
-      {'name': 'Airplane ✈️', 'icon': Icons.flight, 'color': Colors.lightBlueAccent},
-      {'name': 'Cruise Ship 🚢', 'icon': Icons.directions_boat, 'color': Colors.cyanAccent},
-      {'name': 'Bomb 💣', 'icon': Icons.local_fire_department, 'color': Colors.redAccent},
-      {'name': 'Kiss 😘', 'icon': Icons.favorite_border, 'color': Colors.pinkAccent},
-      {'name': 'Heart ❤', 'icon': Icons.favorite, 'color': Colors.pink},
-      {'name': 'Handshake 🤝', 'icon': Icons.handshake, 'color': Colors.amberAccent},
-      {'name': 'Red Rose 🌹', 'icon': Icons.local_florist, 'color': Colors.red},
-      {'name': 'Smiley 😊', 'icon': Icons.emoji_emotions, 'color': Colors.yellowAccent},
-    ];
-
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A0B2E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return Container(
-          padding: EdgeInsets.all(16),
-          height: 280,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Send Special Gifts 🎁',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 2.5,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                  ),
-                  itemCount: gifts.length,
-                  itemBuilder: (context, index) {
-                    final gift = gifts[index];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        _triggerGiftEffect(gift['name']);
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: (gift['color'] as Color).withOpacity(0.4)),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(gift['icon'] as IconData, color: gift['color'] as Color, size: 18),
-                            const SizedBox(width: 6),
-                            Text(
-                              gift['name'].toString().split(' ')[0],
-                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+        return GiftBottomSheet(
+          onSendGift: (giftName, quantity) {
+            _triggerGiftEffect('$giftName x$quantity');
+          },
         );
       },
     );
@@ -272,8 +211,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           bottom: 2,
                           right: 2,
                           child: Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
                               color: Colors.green,
                               shape: BoxShape.circle,
                             ),
@@ -293,7 +232,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -306,7 +245,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
               Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -314,7 +253,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             onTap: () => _openFullHostProfile(context),
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                               child: Row(
                                 children: [
                                   CircleAvatar(
@@ -345,7 +284,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           onTap: _toggleFollow,
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
                               borderRadius: BorderRadius.circular(16),
@@ -372,7 +311,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           onTap: () => _openViewersScreen(context),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: Row(
                               children: [
                                 const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
@@ -397,7 +336,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 5,
@@ -413,7 +352,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(2),
+                              padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -457,8 +396,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                   Container(
                     height: 100,
-                    margin: EdgeInsets.symmetric(horizontal: 12),
-                    padding: EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -469,7 +408,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         final msg = chatMessages[index];
                         bool isSystem = msg['user'] == "System";
                         return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
                             style: TextStyle(
@@ -482,7 +421,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -495,8 +434,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                                            border: OutlineInputBorder(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide.none,
                               ),
@@ -534,7 +473,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                       return Transform.scale(
                         scale: value,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.85),
                             borderRadius: BorderRadius.circular(30),
@@ -555,7 +494,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.none,
-                                ),
+                                 ),
                               ),
                             ],
                           ),
@@ -571,5 +510,3 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 }
-
-  
