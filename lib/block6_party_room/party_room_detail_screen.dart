@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'party_room_model.dart';
+import 'party_room_capsule_header.dart';
+import 'party_room_audio_manager.dart';
+import 'party_gift_animation_helper.dart';
 
 class PartyRoomDetailScreen extends StatefulWidget {
   final PartyRoomModel room;
@@ -13,6 +16,7 @@ class PartyRoomDetailScreen extends StatefulWidget {
 class _PartyRoomDetailScreenState extends State<PartyRoomDetailScreen> {
   bool _isJoined = false;
   bool _isMuted = false;
+  bool _isFollowing = false;
   late final List<Map<String, dynamic>> _seats;
 
   @override
@@ -20,7 +24,7 @@ class _PartyRoomDetailScreenState extends State<PartyRoomDetailScreen> {
     super.initState();
     _seats = List.generate(8, (index) => {
           'seatIndex': index + 1,
-          'userName': index == 0 ? 'Host (${widget.room.hostName})' : 'Empty Seat',
+          'userName': index == 0 ? widget.room.hostName : 'Empty Seat ${index + 1}',
           'isOccupied': index == 0,
           'isMuted': false,
         });
@@ -40,151 +44,182 @@ class _PartyRoomDetailScreenState extends State<PartyRoomDetailScreen> {
     setState(() {
       _isMuted = !_isMuted;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isMuted ? 'Microphone Muted 🔇' : 'Microphone Unmuted 🎙️'),
-        duration: const Duration(milliseconds: 800),
-      ),
-    );
+    PartyRoomAudioManager.showAudioStatus(context, _isMuted);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121026),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1D1B36),
-        title: Text(widget.room.roomName, style: const TextStyle(color: Colors.white, fontSize: 16)),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Navigation & Capsule Header matching Live Streaming Style
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.person, color: Colors.cyanAccent, size: 16),
-                  const SizedBox(width: 4),
-                  Text('${widget.room.onlineCount}', style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)),
+                  PartyRoomCapsuleHeader(
+                    hostName: widget.room.hostName,
+                    onlineCount: widget.room.onlineCount,
+                    isFollowing: _isFollowing,
+                    onProfileTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Viewing host profile: ${widget.room.hostName}')),
+                      );
+                    },
+                    onFollowTap: () {
+                      setState(() {
+                        _isFollowing = !_isFollowing;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(_isFollowing ? 'Followed ${widget.room.hostName} ❤️' : 'Unfollowed')),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const CircleAvatar(
+                      backgroundColor: Colors.black45,
+                      radius: 16,
+                      child: Icon(Icons.close, color: Colors.white, size: 18),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Compact AdMob Safe Slot inside Room Detail
-          Container(
-            height: 35,
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1738),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.white10),
-            ),
-            child: const Center(
-              child: Text(
-                "AdMob Room Detail Banner [Button Size]",
-                style: TextStyle(color: Colors.white38, fontSize: 10),
+            Container(
+              height: 30,
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Center(
+                child: Text(
+                  _isJoined ? 'Connected to ${widget.room.roomName} 🚢' : 'Connecting to Voice Seats...',
+                  style: const TextStyle(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: const Color(0xFF1A1738),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _isJoined ? Icons.fiber_manual_record : Icons.hourglass_empty,
-                  color: _isJoined ? Colors.greenAccent : Colors.orangeAccent,
-                  size: 14,
+            const SizedBox(height: 10),
+            // 8 Voice Seats Grid (Interactive Party Room Layout)
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 20,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 0.75,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  _isJoined ? 'Party Ship Cinematic Room: Live 🚢' : 'Connecting to Party Room...',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: _seats.length,
-              itemBuilder: (context, index) {
-                final seat = _seats[index];
-                bool isOccupied = seat['isOccupied'];
+                itemCount: _seats.length,
+                itemBuilder: (context, index) {
+                  final seat = _seats[index];
+                  bool isOccupied = seat['isOccupied'];
 
-                return Column(
-                  children: [
-                    Expanded(
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: isOccupied ? Colors.pinkAccent.withOpacity(0.3) : Colors.white12,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              isOccupied ? Icons.mic : Icons.mic_none,
-                              color: isOccupied ? Colors.pinkAccent : Colors.white30,
-                              size: 28,
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (!isOccupied) {
+                          seat['isOccupied'] = true;
+                          seat['userName'] = 'You (Speaker)';
+                        } else {
+                          seat['isOccupied'] = false;
+                          seat['userName'] = 'Empty Seat ${index + 1}';
+                        }
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: CircleAvatar(
+                            radius: 32,
+                            backgroundColor: isOccupied ? Colors.pinkAccent.withOpacity(0.4) : Colors.white12,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Icon(
+                                  isOccupied ? Icons.mic : Icons.mic_none,
+                                  color: isOccupied ? Colors.pinkAccent : Colors.white30,
+                                  size: 30,
+                                ),
+                                Positioned(
+                                  bottom: 2,
+                                  right: 2,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black54,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      '${seat['seatIndex']}',
+                                      style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            if (!isOccupied)
-                              const Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Icon(Icons.add_circle, color: Colors.cyanAccent, size: 16),
-                              ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 6),
+                        Text(
+                          seat['userName'],
+                          style: const TextStyle(color: Colors.white70, fontSize: 11),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      seat['userName'],
-                      style: const TextStyle(color: Colors.white70, fontSize: 11),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: const Color(0xFF1D1B36),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isMuted ? Colors.redAccent : Colors.pinkAccent,
+            // Bottom Toolbar for Mic, Gifts & Theme Effects
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1D1B36).withOpacity(0.9),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: _isMuted ? Colors.redAccent : Colors.white24,
+                    ),
+                    onPressed: _toggleMute,
+                    icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
                   ),
-                  onPressed: _toggleMute,
-                  icon: Icon(_isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
-                  label: Text(_isMuted ? 'Muted' : 'Mute', style: const TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Cinematic Gift feature active!')),
-                    );
-                  },
-                  icon: const Icon(Icons.card_giftcard, color: Colors.white),
-                  label: const Text('Send Gift', style: TextStyle(color: Colors.white)),
-                ),
-              ],
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    ),
+                    onPressed: () {
+                      PartyGiftAnimationHelper.showPartyGiftAnimation(context, 'Luxury Cruise Ship', 'Chandran S');
+                    },
+                    icon: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+                    label: const Text('Send Gift 🎁', style: TextStyle(color: Colors.white, fontSize: 13)),
+                  ),
+                  IconButton(
+                    style: IconButton.styleFrom(backgroundColor: Colors.white24),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Raise Hand requested to Host 🙋‍♂️')),
+                      );
+                    },
+                    icon: const Icon(Icons.back_hand, color: Colors.cyanAccent),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
