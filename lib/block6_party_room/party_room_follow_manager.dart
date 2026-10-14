@@ -6,7 +6,6 @@ class PartyRoomFollowManager {
   factory PartyRoomFollowManager() => _instance;
   PartyRoomFollowManager._internal();
 
-  // 👉 Using global StreamerFollowManager for real-time sync across screens
   ValueNotifier<bool> getFollowNotifier(String streamerKey) {
     return StreamerFollowManager().getFollowNotifier(streamerKey);
   }
