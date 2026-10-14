@@ -318,7 +318,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: isSpeaking ? Colors.cyanAccent : Colors.white24,
+                                                                    color: isSpeaking ? Colors.cyanAccent : Colors.white24,
                                   width: isSpeaking ? 2.5 : 1.0,
                                 ),
                                 boxShadow: isSpeaking
@@ -428,58 +428,53 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
               ),
             ),
           ),
+          // 👉 Cinematic Gift Animation Overlay Renderer (Perfect Center)
           if (activeGiftEffect != null)
             AnimatedBuilder(
               animation: _animProgress,
               builder: (context, child) {
                 final String nameLower = activeGiftEffect!.toLowerCase();
-                Alignment beginAlignment = const Alignment(0, 1);
                 IconData giftIcon = Icons.card_giftcard;
 
                 if (nameLower.contains('rocket') || nameLower.contains('starship') || nameLower.contains('jet')) {
-                  beginAlignment = Alignment(0, 1.0 - (_animProgress.value * 2.0));
                   giftIcon = Icons.rocket_launch;
                 } else if (nameLower.contains('car') || nameLower.contains('exclusive') || nameLower.contains('cruise')) {
-                  beginAlignment = Alignment(-1.0 + (_animProgress.value * 2.5), 0.2);
                   giftIcon = Icons.directions_car;
                 } else if (nameLower.contains('flower') || nameLower.contains('rose') || nameLower.contains('ring')) {
-                  beginAlignment = Alignment.center;
                   giftIcon = Icons.local_florist;
                 } else if (nameLower.contains('airplane') || nameLower.contains('air travel')) {
-                  beginAlignment = Alignment(-1.0 + (_animProgress.value * 2.0), -0.5 + (_animProgress.value * 0.5));
                   giftIcon = Icons.airplanemode_active;
                 }
 
-                return Align(
-                  alignment: beginAlignment,
+                return Center(
                   child: Transform.scale(
-                    scale: 0.5 + (_animProgress.value * 1.0),
+                    scale: 0.6 + (_animProgress.value * 0.8),
                     child: Opacity(
                       opacity: (1.0 - _animProgress.value).clamp(0.2, 1.0),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.85),
+                          color: Colors.black.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.amberAccent, width: 2),
+                          border: Border.all(color: Colors.amberAccent, width: 2.5),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.amberAccent.withOpacity(0.8),
-                              blurRadius: 25,
-                              spreadRadius: 8,
+                              blurRadius: 30,
+                              spreadRadius: 10,
                             )
                           ],
                         ),
-                                                child: Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(giftIcon, color: Colors.amberAccent, size: 36),
-                            const SizedBox(width: 12),
+                            Icon(giftIcon, color: Colors.amberAccent, size: 40),
+                            const SizedBox(width: 14),
                             Text(
                               activeGiftEffect!,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 24,
+                                fontSize: 26,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.none,
                               ),
@@ -497,4 +492,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     );
   }
 }
-                
+                                  
