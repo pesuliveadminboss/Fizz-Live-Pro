@@ -4,7 +4,6 @@ import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
-import 'party_room_follow_manager.dart';
 import 'party_room_minimize_helper.dart';
 
 class PartyRoomScreen extends StatefulWidget {
@@ -24,7 +23,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  final String streamerKey = 'alsha_live_007';
+  // 👉 Global static notifier to sync follow state directly between Party Room and Profile
+  static final ValueNotifier<bool> globalFollowNotifier = ValueNotifier<bool>(false);
 
   bool isMuted = false;
   String? activeGiftEffect;
@@ -73,11 +73,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _toggleFollow() {
-    PartyRoomFollowManager().toggleFollow(streamerKey);
-    final bool currentStatus = PartyRoomFollowManager().isFollowing(streamerKey);
+    globalFollowNotifier.value = !globalFollowNotifier.value;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(currentStatus ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        content: Text(globalFollowNotifier.value ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -109,7 +108,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   void _openFullHostProfile(BuildContext context) async {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
-      id: streamerKey,
+      id: 'alsha_live_007',
       country: 'India',
       flag: '🇮🇳',
       age: 22,
@@ -170,53 +169,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    // 👉 If minimized, pop the screen and show floating overlay cleanly
-    if (isMinimized) {
-      return WillPopScope(
-        onWillPop: () async {
-          setState(() {
-            isMinimized = false;
-          });
-          return false;
-        },
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Stack(
-            children: [
-              // Transparent background so previous screen remains visible
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isMinimized = false;
-                  });
-                },
-                child: Container(color: Colors.black54),
-              ),
-              AnimatedBuilder(
-                animation: _glowAnimation,
-                builder: (context, child) {
-                  return PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
-                    offset: floatingOffset,
-                    onPanUpdate: (details) {
-                      setState(() {
-                        floatingOffset += details.delta;
-                      });
-                    },
-                    onTap: () {
-                      setState(() {
-                        isMinimized = false;
-                      });
-                    },
-                    glowAnimation: _glowAnimation,
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       body: Stack(
         children: [
@@ -267,8 +219,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
+                        // 👉 Direct ValueListenableBuilder for seamless follow sync
                         ValueListenableBuilder<bool>(
-                          valueListenable: PartyRoomFollowManager().getFollowNotifier(streamerKey),
+                          valueListenable: globalFollowNotifier,
                           builder: (context, isFollowing, child) {
                             return InkWell(
                               onTap: _toggleFollow,
@@ -483,7 +436,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           const SizedBox(width: 12),
                           Text(
                             activeGiftEffect!,
-                            style: const TextStyle(
+                            style: constTextStyle(
                               color: Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -496,6 +449,26 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   );
                 },
               ),
+            ),
+          if (isMinimized)
+            AnimatedBuilder(
+              animation: _glowAnimation,
+              builder: (context, child) {
+                return PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
+                  offset: floatingOffset,
+                  onPanUpdate: (details) {
+                    setState(() {
+                      floatingOffset += details.delta;
+                    });
+                  },
+                  onTap: () {
+                    setState(() {
+                      isMinimized = false;
+                    });
+                  },
+                  glowAnimation: _glowAnimation,
+                );
+              },
             ),
         ],
       ),
