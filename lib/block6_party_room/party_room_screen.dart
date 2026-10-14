@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-// Import Block 3 Full Streamer Profile Screen & Block 4 Private Chat Screen
+// Import Block 3 Full Streamer Profile Screen & Model
 import '../block3_hot_tab/streamer_profile_screen.dart';
+import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 
 class PartyRoomScreen extends StatefulWidget {
@@ -28,12 +29,22 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen (Synced with Hot/Live Page logic)
+  // Function to navigate to Full Streamer Profile Screen with required Streamer model
   void _openFullHostProfile(BuildContext context) {
+    // Create streamer profile model instance for Alsha Live
+    final streamerModel = StreamerProfileModel(
+      name: 'Alsha Live',
+      id: 'alsha_live_007',
+      imageUrl: '',
+      followersCount: '45.2K',
+      followingCount: '340',
+      bio: 'Welcome to my party room! Enjoy the music & vibes 🎉',
+    );
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const StreamerProfileScreen(), // Opens full profile screen directly
+        builder: (context) => StreamerProfileScreen(streamer: streamerModel),
       ),
     );
   }
