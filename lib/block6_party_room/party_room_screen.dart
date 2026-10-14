@@ -24,7 +24,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  // 👉 Unique streamer key to sync follow state globally
   final String streamerKey = 'alsha_live_007';
 
   bool isMuted = false;
@@ -221,7 +220,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
-                        // 👉 Synced Follow Button using PartyRoomFollowManager
                         ValueListenableBuilder<bool>(
                           valueListenable: PartyRoomFollowManager().getFollowNotifier(streamerKey),
                           builder: (context, isFollowing, child) {
@@ -452,7 +450,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                 },
               ),
             ),
-          // 👉 Minimized Floating Widget handled cleanly via Stack Overlay without black screen
           if (isMinimized)
             AnimatedBuilder(
               animation: _glowAnimation,
