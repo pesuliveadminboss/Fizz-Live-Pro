@@ -3,10 +3,11 @@ import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
+import '../block5_live_streaming/live_streamer_overlay_manager.dart'; // 👉 Live stream overlay manager to hide live mini-player
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_minimize_helper.dart';
-import 'party_room_overlay_manager.dart'; // 👉 ஓவர்லே மேனேஜர் இம்போர்ட் செய்யப்பட்டுள்ளது
+import 'party_room_overlay_manager.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -57,8 +58,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    // 👉 புதிய பார்ட்டி ரூமிற்கு உள்ளே நுழையும் போதே, ஏற்கனவே உள்ள மினி-விண்டோவை ஆட்டோமேட்டிக்காக கட் செய்துவிடும்!
+    // Hide Party Room overlay and Live Room mini-player when entering a new party room to avoid overlapping
     PartyRoomOverlayManager.hideOverlay();
+    LiveStreamerOverlayManager.hideOverlay();
 
     _glowController = AnimationController(
       duration: const Duration(milliseconds: 600),
