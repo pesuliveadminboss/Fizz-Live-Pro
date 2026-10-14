@@ -248,7 +248,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                   }).toList(),
                 ),
                 const SizedBox(width: 8),
-                // 👉 Send Button added here
+                // 👉 Send Button with dynamic diamond calculation
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pinkAccent,
