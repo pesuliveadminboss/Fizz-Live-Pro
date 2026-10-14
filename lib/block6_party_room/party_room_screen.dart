@@ -6,6 +6,7 @@ import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_minimize_helper.dart';
+import 'party_room_overlay_manager.dart'; // 👉 ஓவர்லே மேனேஜர் இம்போர்ட் செய்யப்பட்டுள்ளது
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -56,6 +57,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
+    // 👉 புதிய பார்ட்டி ரூமிற்கு உள்ளே நுழையும் போதே, ஏற்கனவே உள்ள மினி-விண்டோவை ஆட்டோமேட்டிக்காக கட் செய்துவிடும்!
+    PartyRoomOverlayManager.hideOverlay();
+
     _glowController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -164,7 +168,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -175,7 +179,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -183,7 +187,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             onTap: () => _openFullHostProfile(context),
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                               child: Row(
                                 children: [
                                   CircleAvatar(
@@ -201,7 +205,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                       ),
                                       Text(
                                         '${roomViewers.length} Online • Party Room',
-                                        style: TextStyle(color: Colors.white60, fontSize: 10),
+                                        style: const TextStyle(color: Colors.white60, fontSize: 10),
                                       ),
                                     ],
                                   ),
@@ -225,7 +229,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             valueListenable: followNotifier,
                             builder: (context, isFollowing, child) {
                               return Container(
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
                                   borderRadius: BorderRadius.circular(16),
@@ -241,7 +245,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                     const SizedBox(width: 4),
                                     Text(
                                       isFollowing ? 'Following' : 'Follow',
-                                      style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -254,7 +258,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           onTap: () => _openViewersScreen(context),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: Row(
                               children: [
                                 const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
@@ -269,6 +273,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                           onPressed: () {
                             Navigator.pop(context);
+                            PartyRoomOverlayManager.showFloatingMiniPlayer(
+                              context: context,
+                              room: widget.room,
+                            );
                           },
                         ),
                       ],
@@ -277,7 +285,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 5,
@@ -293,7 +301,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(2),
+                              padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -337,8 +345,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                   Container(
                     height: 100,
-                    margin: EdgeInsets.symmetric(horizontal: 12),
-                    padding: EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -349,9 +357,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         final msg = chatMessages[index];
                         bool isSystem = msg['user'] == "System";
                         return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
-                            isSystem ? "${msg['text']}" : "${msg['user']} :${msg['text']}",
+                            isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
                             style: TextStyle(
                               color: isSystem ? Colors.amberAccent : Colors.white70,
                               fontSize: 11,
@@ -362,20 +370,20 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
                         Expanded(
                           child: TextField(
                             controller: _messageController,
-                            style: TextStyle(color: Colors.white, fontSize: 13),
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
                             onSubmitted: (_) => _sendMessage(),
                             decoration: InputDecoration(
                               hintText: 'Type a message...',
-                              hintStyle: TextStyle(color: Colors.white54, fontSize: 13),
+                              hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 borderSide: BorderSide.none,
@@ -451,4 +459,3 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 }
-                            
