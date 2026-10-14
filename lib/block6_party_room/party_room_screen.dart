@@ -457,7 +457,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                   Container(
                     height: 100,
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    margin: EdgeInsets.symmetric(horizontal: 12),
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
@@ -496,3 +496,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
                               contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              border: OutlineInputBorder(
+  borderRadius: BorderRadius.circular(20),
+  borderSide: BorderSide.none,
+),     
