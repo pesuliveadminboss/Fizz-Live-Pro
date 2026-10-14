@@ -293,7 +293,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -495,4 +495,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 14,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 14,
