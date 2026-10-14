@@ -22,7 +22,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
-  bool isFollowing = false;
+  // 👉 Global follow state that syncs across Party Room & Full Profile
+  static final ValueNotifier<bool> globalIsFollowing = ValueNotifier<bool>(false);
+
   bool isMuted = false;
   String? activeGiftEffect;
 
@@ -70,12 +72,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _toggleFollow() {
-    setState(() {
-      isFollowing = !isFollowing;
-    });
+    globalIsFollowing.value = !globalIsFollowing.value;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(isFollowing ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        content: Text(globalIsFollowing.value ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -280,31 +280,37 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
-                        InkWell(
-                          onTap: _toggleFollow,
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
+                        // 👉 Follow Button with ValueListenableBuilder for real-time sync
+                        ValueListenableBuilder<bool>(
+                          valueListenable: globalIsFollowing,
+                          builder: (context, isFollowing, child) {
+                            return InkWell(
+                              onTap: _toggleFollow,
                               borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isFollowing ? Icons.check : Icons.favorite,
-                                  size: 14,
-                                  color: isFollowing ? Colors.white70 : Colors.white,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  isFollowing ? 'Following' : 'Follow',
-                                  style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isFollowing ? Icons.check : Icons.favorite,
+                                      size: 14,
+                                      color: isFollowing ? Colors.white70 : Colors.white,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isFollowing ? 'Following' : 'Follow',
+                                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 6),
                         InkWell(
@@ -483,7 +489,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ],
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                              mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
                               const SizedBox(width: 12),
@@ -494,7 +500,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.none,
-                                 ),
+                                ),
                               ),
                             ],
                           ),
@@ -510,3 +516,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 }
+     
