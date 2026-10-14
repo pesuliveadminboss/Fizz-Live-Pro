@@ -334,5 +334,169 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
             children: [
               // 1. Top Header with Clickable Host Profile, Capsule Heart Follow Button, Dynamic Viewer Count, & Square Minimize ('X')
               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    // Clickable Host Profile Area -> Opens Full Profile Screen
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _openFullHostProfile(context),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.pinkAccent.withOpacity(0.3),
+                                child: const Icon(Icons.person, color: Colors.white, size: 20),
+                              ),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Alsha Live',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                  Text(
+                                    '${roomViewers.length} Online • Party Room',
+                                    style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Capsule Heart Follow Button (Synced)
+                    InkWell(
+                      onTap: _toggleFollow,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isFollowing ? Icons.check : Icons.favorite,
+                              size: 14,
+                              color: isFollowing ? Colors.white70 : Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isFollowing ? 'Following' : 'Follow',
+                              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    // Dynamic Viewer Count (Eye Icon + Count -> Opens Viewers Screen)
+                    InkWell(
+                      onTap: () => _openViewersScreen(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
+                            const SizedBox(width: 3),
+                            Text('${roomViewers.length}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    // Square Minimize / Floating Button ('X')
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      onPressed: () {
+                        setState(() {
+                          isMinimized = true; // Switch to square bass-glow floating widget
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
 
+              // 2. 10 Voice Seats Grid Layout
+              Expanded(
+                flex: 3,
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    final seat = voiceSeats[index];
+                    final bool isSpeaking = seat['isSpeaking'];
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSpeaking ? Colors.cyanAccent : Colors.white24,
+                              width: isSpeaking ? 2.5 : 1.0,
+                            ),
+                            boxShadow: isSpeaking
+                                ? [BoxShadow(color: Colors.cyanAccent.withOpacity(0.6), blurRadius: 8, spreadRadius: 1)]
+                                : [],
+                          ),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.purple.withOpacity(0.4),
+                            child: const Icon(Icons.mic, size: 16, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          seat['name'],
+                          style: TextStyle(
+                            color: isSpeaking ? Colors.cyanAccent : Colors.white70,
+                            fontSize: 9,
+                            fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+              // 3. Cinematic Graphic / Cruise Placeholder area
+              Expanded(
+                flex: 3,
+                child: Center(
+                  child: Icon(
+                    Icons.directions_boat,
+                    size: 90,
+                    color: Colors.purpleAccent.withOpacity(0.3),
+                  ),
+                ),
+              ),
+
+              // 4. Live Chat & Room Joining Notifications Area
+              Container(
+                height: 100,
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.3),
                 
