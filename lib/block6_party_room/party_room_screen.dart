@@ -98,9 +98,9 @@ class _RoomViewersScreenState extends State<RoomViewersScreen> {
                 );
               },
             ),
-          );
-         }
-       }
+    );
+  }
+}
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
