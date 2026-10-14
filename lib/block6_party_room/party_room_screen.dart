@@ -3,7 +3,7 @@ import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
-import '../block5_live_streaming/live_streamer_overlay_manager.dart'; // 👉 Live stream overlay manager to hide live mini-player
+import '../block5_live_streaming/live_streamer_overlay_manager.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_minimize_helper.dart';
@@ -21,7 +21,7 @@ class PartyRoomScreen extends StatefulWidget {
   State<PartyRoomScreen> createState() => _PartyRoomScreenState();
 }
 
-class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProviderStateMixin {
+class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderStateMixin {
   bool isMinimized = false;
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
@@ -30,6 +30,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   bool isMuted = false;
   String? activeGiftEffect;
+  
+  late AnimationController _animController;
+  late Animation<double> _animProgress;
 
   final List<Map<String, String>> chatMessages = [
     {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful."},
@@ -58,7 +61,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    // Hide Party Room overlay and Live Room mini-player when entering a new party room to avoid overlapping
     PartyRoomOverlayManager.hideOverlay();
     LiveStreamerOverlayManager.hideOverlay();
 
@@ -69,11 +71,18 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     _glowAnimation = Tween<double>(begin: 2.0, end: 6.0).animate(
       CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
     );
+
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _animProgress = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
   }
 
   @override
   void dispose() {
     _glowController.dispose();
+    _animController.dispose();
     _messageController.dispose();
     super.dispose();
   }
@@ -134,11 +143,13 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     }
   }
 
-  void _triggerGiftEffect(String giftName) {
+  void _triggerGiftEffect(String giftName, int quantity) {
     setState(() {
-      activeGiftEffect = giftName;
+      activeGiftEffect = '$giftName x$quantity';
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    _animController.forward(from: 0.0);
+
+    Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         setState(() {
           activeGiftEffect = null;
@@ -155,7 +166,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       builder: (context) {
         return GiftBottomSheet(
           onSendGift: (giftName, quantity) {
-            _triggerGiftEffect('$giftName x$quantity');
+            _triggerGiftEffect(giftName, quantity);
           },
         );
       },
@@ -418,46 +429,72 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
             ),
           ),
           if (activeGiftEffect != null)
-            Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.2, end: 1.2),
-                duration: const Duration(milliseconds: 600),
-                builder: (context, value, child) {
-                  return Transform.scale(
-                    scale: value,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.amberAccent, width: 2),
-                        boxShadow: [
-                          BoxShadow(color: Colors.amberAccent.withOpacity(0.6), blurRadius: 20, spreadRadius: 5)
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
-                          const SizedBox(width: 12),
-                          Text(
-                            activeGiftEffect!,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
+            AnimatedBuilder(
+              animation: _animProgress,
+              builder: (context, child) {
+                final String nameLower = activeGiftEffect!.toLowerCase();
+                Alignment beginAlignment = const Alignment(0, 1);
+                IconData giftIcon = Icons.card_giftcard;
+
+                if (nameLower.contains('rocket') || nameLower.contains('starship') || nameLower.contains('jet')) {
+                  beginAlignment = Alignment(0, 1.0 - (_animProgress.value * 2.0));
+                  giftIcon = Icons.rocket_launch;
+                } else if (nameLower.contains('car') || nameLower.contains('exclusive') || nameLower.contains('cruise')) {
+                  beginAlignment = Alignment(-1.0 + (_animProgress.value * 2.5), 0.2);
+                  giftIcon = Icons.directions_car;
+                } else if (nameLower.contains('flower') || nameLower.contains('rose') || nameLower.contains('ring')) {
+                  beginAlignment = Alignment.center;
+                  giftIcon = Icons.local_florist;
+                } else if (nameLower.contains('airplane') || nameLower.contains('air travel')) {
+                  beginAlignment = Alignment(-1.0 + (_animProgress.value * 2.0), -0.5 + (_animProgress.value * 0.5));
+                  giftIcon = Icons.airplanemode_active;
+                }
+
+                return Align(
+                  alignment: beginAlignment,
+                  child: Transform.scale(
+                    scale: 0.5 + (_animProgress.value * 1.0),
+                    child: Opacity(
+                      opacity: (1.0 - _animProgress.value).clamp(0.2, 1.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.85),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.amberAccent, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amberAccent.withOpacity(0.8),
+                              blurRadius: 25,
+                              spreadRadius: 8,
+                            )
+                          ],
+                        ),
+                                                child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(giftIcon, color: Colors.amberAccent, size: 36),
+                            const SizedBox(width: 12),
+                            Text(
+                              activeGiftEffect!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.none,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
         ],
       ),
     );
   }
 }
+                
