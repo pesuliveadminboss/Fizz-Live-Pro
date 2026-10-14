@@ -16,20 +16,60 @@ class PartyRoomScreen extends StatefulWidget {
   State<PartyRoomScreen> createState() => _PartyRoomScreenState();
 }
 
-class _PartyRoomScreenState extends State<PartyRoomScreen> {
+class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProviderStateMixin {
   bool isMinimized = false;
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
+
+  // Follow State Synchronization Variable
+  bool isFollowing = false;
+
+  // Animation Controller for Square Minimized Floating Bass Glow Effect
+  late AnimationController _glowController;
+  late Animation<double> _glowAnimation;
 
   // Simulated 10 Voice Seats Data
   final List<Map<String, dynamic>> voiceSeats = List.generate(10, (index) => {
         'index': index + 1,
         'name': index == 0 ? 'Host' : 'User ${index + 1}',
-        'isSpeaking': index == 1 || index == 4, // Simulated speaking glow
+        'isSpeaking': index == 1 || index == 4,
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with ALL required parameters including language
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    )..repeat(reverse: true);
+    _glowAnimation = Tween<double>(begin: 2.0, end: 6.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  // Function to toggle Follow state synchronized with Profile & Show Popup
+  void _toggleFollow() {
+    setState(() {
+      isFollowing = !isFollowing;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isFollowing ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        duration: const Duration(seconds: 1),
+        backgroundColor: Colors.pinkAccent,
+      ),
+    );
+  }
+
+  // Function to navigate to Full Streamer Profile Screen with synchronized follow state
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
@@ -39,7 +79,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       age: 22,
       status: 'Online',
       intro: 'Welcome to my party room! Enjoy the music & vibes 🎉',
-      language: 'Tamil / English', // Required language parameter provided successfully
+      language: 'Tamil / English',
     );
 
     Navigator.push(
@@ -47,69 +87,82 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
       MaterialPageRoute(
         builder: (context) => StreamerProfileScreen(streamer: streamerModel),
       ),
-    );
+    ).then((_) {
+      // Refresh state when returning from profile page in case follow changed there
+      setState(() {});
+    });
+  }
+
+  // Send message action
+  void _sendMessage() {
+    if (_messageController.text.trim().isNotEmpty) {
+      _messageController.clear();
+      FocusScope.of(context).unfocus();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 1. SQUARE FLOATING MINIMIZED WIDGET WITH BASS GLOW EFFECT
     if (isMinimized) {
-      return Stack(
-        children: [
-          Positioned(
-            left: floatingOffset.dx,
-            top: floatingOffset.dy,
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  floatingOffset += details.delta;
-                });
-              },
-              onTap: () {
-                setState(() {
-                  isMinimized = false; // Restore full screen
-                });
-              },
-              child: Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.cyanAccent, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.cyanAccent.withOpacity(0.5),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    )
-                  ],
-                  color: Colors.black87,
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.pinkAccent,
-                      child: Icon(Icons.mic, color: Colors.white, size: 24),
+      return AnimatedBuilder(
+        animation: _glowAnimation,
+        builder: (context, child) {
+          return Stack(
+            children: [
+              Positioned(
+                left: floatingOffset.dx,
+                top: floatingOffset.dy,
+                child: GestureDetector(
+                  onPanUpdate: (details) {
+                    setState(() {
+                      floatingOffset += details.delta;
+                    });
+                  },
+                  onTap: () {
+                    setState(() {
+                      isMinimized = false; // Restore full screen
+                    });
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10), // Square box with smooth corners
+                      border: Border.all(color: Colors.cyanAccent, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.cyanAccent.withOpacity(0.8),
+                          blurRadius: 10,
+                          spreadRadius: _glowAnimation.value,
+                        )
+                      ],
+                      color: Colors.black87,
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
+                        Positioned(
+                          bottom: 2,
+                          right: 2,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
+                          ),
                         ),
-                        child: const Icon(Icons.play_arrow, size: 12, color: Colors.white),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       );
     }
 
@@ -125,12 +178,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Top Header with Full Profile Routing, Follow Button & Minimize ('X')
+              // 1. Top Header with Clickable Host Profile, Capsule Heart Follow Button, Viewer Count & Square Minimize ('X')
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    // CLICKABLE HOST PROFILE AREA -> Opens Full Profile Screen directly
+                    // Clickable Host Profile Area -> Opens Full Profile Screen
                     Expanded(
                       child: InkWell(
                         onTap: () => _openFullHostProfile(context),
@@ -163,25 +216,49 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                         ),
                       ),
                     ),
-                    // Follow Button (+)
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add, size: 14, color: Colors.white),
-                      label: const Text('Follow', style: TextStyle(fontSize: 12, color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                        minimumSize: const Size(60, 28),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    // Capsule Heart Follow Button (Synced)
+                    InkWell(
+                      onTap: _toggleFollow,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isFollowing ? Icons.check : Icons.favorite,
+                              size: 14,
+                              color: isFollowing ? Colors.white70 : Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isFollowing ? 'Following' : 'Follow',
+                              style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // Minimize / Floating Button ('X')
+                    const SizedBox(width: 6),
+                    // Viewer Count (Eye Icon + Count)
+                    const Row(
+                      children: [
+                        Icon(Icons.remove_red_eye, color: Colors.white60, size: 14),
+                        SizedBox(width: 3),
+                        Text('14', style: TextStyle(color: Colors.white, fontSize: 11)),
+                      ],
+                    ),
+                    const SizedBox(width: 4),
+                    // Square Minimize / Floating Button ('X')
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70),
+                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                       onPressed: () {
                         setState(() {
-                          isMinimized = true; // Switch to floating widget
+                          isMinimized = true; // Switch to square bass-glow floating widget
                         });
                       },
                     ),
@@ -278,7 +355,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                 ),
               ),
 
-              // 5. Bottom Message Input Bar & Toolbar
+              // 5. Bottom Message Input Bar with Send Button & Toolbar
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -287,6 +364,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                       child: TextField(
                         controller: _messageController,
                         style: const TextStyle(color: Colors.white, fontSize: 13),
+                        onSubmitted: (_) => _sendMessage(),
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
                           hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
@@ -296,6 +374,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                             borderSide: BorderSide.none,
+                          ),
+                          // SEND BUTTON INSIDE MESSAGE BAR
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.send, color: Colors.cyanAccent, size: 18),
+                            onPressed: _sendMessage,
                           ),
                         ),
                       ),
