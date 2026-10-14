@@ -29,14 +29,15 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with all required parameters including age
+  // Function to navigate to Full Streamer Profile Screen with ALL required parameters bundled together
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
       id: 'alsha_live_007',
       country: 'India',
       flag: '🇮🇳',
-      age: 22, // Required age parameter provided successfully
+      age: 22,
+      status: 'Online',
     );
 
     Navigator.push(
