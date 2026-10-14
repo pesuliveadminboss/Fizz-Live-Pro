@@ -13,12 +13,22 @@ class GiftBottomSheet extends StatefulWidget {
 }
 
 class _GiftBottomSheetState extends State<GiftBottomSheet> {
-  String selectedCategory = 'Lucky';
+  String selectedCategory = 'Hot';
   Map<String, dynamic>? selectedGift;
   int selectedQuantity = 1;
   final int userDiamondBalance = 1710;
 
   final Map<String, List<Map<String, dynamic>>> giftCategories = {
+    'Hot': [
+      {'name': 'Ferris Wheel', 'price': 277000},
+      {'name': 'DJ music', 'price': 53500},
+      {'name': 'Musical Note', 'price': 2},
+      {'name': 'Hammer', 'price': 180},
+      {'name': 'Tomato', 'price': 180},
+      {'name': 'Egg', 'price': 180},
+      {'name': 'Chili', 'price': 180},
+      {'name': 'Rose', 'price': 180},
+    ],
     'Lucky': [
       {'name': 'Starship', 'price': 6666},
       {'name': 'Giant Feast', 'price': 9999},
@@ -28,11 +38,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Mystery Box', 'price': 360},
       {'name': 'Bomb', 'price': 180},
       {'name': 'Puppy', 'price': 180},
-      {'name': 'Hammer', 'price': 180},
-      {'name': 'Kiss', 'price': 180},
-      {'name': 'Chili', 'price': 180},
       {'name': 'Slippers', 'price': 180},
-      {'name': 'Rose', 'price': 180},
     ],
     'Svip': [
       {'name': 'Festival of...', 'price': 10000},
@@ -40,11 +46,8 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Jasmine G...', 'price': 4000},
       {'name': 'Masala Chai', 'price': 1000},
       {'name': 'Samosa', 'price': 1000},
-      {'name': 'Forever R...', 'price': 1000},
       {'name': 'Bollywood...', 'price': 80000},
       {'name': 'Taj Mahal', 'price': 100000},
-      {'name': 'Royal Elep...', 'price': 500000},
-      {'name': 'Sky Castle', 'price': 300000},
     ],
     'Intimacy': [
       {'name': 'Flower girl', 'price': 17700},
@@ -55,6 +58,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Queen of...', 'price': 97000},
       {'name': 'Swan Tea', 'price': 1700},
       {'name': 'Lipstick', 'price': 2},
+      {'name': 'Bracelet', 'price': 770},
     ],
     'Wealth': [
       {'name': 'Exclusive Car', 'price': 339900},
@@ -69,11 +73,13 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Love Galaxy', 'price': 17000},
       {'name': 'Valentine Wish', 'price': 57000},
       {'name': '2026', 'price': 2},
+      {'name': 'New Year Cheers', 'price': 890},
     ],
     'Bag': [
       {'name': 'Linked Ring', 'price': 2},
       {'name': 'RosePerfume', 'price': 2},
       {'name': 'LoveCrown', 'price': 2},
+      {'name': 'Fluttering Ring', 'price': 2},
       {'name': 'Voting', 'price': 10},
     ],
   };
@@ -87,7 +93,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
     return Container(
       height: 420,
       decoration: const BoxDecoration(
-        color: Color(0xFF1A122B),
+        color: Color(0xFF161224),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -102,7 +108,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
               children: giftCategories.keys.map((category) {
                 bool isSelected = selectedCategory == category;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
@@ -125,9 +131,9 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                           Container(
                             margin: const EdgeInsets.only(top: 4),
                             height: 3,
-                            width: 20,
+                            width: 16,
                             decoration: BoxDecoration(
-                              color: Colors.pinkAccent,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -138,7 +144,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
               }).toList(),
             ),
           ),
-          const Divider(color: Colors.white24, height: 1),
+          const Divider(color: Colors.white12, height: 1),
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(12),
@@ -146,7 +152,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                 crossAxisCount: 4,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.82,
               ),
               itemCount: gifts.length,
               itemBuilder: (context, index) {
@@ -161,17 +167,17 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.pinkAccent.withOpacity(0.2) : Colors.black.withOpacity(0.3),
+                      color: isSelected ? Colors.pinkAccent.withOpacity(0.25) : Colors.black.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? Colors.pinkAccent : Colors.white12,
-                        width: isSelected ? 2 : 1,
+                        color: isSelected ? Colors.pinkAccent : Colors.transparent,
+                        width: 1.5,
                       ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.card_giftcard, color: Colors.amberAccent, size: 28),
+                        const Icon(Icons.card_giftcard, color: Colors.amberAccent, size: 26),
                         const SizedBox(height: 6),
                         Text(
                           gift['name'],
@@ -182,11 +188,11 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.diamond, color: Colors.cyanAccent, size: 10),
+                            const Icon(Icons.diamond, color: Colors.amber, size: 10),
                             const SizedBox(width: 3),
                             Text(
                               '${gift['price']}',
-                              style: const TextStyle(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -199,15 +205,15 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0.6),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: Colors.black45,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.amber.withOpacity(0.5)),
+                    border: Border.all(color: Colors.white24),
                   ),
                   child: Row(
                     children: [
@@ -220,7 +226,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                 ),
                 const Spacer(),
                 Row(
-                  children: [1, 17, 37, 57].map((qty) {
+                  children: [1, 77, 177].map((qty) {
                     bool isQtySelected = selectedQuantity == qty;
                     return GestureDetector(
                       onTap: () {
@@ -230,32 +236,26 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 2),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: isQtySelected ? Colors.white : Colors.white24,
-                          borderRadius: BorderRadius.circular(12),
+                          color: isQtySelected ? Colors.white24 : Colors.white10,
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Text(
                           '$qty',
                           style: TextStyle(
-                            color: isQtySelected ? Colors.black : Colors.white,
+                            color: isQtySelected ? Colors.white : Colors.white60,
                             fontWeight: FontWeight.bold,
-                            fontSize: 11,
+                            fontSize: 12,
                           ),
                         ),
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(width: 8),
-                // 👉 Send Button with dynamic diamond calculation
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  ),
-                  onPressed: () {
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
                     if (selectedGift != null) {
                       if (userDiamondBalance >= totalRequiredDiamonds) {
                         widget.onSendGift(selectedGift!['name'], selectedQuantity);
@@ -271,7 +271,23 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                       );
                     }
                   },
-                  child: Text('Send ($totalRequiredDiamonds)', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.pinkAccent, Colors.purpleAccent],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      totalRequiredDiamonds > 0 ? 'Send ($totalRequiredDiamonds)' : 'Send',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
