@@ -171,7 +171,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
       ),
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           height: 280,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,4 +495,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
