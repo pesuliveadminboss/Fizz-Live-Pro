@@ -29,12 +29,13 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with required parameters
+  // Function to navigate to Full Streamer Profile Screen with all required parameters
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
       id: 'alsha_live_007',
-      country: 'India', // Required parameter provided successfully
+      country: 'India',
+      flag: '🇮🇳', // Required parameter provided successfully
     );
 
     Navigator.push(
