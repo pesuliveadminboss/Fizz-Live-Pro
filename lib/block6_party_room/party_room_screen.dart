@@ -23,8 +23,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   bool isFollowing = false;
   bool isMuted = false;
-
-  // Active floating gift animation overlay state
   String? activeGiftEffect;
 
   final List<Map<String, String>> chatMessages = [
@@ -497,4 +495,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
-                              content
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14,
