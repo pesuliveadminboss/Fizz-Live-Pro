@@ -4,6 +4,8 @@ import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
+import 'party_room_follow_manager.dart';
+import 'party_room_minimize_helper.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -21,9 +23,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   bool isMinimized = false;
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
-
-  // 👉 Global follow state that syncs across Party Room & Full Profile
-  static final ValueNotifier<bool> globalIsFollowing = ValueNotifier<bool>(false);
 
   bool isMuted = false;
   String? activeGiftEffect;
@@ -72,10 +71,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _toggleFollow() {
-    globalIsFollowing.value = !globalIsFollowing.value;
+    PartyRoomFollowManager().toggleFollow();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(globalIsFollowing.value ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        content: Text(PartyRoomFollowManager().isFollowing ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -174,55 +173,19 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
         builder: (context, child) {
           return Stack(
             children: [
-              Positioned(
-                left: floatingOffset.dx,
-                top: floatingOffset.dy,
-                child: GestureDetector(
-                  onPanUpdate: (details) {
-                    setState(() {
-                      floatingOffset += details.delta;
-                    });
-                  },
-                  onTap: () {
-                    setState(() {
-                      isMinimized = false;
-                    });
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.cyanAccent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.cyanAccent.withOpacity(0.8),
-                          blurRadius: 10,
-                          spreadRadius: _glowAnimation.value,
-                        )
-                      ],
-                      color: Colors.black87,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(Icons.mic, color: Colors.cyanAccent, size: 26),
-                        Positioned(
-                          bottom: 2,
-                          right: 2,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.play_arrow, size: 8, color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
+                offset: floatingOffset,
+                onPanUpdate: (details) {
+                  setState(() {
+                    floatingOffset += details.delta;
+                  });
+                },
+                onTap: () {
+                  setState(() {
+                    isMinimized = false;
+                  });
+                },
+                glowAnimation: _glowAnimation,
               ),
             ],
           );
@@ -280,9 +243,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
-                        // 👉 Follow Button with ValueListenableBuilder for real-time sync
                         ValueListenableBuilder<bool>(
-                          valueListenable: globalIsFollowing,
+                          valueListenable: PartyRoomFollowManager().isFollowingNotifier,
                           builder: (context, isFollowing, child) {
                             return InkWell(
                               onTap: _toggleFollow,
@@ -416,7 +378,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
-                            isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
+                            isSystem ? "${msg['text']}" : "${msg['user']} :${msg['text']}",
                             style: TextStyle(
                               color: isSystem ? Colors.amberAccent : Colors.white70,
                               fontSize: 11,
@@ -489,7 +451,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ],
                           ),
                           child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
                               const SizedBox(width: 12),
@@ -516,4 +478,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
     );
   }
 }
-     
+                            
