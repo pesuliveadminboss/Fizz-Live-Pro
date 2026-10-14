@@ -6,6 +6,7 @@ import 'live_tools_and_gifts_helper.dart';
 import 'live_ads_integration_helper.dart';
 import 'streamer_follow_manager.dart';
 import 'live_streamer_overlay_manager.dart';
+import '../block6_party_room/party_room_overlay_manager.dart'; // 👉 Import Party Room overlay manager to hide party mini-player
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -40,8 +41,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void initState() {
     super.initState();
-    // புதிய லைவ் ரூமிற்கு உள்ளே நுழையும் போதே, ஏற்கனவே உள்ள மினி-பிளேயரை ஆட்டோமேட்டிக்காக கட் செய்துவிடும்!
+    // Hide live streamer mini-player and party room overlay when entering live room to avoid overlapping
     LiveStreamerOverlayManager.hideOverlay();
+    PartyRoomOverlayManager.hideOverlay();
   }
 
   void _handleNewMessage(String msg) {
