@@ -115,8 +115,8 @@ class _FloatingPartyRoomWidgetState extends State<_FloatingPartyRoomWidget> with
                     child: GestureDetector(
                       onTap: widget.onClose,
                       child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
                           color: Colors.redAccent,
                           shape: BoxShape.circle,
                         ),
@@ -128,8 +128,8 @@ class _FloatingPartyRoomWidgetState extends State<_FloatingPartyRoomWidget> with
                     bottom: 2,
                     right: 2,
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
                         color: Colors.green,
                         shape: BoxShape.circle,
                       ),
