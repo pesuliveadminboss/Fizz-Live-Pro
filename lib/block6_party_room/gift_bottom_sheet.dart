@@ -303,5 +303,65 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                     children: [
                       Icon(Icons.diamond, color: Colors.amber, size: 16),
                       SizedBox(width: 4),
-                      Text('1710', style: TextStyle(color
+                                            Text('1710', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                      Icon(Icons.chevron_right, color: Colors.white70, size: 16),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  children: [1, 17, 37, 57].map((qty) {
+                    bool isQtySelected = selectedQuantity == qty;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedQuantity = qty;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isQtySelected ? Colors.white : Colors.white24,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '$qty',
+                          style: TextStyle(
+                            color: isQtySelected ? Colors.black : Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  ),
+                  onPressed: () {
+                    if (selectedGiftName != null) {
+                      widget.onSendGift(selectedGiftName!, selectedQuantity);
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please select a gift first!'), duration: Duration(seconds: 1)),
+                      );
+                    }
+                  },
+                  child: const Text('Send', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
                                                     
