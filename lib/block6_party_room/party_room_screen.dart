@@ -29,14 +29,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with correct model parameters
+  // Function to navigate to Full Streamer Profile Screen safely matching the model definition
   void _openFullHostProfile(BuildContext context) {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
       id: 'alsha_live_007',
-      followersCount: '45.2K',
-      followingCount: '340',
-      bio: 'Welcome to my party room! Enjoy the music & vibes 🎉',
     );
 
     Navigator.push(
