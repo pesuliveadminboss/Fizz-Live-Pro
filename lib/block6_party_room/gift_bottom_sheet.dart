@@ -14,8 +14,9 @@ class GiftBottomSheet extends StatefulWidget {
 
 class _GiftBottomSheetState extends State<GiftBottomSheet> {
   String selectedCategory = 'Lucky';
-  String? selectedGiftName;
+  Map<String, dynamic>? selectedGift;
   int selectedQuantity = 1;
+  final int userDiamondBalance = 1710;
 
   final Map<String, List<Map<String, dynamic>>> giftCategories = {
     'Lucky': [
@@ -44,10 +45,6 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Taj Mahal', 'price': 100000},
       {'name': 'Royal Elep...', 'price': 500000},
       {'name': 'Sky Castle', 'price': 300000},
-      {'name': 'Bengal Tig...', 'price': 100000},
-      {'name': 'Luxury Co...', 'price': 50000},
-      {'name': 'Peacock...', 'price': 10000},
-      {'name': 'Lassi', 'price': 500},
     ],
     'Intimacy': [
       {'name': 'Flower girl', 'price': 17700},
@@ -57,80 +54,13 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Pool Table', 'price': 17000},
       {'name': 'Queen of...', 'price': 97000},
       {'name': 'Swan Tea', 'price': 1700},
-      {'name': 'foral love', 'price': 2},
       {'name': 'Lipstick', 'price': 2},
-      {'name': 'Bracelet', 'price': 770},
-      {'name': 'Perfume', 'price': 3770},
-      {'name': 'Shopping...', 'price': 27770},
-      {'name': 'VIP Collec...', 'price': 77700},
-      {'name': 'Pearl Dress', 'price': 82770},
-      {'name': 'Tulip Ring', 'price': 100000},
-      {'name': 'Manor Tea...', 'price': 27770},
-      {'name': 'Sky Roma...', 'price': 17000},
-      {'name': 'I am cool', 'price': 57000},
-      {'name': 'Love letter', 'price': 2},
-      {'name': 'Airplane', 'price': 2},
-      {'name': 'Pink rose', 'price': 2},
-      {'name': 'Shining Ri...', 'price': 200},
-      {'name': 'Together I...', 'price': 19700},
-      {'name': 'Gift car', 'price': 3000},
-      {'name': 'Timeless L...', 'price': 3000},
-      {'name': 'I PAY', 'price': 17700},
-      {'name': 'Memory I...', 'price': 37000},
-      {'name': 'Diamond...', 'price': 17700},
-      {'name': 'Luxury Air...', 'price': 57000},
-      {'name': 'Air travel', 'price': 890},
-      {'name': 'Billionaire...', 'price': 3000},
-      {'name': 'Memory P...', 'price': 200},
-      {'name': 'Castle Pro...', 'price': 77700},
-      {'name': 'CP Letter', 'price': 2},
-      {'name': 'In My Han...', 'price': 300,
-      'name': 'CP Walk', 'price': 3000},
-      {'name': 'Run to Love', 'price': 57000},
-      {'name': 'CP Kiss', 'price': 17000},
-      {'name': 'Love Book', 'price': 200},
-      {'name': 'Paper plane', 'price': 2},
-      {'name': 'Passionate Night', 'price': 3700},
-      {'name': 'Wedding Ring', 'price': 17000},
-      {'name': 'Yacht Party', 'price': 57000},
-      {'name': 'Yacht Wedding', 'price': 17000},
-      {'name': 'Holding You', 'price': 3700},
-      {'name': 'Twilight Yacht', 'price': 890},
-      {'name': 'Private Lounge', 'price': 3700},
-      {'name': 'Sweet Cake', 'price': 1770},
-      {'name': 'Date & Drink', 'price': 17770},
-      {'name': 'Love Couple', 'price': 27770},
-      {'name': 'Oath Blade', 'price': 770},
-      {'name': 'Starry Rose', 'price': 17700},
-      {'name': 'Pink Romance', 'price': 17700},
-      {'name': 'Dance Lover', 'price': 2},
-      {'name': 'Shining Dancer', 'price': 890},
-      {'name': 'Manor Love', 'price': 17770},
-      {'name': 'Growing Love', 'price': 1770},
-      {'name': 'Romantic Candy', 'price': 70},
-      {'name': 'Romantic Butterfly', 'price': 2},
-      {'name': 'Diamond Ring', 'price': 2},
-      {'name': 'Gold Watch', 'price': 770},
-      {'name': 'Cash Rain', 'price': 3770},
-      {'name': 'Luxury House', 'price': 12770},
-      {'name': 'Castle Romance', 'price': 17700},
-      {'name': 'Cruise Romance', 'price': 77700},
-      {'name': 'Hot Air Balloon', 'price': 200},
-      {'name': 'Beach Chair', 'price': 2},
-      {'name': 'Happy Summer', 'price': 200},
-      {'name': 'Beach Couple', 'price': 77700},
-      {'name': 'Castle Love', 'price': 27700},
-      {'name': 'Flower Man', 'price': 17700},
     ],
     'Wealth': [
       {'name': 'Exclusive Car', 'price': 339900},
       {'name': 'Wealth Castle', 'price': 995800},
       {'name': 'Star Wand', 'price': 798000},
       {'name': 'Love Jet', 'price': 550000},
-      {'name': 'Coin Burst', 'price': 370000},
-      {'name': 'Victory Crown', 'price': 277000},
-      {'name': 'Crystal Dragon', 'price': 100000},
-      {'name': 'Heart of Ocean', 'price': 30000},
       {'name': 'Rocket', 'price': 4158000},
     ],
     'Festival': [
@@ -138,31 +68,12 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
       {'name': 'Flower Heart', 'price': 3990},
       {'name': 'Love Galaxy', 'price': 17000},
       {'name': 'Valentine Wish', 'price': 57000},
-      {'name': 'Eid Blessing', 'price': 770},
-      {'name': 'Eid Night', 'price': 27770},
-      {'name': 'Eid Feast', 'price': 50770},
-      {'name': 'Christmas Wish', 'price': 97000},
-      {'name': 'Christmas Tree', 'price': 225000},
       {'name': '2026', 'price': 2},
-      {'name': 'New Year Cheers', 'price': 890},
-      {'name': 'New Year Celebration', 'price': 3990},
-      {'name': 'New Year Romance', 'price': 97000},
-      {'name': 'Countdown', 'price': 270000},
-      {'name': 'Pink Heart', 'price': 2},
-      {'name': 'Blessing Lantern', 'price': 3},
-      {'name': 'Blessing Light', 'price': 770},
-      {'name': 'Golden Moon', 'price': 5770},
-      {'name': 'Ramadan Kareem', 'price': 20770},
-      {'name': 'Christmas Pine', 'price': 2},
-      {'name': 'Christmas Wreath', 'price': 500},
-      {'name': 'Enchanting Tree', 'price': 3990},
-      {'name': 'Santa\'s Gift', 'price': 57000},
     ],
     'Bag': [
       {'name': 'Linked Ring', 'price': 2},
       {'name': 'RosePerfume', 'price': 2},
       {'name': 'LoveCrown', 'price': 2},
-      {'name': 'Fluttering Ring', 'price': 2},
       {'name': 'Voting', 'price': 10},
     ],
   };
@@ -170,6 +81,8 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final gifts = giftCategories[selectedCategory] ?? [];
+    final int giftUnitPrice = selectedGift != null ? (selectedGift!['price'] as int) : 0;
+    final int totalRequiredDiamonds = giftUnitPrice * selectedQuantity;
 
     return Container(
       height: 420,
@@ -194,7 +107,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                     onTap: () {
                       setState(() {
                         selectedCategory = category;
-                        selectedGiftName = null;
+                        selectedGift = null;
                       });
                     },
                     child: Column(
@@ -238,12 +151,12 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
               itemCount: gifts.length,
               itemBuilder: (context, index) {
                 final gift = gifts[index];
-                bool isSelected = selectedGiftName == gift['name'];
+                bool isSelected = selectedGift?['name'] == gift['name'];
 
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedGiftName = gift['name'];
+                      selectedGift = gift;
                     });
                   },
                   child: Container(
@@ -254,9 +167,6 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                         color: isSelected ? Colors.pinkAccent : Colors.white12,
                         width: isSelected ? 2 : 1,
                       ),
-                      boxShadow: isSelected
-                          ? [BoxShadow(color: Colors.pinkAccent.withOpacity(0.6), blurRadius: 8, spreadRadius: 1)]
-                          : [],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -299,12 +209,12 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.amber.withOpacity(0.5)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.diamond, color: Colors.amber, size: 16),
-                      SizedBox(width: 4),
-                                            Text('1710', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                      Icon(Icons.chevron_right, color: Colors.white70, size: 16),
+                      const Icon(Icons.diamond, color: Colors.amber, size: 16),
+                      const SizedBox(width: 4),
+                      Text('$userDiamondBalance', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                      const Icon(Icons.chevron_right, color: Colors.white70, size: 16),
                     ],
                   ),
                 ),
@@ -338,6 +248,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                   }).toList(),
                 ),
                 const SizedBox(width: 8),
+                // 👉 Send Button added here
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pinkAccent,
@@ -345,16 +256,22 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   ),
                   onPressed: () {
-                    if (selectedGiftName != null) {
-                      widget.onSendGift(selectedGiftName!, selectedQuantity);
-                      Navigator.pop(context);
+                    if (selectedGift != null) {
+                      if (userDiamondBalance >= totalRequiredDiamonds) {
+                        widget.onSendGift(selectedGift!['name'], selectedQuantity);
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Insufficient Diamonds!'), duration: Duration(seconds: 1)),
+                        );
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please select a gift first!'), duration: Duration(seconds: 1)),
                       );
                     }
                   },
-                  child: const Text('Send', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  child: Text('Send ($totalRequiredDiamonds)', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
               ],
             ),
@@ -364,4 +281,3 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
     );
   }
 }
-                                                    
