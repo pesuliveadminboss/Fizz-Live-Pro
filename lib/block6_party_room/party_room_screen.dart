@@ -272,8 +272,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           bottom: 2,
                           right: 2,
                           child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
                               color: Colors.green,
                               shape: BoxShape.circle,
                             ),
@@ -306,7 +306,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
               Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
@@ -314,7 +314,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             onTap: () => _openFullHostProfile(context),
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                               child: Row(
                                 children: [
                                   CircleAvatar(
@@ -345,7 +345,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           onTap: _toggleFollow,
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
                               borderRadius: BorderRadius.circular(16),
@@ -372,7 +372,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           onTap: () => _openViewersScreen(context),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: const EdgeInsets.all(4.0),
+                            padding: EdgeInsets.all(4.0),
                             child: Row(
                               children: [
                                 const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
@@ -397,7 +397,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12),
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 5,
@@ -413,7 +413,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(2),
+                              padding: EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -458,7 +458,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   Container(
                     height: 100,
                     margin: const EdgeInsets.symmetric(horizontal: 12),
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -469,7 +469,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         final msg = chatMessages[index];
                         bool isSystem = msg['user'] == "System";
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          padding: EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
                             style: TextStyle(
@@ -482,7 +482,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Row(
                       children: [
                         Expanded(
