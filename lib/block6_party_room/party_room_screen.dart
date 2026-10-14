@@ -29,13 +29,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isMuted': false,
       });
 
-  // Function to navigate to Full Streamer Profile Screen with required Streamer model
+  // Function to navigate to Full Streamer Profile Screen with correct model parameters
   void _openFullHostProfile(BuildContext context) {
-    // Create streamer profile model instance for Alsha Live
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
       id: 'alsha_live_007',
-      imageUrl: '',
       followersCount: '45.2K',
       followingCount: '340',
       bio: 'Welcome to my party room! Enjoy the music & vibes 🎉',
