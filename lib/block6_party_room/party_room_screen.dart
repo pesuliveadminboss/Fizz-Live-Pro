@@ -24,6 +24,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   Offset floatingOffset = const Offset(20, 100);
   final TextEditingController _messageController = TextEditingController();
 
+  // 👉 Unique streamer key to sync follow state globally
+  final String streamerKey = 'alsha_live_007';
+
   bool isMuted = false;
   String? activeGiftEffect;
 
@@ -71,10 +74,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   }
 
   void _toggleFollow() {
-    PartyRoomFollowManager().toggleFollow();
+    PartyRoomFollowManager().toggleFollow(streamerKey);
+    final bool currentStatus = PartyRoomFollowManager().isFollowing(streamerKey);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(PartyRoomFollowManager().isFollowing ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
+        content: Text(currentStatus ? 'Following Alsha Live ❤' : 'Unfollowed Alsha Live'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -106,7 +110,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
   void _openFullHostProfile(BuildContext context) async {
     final streamerModel = StreamerProfileModel(
       name: 'Alsha Live',
-      id: 'alsha_live_007',
+      id: streamerKey,
       country: 'India',
       flag: '🇮🇳',
       age: 22,
@@ -167,45 +171,19 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    if (isMinimized) {
-      return AnimatedBuilder(
-        animation: _glowAnimation,
-        builder: (context, child) {
-          return Stack(
-            children: [
-              PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
-                offset: floatingOffset,
-                onPanUpdate: (details) {
-                  setState(() {
-                    floatingOffset += details.delta;
-                  });
-                },
-                onTap: () {
-                  setState(() {
-                    isMinimized = false;
-                  });
-                },
-                glowAnimation: _glowAnimation,
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1A0B2E), Color(0xFF0F051D), Color(0xFF05020A)],
-          ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Column(
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF1A0B2E), Color(0xFF0F051D), Color(0xFF05020A)],
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -243,8 +221,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                             ),
                           ),
                         ),
+                        // 👉 Synced Follow Button using PartyRoomFollowManager
                         ValueListenableBuilder<bool>(
-                          valueListenable: PartyRoomFollowManager().isFollowingNotifier,
+                          valueListenable: PartyRoomFollowManager().getFollowNotifier(streamerKey),
                           builder: (context, isFollowing, child) {
                             return InkWell(
                               onTap: _toggleFollow,
@@ -378,7 +357,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
-                            isSystem ? "${msg['text']}" : "${msg['user']} :${msg['text']}",
+                            isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
                             style: TextStyle(
                               color: isSystem ? Colors.amberAccent : Colors.white70,
                               fontSize: 11,
@@ -432,50 +411,70 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with SingleTickerProv
                   ),
                 ],
               ),
-              if (activeGiftEffect != null)
-                Center(
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0.2, end: 1.2),
-                    duration: const Duration(milliseconds: 600),
-                    builder: (context, value, child) {
-                      return Transform.scale(
-                        scale: value,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.85),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: Colors.amberAccent, width: 2),
-                            boxShadow: [
-                              BoxShadow(color: Colors.amberAccent.withOpacity(0.6), blurRadius: 20, spreadRadius: 5)
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
-                              const SizedBox(width: 12),
-                              Text(
-                                activeGiftEffect!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.none,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
+            ),
           ),
-        ),
+          if (activeGiftEffect != null)
+            Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.2, end: 1.2),
+                duration: const Duration(milliseconds: 600),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: Colors.amberAccent, width: 2),
+                        boxShadow: [
+                          BoxShadow(color: Colors.amberAccent.withOpacity(0.6), blurRadius: 20, spreadRadius: 5)
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.local_fire_department, color: Colors.amberAccent, size: 32),
+                          const SizedBox(width: 12),
+                          Text(
+                            activeGiftEffect!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          // 👉 Minimized Floating Widget handled cleanly via Stack Overlay without black screen
+          if (isMinimized)
+            AnimatedBuilder(
+              animation: _glowAnimation,
+              builder: (context, child) {
+                return PartyRoomMinimizeHelper.buildMinimizedFloatingWidget(
+                  offset: floatingOffset,
+                  onPanUpdate: (details) {
+                    setState(() {
+                      floatingOffset += details.delta;
+                    });
+                  },
+                  onTap: () {
+                    setState(() {
+                      isMinimized = false;
+                    });
+                  },
+                  glowAnimation: _glowAnimation,
+                );
+              },
+            ),
+        ],
       ),
     );
   }
 }
-                            
