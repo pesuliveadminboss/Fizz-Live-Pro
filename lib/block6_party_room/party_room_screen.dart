@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+// Import Block 3 Full Streamer Profile Screen & Block 4 Private Chat Screen
+import '../block3_hot_tab/streamer_profile_screen.dart';
+import '../block4_private_chat/private_chat_screen.dart';
 
 class PartyRoomScreen extends StatefulWidget {
-  final dynamic room; // Can accept room model or roomID
+  final dynamic room;
 
   const PartyRoomScreen({
     super.key,
@@ -24,6 +27,16 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         'isSpeaking': index == 1 || index == 4, // Simulated speaking glow
         'isMuted': false,
       });
+
+  // Function to navigate to Full Streamer Profile Screen (Synced with Hot/Live Page logic)
+  void _openFullHostProfile(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const StreamerProfileScreen(), // Opens full profile screen directly
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,30 +113,42 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Top Header with Follow Button & Minimize ('X')
+              // 1. Top Header with Full Profile Routing, Follow Button & Minimize ('X')
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.pinkAccent.withOpacity(0.3),
-                      child: const Icon(Icons.person, color: Colors.white, size: 20),
-                    ),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Alsha Live',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    // CLICKABLE HOST PROFILE AREA -> Opens Full Profile Screen directly
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _openFullHostProfile(context),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Colors.pinkAccent.withOpacity(0.3),
+                                child: const Icon(Icons.person, color: Colors.white, size: 20),
+                              ),
+                              const SizedBox(width: 8),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Alsha Live',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                  Text(
+                                    '14 Online • Party Room',
+                                    style: TextStyle(color: Colors.white60, fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Text(
-                            '14 Online • Party Room',
-                            style: TextStyle(color: Colors.white60, fontSize: 10),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                     // Follow Button (+)
