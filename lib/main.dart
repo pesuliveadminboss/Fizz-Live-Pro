@@ -59,8 +59,11 @@ import 'block6_party_room/party_room_audio_manager.dart';
 import 'block6_party_room/party_room_members_helper.dart';
 import 'block6_party_room/party_room_theme_helper.dart';
 
-// --- BLOCK 7 IMPORTS (ZegoCloud Integration Service) ---
+// --- BLOCK 7 IMPORTS (ZegoCloud Integration & Audio/Video Services) ---
 import 'block7_zego_integration/zego_party_room_service.dart';
+import 'block7_zego_integration/zego_voice_speaking_effect_helper.dart';
+import 'block7_zego_integration/zego_video_call_service.dart';
+import 'block7_zego_integration/zego_live_tools_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -154,7 +157,7 @@ class LoginAuthScreenProfileBridge extends StatelessWidget {
   }
 }
 
-// --- POPUPS WRAPPER (Daily Rewards, Auth Settings, Call Reminders) ---
+// --- POPUPS WRAPPER (Optimized: Auto-dismiss within 2 seconds) ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
@@ -169,18 +172,16 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
         context: context,
-        builder: (_) => const DailyRewardsDialog(),
-      ).then((_) {
-        showDialog(
-          context: context,
-          builder: (_) => const AuthorizationSettingsDialog(),
-        ).then((_) {
-          showDialog(
-            context: context,
-            builder: (_) => const CallReminderDialog(),
-          );
-        });
-      });
+        barrierDismissible: true,
+        builder: (_) {
+          Future.delayed(const Duration(seconds: 2), () {
+            if (Navigator.canPop(context)) {
+              Navigator.of(context, rootNavigator: true).pop();
+            }
+          });
+          return const DailyRewardsDialog();
+        },
+      );
     });
   }
 
