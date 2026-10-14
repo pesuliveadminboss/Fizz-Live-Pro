@@ -1,20 +1,21 @@
 import 'package:flutter/foundation.dart';
+import '../block5_live_streaming/streamer_follow_manager.dart';
 
 class PartyRoomFollowManager {
   static final PartyRoomFollowManager _instance = PartyRoomFollowManager._internal();
   factory PartyRoomFollowManager() => _instance;
   PartyRoomFollowManager._internal();
 
-  final ValueNotifier<bool> isFollowingNotifier = ValueNotifier<bool>(false);
-
-  bool get isFollowing => isFollowingNotifier.value;
-
-  void toggleFollow() {
-    isFollowingNotifier.value = !isFollowingNotifier.value;
+  // 👉 Using global StreamerFollowManager for real-time sync across screens
+  ValueNotifier<bool> getFollowNotifier(String streamerKey) {
+    return StreamerFollowManager().getFollowNotifier(streamerKey);
   }
 
-  void setFollowing(bool status) {
-    isFollowingNotifier.value = status;
+  bool isFollowing(String streamerKey) {
+    return StreamerFollowManager().isFollowing(streamerKey);
+  }
+
+  void toggleFollow(String streamerKey) {
+    StreamerFollowManager().toggleFollow(streamerKey);
   }
 }
-
