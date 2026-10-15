@@ -13,9 +13,9 @@ class ZegoVideoCallService {
     if (_isEngineInitialized) return;
 
     try {
-      // Using standard integer appID and appSign string
+      // Removed 'const' keyword to fix the compilation error
       await ZegoExpressEngine.createEngineWithProfile(
-        const ZegoEngineProfile(
+        ZegoEngineProfile(
           123456789, // Replace with your valid Zego AppID integer if needed
           ZegoScenario.StandardVideoCall,
           appSign: "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz12",
@@ -220,7 +220,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
           if (activeGiftEffect != null)
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(30),
