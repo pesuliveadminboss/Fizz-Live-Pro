@@ -51,12 +51,19 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     {"name": "Suresh Babu", "status": "Active Listener"},
   ];
 
-  final List<Map<String, dynamic>> voiceSeats = List.generate(10, (index) => {
-        'index': index + 1,
-        'name': index == 0 ? 'Host' : 'User ${index + 1}',
-        'isSpeaking': index == 1 || index == 4,
-        'isMuted': false,
-      });
+  // 10 Seats configuration (Indices 0, 1, 4 have active users, others are empty/locked)
+  final List<Map<String, dynamic>> voiceSeats = [
+    {'index': 1, 'name': 'Host', 'isOccupied': true, 'isSpeaking': false},
+    {'index': 2, 'name': 'User 2', 'isOccupied': true, 'isSpeaking': true},
+    {'index': 3, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 4, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 5, 'name': 'User 5', 'isOccupied': true, 'isSpeaking': true},
+    {'index': 6, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 7, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 8, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 9, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 10, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+  ];
 
   @override
   void initState() {
@@ -201,7 +208,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
             child: SafeArea(
               child: Column(
                 children: [
-                  // Top Header with Host Name & Direct Minimize on Close
+                  // Top Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
@@ -238,7 +245,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                             ),
                           ),
                         ),
-                        // Follow Button
                         ValueListenableBuilder<bool>(
                           valueListenable: followNotifier,
                           builder: (context, isFollowing, child) {
@@ -259,7 +265,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           },
                         ),
                         const SizedBox(width: 8),
-                        // Viewers Count
                         InkWell(
                           onTap: () => _openViewersScreen(context),
                           child: Row(
@@ -271,7 +276,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Direct Minimize on Close Button
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                           onPressed: () {
@@ -286,7 +290,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Voice Seats Grid (10 Seats) with Profile Bottom Sheet Trigger
+                  // Voice Seats Grid (10 Seats) - Clickable only if occupied
                   Expanded(
                     flex: 4,
                     child: GridView.builder(
@@ -301,12 +305,15 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                       itemCount: 10,
                       itemBuilder: (context, index) {
                         final seat = voiceSeats[index];
-                        final bool isSpeaking = seat['isSpeaking'];
+                        final bool isOccupied = seat['isOccupied'] ?? false;
+                        final bool isSpeaking = seat['isSpeaking'] ?? false;
                         final String seatUserName = seat['name'];
                         final String roleDesc = index == 0 ? 'Room Host' : 'Party Participant';
 
                         return GestureDetector(
-                          onTap: () => _showSeatProfile(context, seatUserName, roleDesc),
+                          onTap: isOccupied 
+                              ? () => _showSeatProfile(context, seatUserName, roleDesc) 
+                              : null, // Empty seats will not trigger popup
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -315,21 +322,25 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isSpeaking ? Colors.cyanAccent : Colors.white24,
+                                    color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white38 : Colors.white12),
                                     width: isSpeaking ? 2.5 : 1.0,
                                   ),
                                 ),
                                 child: CircleAvatar(
                                   radius: 20,
-                                  backgroundColor: Colors.purple.withOpacity(0.4),
-                                  child: const Icon(Icons.mic, size: 16, color: Colors.white),
+                                  backgroundColor: isOccupied ? Colors.purple.withOpacity(0.4) : Colors.white.withOpacity(0.05),
+                                  child: Icon(
+                                    isOccupied ? Icons.mic : Icons.mic_off, 
+                                    size: 16, 
+                                    color: isOccupied ? Colors.white : Colors.white24,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 seatUserName,
                                 style: TextStyle(
-                                  color: isSpeaking ? Colors.cyanAccent : Colors.white70,
+                                  color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white70 : Colors.white30),
                                   fontSize: 9,
                                   fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
                                 ),
@@ -439,7 +450,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
             ),
           ),
           
-          // Gift Animation Overlay
           if (activeGiftEffect != null)
             Center(
               child: Container(
