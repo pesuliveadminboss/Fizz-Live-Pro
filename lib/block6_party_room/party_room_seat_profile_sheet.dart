@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'gift_bottom_sheet.dart';
-import '../../private_chat_screen.dart'; // ரூட் ஃபோல்டரில் உள்ள பிரைவேட் சாட் ஸ்கிரீன் இம்போர்ட்
+import '../block4_private_chat/private_chat_screen.dart'; // Block 4 பிரைவேட் சாட் இம்போர்ட்
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
@@ -108,7 +108,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Message Button -> Jumps directly to PrivateChatScreen
+              // Message Button -> Jumps directly to block4 PrivateChatScreen with selected seat userName
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -123,7 +123,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PrivateChatScreen(streamerName: userName), // பிரைவேட் சாட் ஸ்கிரீனுக்கு நேராக ஜம்ப் ஆகும்[span_3](start_span)[span_3](end_span)
+                        builder: (context) => PrivateChatScreen(streamerName: userName), // 👈 ஜம்ப் ஆகுற மெயின் லைன் மச்சான்
                       ),
                     );
                   },
