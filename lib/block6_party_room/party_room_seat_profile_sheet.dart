@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
+import 'gift_bottom_sheet.dart';
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
   final String role;
+  final Function(String giftName, int quantity)? onSendGift;
 
   const PartyRoomSeatProfileSheet({
     super.key,
     required this.userName,
     required this.role,
+    this.onSendGift,
   });
 
   @override
@@ -104,6 +107,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
+              // Message Button -> Jumps to Private Chat area
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -114,9 +118,10 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close sheet
+                    // TODO: Replace with your actual Private Chat Screen navigation if available
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Opening chat with $userName...'), duration: const Duration(milliseconds: 800)),
+                      SnackBar(content: Text('Jumping to Private Chat with $userName...'), duration: const Duration(milliseconds: 800)),
                     );
                   },
                   icon: const Icon(Icons.message, color: Colors.white, size: 16),
@@ -127,6 +132,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              // Send Gifts Button -> Opens Gift Bottom Sheet
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -137,9 +143,23 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Opening gift menu for $userName...'), duration: const Duration(milliseconds: 800)),
+                    Navigator.pop(context); // Close profile sheet
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return GiftBottomSheet(
+                          onSendGift: (giftName, quantity) {
+                            if (onSendGift != null) {
+                              onSendGift!(giftName, quantity);
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Sent $giftName x$quantity to $userName 🎁'), duration: const Duration(milliseconds: 1000)),
+                            );
+                          },
+                        );
+                      },
                     );
                   },
                   icon: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
