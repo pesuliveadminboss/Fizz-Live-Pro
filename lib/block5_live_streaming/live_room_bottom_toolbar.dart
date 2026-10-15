@@ -30,7 +30,6 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
     super.dispose();
   }
 
-  // Tools Menu BottomSheet with working interactive items
   void _showToolsBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -98,62 +97,52 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
     );
   }
 
+  void _submitMessage() {
+    if (_messageController.text.trim().isNotEmpty) {
+      widget.onSendMessage(_messageController.text.trim());
+      _messageController.clear();
+      setState(() {
+        _isTypingOpen = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isTypingOpen) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        width: 260,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.95),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.pinkAccent, width: 1.5),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _messageController,
-                autofocus: true,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                decoration: const InputDecoration(
-                  hintText: 'Enter something...',
-                  hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
-                  border: InputBorder.none,
-                  isDense: true,
-                ),
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    widget.onSendMessage(value);
-                    _messageController.clear();
-                    setState(() {
-                      _isTypingOpen = false;
-                    });
-                  }
-                },
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 20),
-              padding: EdgeInsets.zero,
+        child: TextField(
+          controller: _messageController,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white, fontSize: 13),
+          decoration: InputDecoration(
+            hintText: 'Say something...',
+            hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            // 👉 டெக்ஸ்ட் பாரின் உள்ளேயே வலது பக்கத்தில் சென்ட் பட்டன்
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 18),
               constraints: const BoxConstraints(),
-              onPressed: () {
-                if (_messageController.text.isNotEmpty) {
-                  widget.onSendMessage(_messageController.text);
-                  _messageController.clear();
-                  setState(() {
-                    _isTypingOpen = false;
-                  });
-                }
-              },
+              padding: EdgeInsets.zero,
+              onPressed: _submitMessage,
             ),
-          ],
+          ),
+          onSubmitted: (_) => _submitMessage(),
         ),
       );
     }
 
     return Row(
       children: [
-        // Message Icon
         GestureDetector(
           onTap: () {
             setState(() {
@@ -171,7 +160,6 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
           ),
         ),
         const SizedBox(width: 8),
-        // Grid Menu (Tools) Button triggering BottomSheet
         GestureDetector(
           onTap: () => _showToolsBottomSheet(context),
           child: Container(
