@@ -7,6 +7,7 @@ import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_overlay_manager.dart';
 import 'party_room_model.dart';
+import 'party_room_seat_profile_sheet.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -120,6 +121,17 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     setState(() {});
   }
 
+  void _showSeatProfile(BuildContext context, String seatName, String role) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return PartyRoomSeatProfileSheet(userName: seatName, role: role);
+      },
+    );
+  }
+
   void _sendMessage() {
     if (_messageController.text.trim().isNotEmpty) {
       setState(() {
@@ -167,7 +179,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   Widget build(BuildContext context) {
     final followNotifier = StreamerFollowManager().getFollowNotifier(streamerKey);
     
-    // Host / Streamer name handling (No cinematic room name on top header)
     final String hostName = widget.room is PartyRoomModel 
         ? (widget.room as PartyRoomModel).hostName 
         : 'Alsha Live';
@@ -260,7 +271,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Direct Minimize on Close Button (No dialog popup)
+                        // Direct Minimize on Close Button
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                           onPressed: () {
@@ -275,9 +286,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // (Type, Mic, Theme banner removed completely as requested)
-
-                  // Voice Seats Grid (10 Seats)
+                  // Voice Seats Grid (10 Seats) with Profile Bottom Sheet Trigger
                   Expanded(
                     flex: 4,
                     child: GridView.builder(
@@ -293,35 +302,41 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                       itemBuilder: (context, index) {
                         final seat = voiceSeats[index];
                         final bool isSpeaking = seat['isSpeaking'];
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSpeaking ? Colors.cyanAccent : Colors.white24,
-                                  width: isSpeaking ? 2.5 : 1.0,
+                        final String seatUserName = seat['name'];
+                        final String roleDesc = index == 0 ? 'Room Host' : 'Party Participant';
+
+                        return GestureDetector(
+                          onTap: () => _showSeatProfile(context, seatUserName, roleDesc),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isSpeaking ? Colors.cyanAccent : Colors.white24,
+                                    width: isSpeaking ? 2.5 : 1.0,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.purple.withOpacity(0.4),
+                                  child: const Icon(Icons.mic, size: 16, color: Colors.white),
                                 ),
                               ),
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.purple.withOpacity(0.4),
-                                child: const Icon(Icons.mic, size: 16, color: Colors.white),
+                              const SizedBox(height: 2),
+                              Text(
+                                seatUserName,
+                                style: TextStyle(
+                                  color: isSpeaking ? Colors.cyanAccent : Colors.white70,
+                                  fontSize: 9,
+                                  fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              seat['name'],
-                              style: TextStyle(
-                                color: isSpeaking ? Colors.cyanAccent : Colors.white70,
-                                fontSize: 9,
-                                fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -361,7 +376,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     child: ListView.builder(
                       itemCount: chatMessages.length,
                       itemBuilder: (context, index) {
-                        final msg = chatMessages.last; // or list index
                         final currentMsg = chatMessages[index];
                         bool isSystem = currentMsg['user'] == "System";
                         return Padding(
