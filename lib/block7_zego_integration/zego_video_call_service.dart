@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../block6_party_room/gift_bottom_sheet.dart';
 
 class ZegoVideoCallService {
@@ -7,29 +8,56 @@ class ZegoVideoCallService {
 
   // Initialize Live Video Broadcast
   static Future<void> startVideoBroadcast(String streamID) async {
-    debugPrint("Starting Zego Video Broadcast for Stream: $streamID[span_1](start_span)[span_1](end_span)");
+    debugPrint("Starting Zego Video Broadcast for Stream: $streamID[span_0](start_span)[span_0](end_span)");
   }
 
   // Toggle Camera Front / Back
   static void switchCamera() {
     isFrontCamera = !isFrontCamera;
-    debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera[span_2](start_span)[span_2](end_span)");
+    debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera[span_1](start_span)[span_1](end_span)");
   }
 
-  // Toggle Video On / Off (Audio only mode)
+  // Toggle Video On / Off
   static void toggleVideo(bool enable) {
     isVideoEnabled = enable;
-    debugPrint("Zego Video Enabled: $isVideoEnabled[span_3](start_span)[span_3](end_span)");
+    debugPrint("Zego Video Enabled: $isVideoEnabled[span_2](start_span)[span_2](end_span)");
   }
 
-  // 👉 Real-Time Video Call UI Screen launcher with all controls (Mute, Camera, Beauty, Gift, Disconnect)
-  static void startRealTimeVideoCall(BuildContext context, {required String receiverName}) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RealTimeVideoCallScreen(receiverName: receiverName),
-      ),
-    );
+  // 👉 Request All Permissions (Camera, Mic, Contacts, Location) then launch Real-Time Video Call
+  static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
+    // Request permissions for Camera, Microphone, Contacts, and Location
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+      Permission.microphone,
+      Permission.contacts,
+      Permission.location,
+    ].request();
+
+    bool allGranted = statuses[Permission.camera]!.isGranted &&
+        statuses[Permission.microphone]!.isGranted;
+
+    if (allGranted) {
+      // If permissions granted, open Real-Time Video Call Screen
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RealTimeVideoCallScreen(receiverName: receiverName),
+          ),
+        );
+      }
+    } else {
+      // If permission denied, show alert
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Camera and Microphone permissions are required for Video Call!'),
+            backgroundColor: Colors.redAccent,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -80,7 +108,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Background Video View (Mock / Active Stream View)
+          // Background Video View
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -103,9 +131,9 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.videocam, size: 100, color: Colors.white12),
+                          const Icon(Icons.videocam, size: 100, color: Colors.cyanAccent),
                           const SizedBox(height: 10),
-                          Text('Connected with ${widget.receiverName}', style: const TextStyle(color: Colors.white70, fontSize: 16)),
+                          Text('Connected with ${widget.receiverName}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                           if (isBeautyModeOn)
                             Container(
                               margin: const EdgeInsets.only(top: 8),
@@ -136,7 +164,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.receiverName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                    const Text('00:45 Secs • HD', style: TextStyle(color: Colors.cyanAccent, fontSize: 11)),
+                    const Text('Live Connection • HD', style: TextStyle(color: Colors.cyanAccent, fontSize: 11)),
                   ],
                 ),
                 const Spacer(),
@@ -146,9 +174,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                     setState(() {
                       isBeautyModeOn = !isBeautyModeOn;
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(isBeautyModeOn ? 'Beauty Mode Enabled ✨' : 'Beauty Mode Disabled'), duration: const Duration(milliseconds: 600)),
-                    );
                   },
                 ),
               ],
@@ -180,7 +205,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
               ),
             ),
 
-          // Bottom Controls Toolbar (Mute, Camera Switch, Video Off, Gift, Disconnect)
+          // Bottom Controls Toolbar
           Positioned(
             bottom: 30,
             left: 20,
@@ -188,7 +213,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // 1. Mute / Unmute Button
                 FloatingActionButton(
                   heroTag: 'mute_btn',
                   backgroundColor: isMuted ? Colors.redAccent : Colors.white24,
@@ -199,8 +223,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   },
                   child: Icon(isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
                 ),
-
-                // 2. Camera Switch (Front / Back)
                 FloatingActionButton(
                   heroTag: 'switch_cam',
                   backgroundColor: Colors.white24,
@@ -212,8 +234,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   },
                   child: const Icon(Icons.cameraswitch, color: Colors.white),
                 ),
-
-                // 3. Video On / Off
                 FloatingActionButton(
                   heroTag: 'video_off',
                   backgroundColor: isVideoOff ? Colors.redAccent : Colors.white24,
@@ -225,16 +245,12 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   },
                   child: Icon(isVideoOff ? Icons.videocam_off : Icons.videocam, color: Colors.white),
                 ),
-
-                // 4. Gift Option inside Call
                 FloatingActionButton(
                   heroTag: 'gift_btn',
                   backgroundColor: Colors.pinkAccent,
                   onPressed: () => _showGiftSheet(context),
                   child: const Icon(Icons.card_giftcard, color: Colors.white),
                 ),
-
-                // 5. Disconnect / Cut Call
                 FloatingActionButton(
                   heroTag: 'cut_call',
                   backgroundColor: Colors.red,
