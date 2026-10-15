@@ -16,53 +16,60 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
     final followNotifier = StreamerFollowManager().getFollowNotifier(userName);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       decoration: const BoxDecoration(
         color: Color(0xFF1D1B36),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
         children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white24,
-              borderRadius: BorderRadius.circular(2),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
           const SizedBox(height: 20),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.pinkAccent.withOpacity(0.3),
-                child: const Icon(Icons.person, color: Colors.white, size: 36),
+              const CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.pinkAccent,
+                child: Icon(Icons.person, color: Colors.white, size: 30),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       userName,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       role,
-                      style: const TextStyle(color: Colors.cyanAccent, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.cyanAccent,
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              // Follow Button
+              const SizedBox(width: 8),
               ValueListenableBuilder<bool>(
                 valueListenable: followNotifier,
                 builder: (context, isFollowing, child) {
@@ -72,7 +79,9 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     onPressed: () {
                       StreamerFollowManager().toggleFollow(userName);
@@ -85,7 +94,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     },
                     child: Text(
                       isFollowing ? 'Following' : 'Follow',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   );
                 },
@@ -93,7 +102,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          // Message and Send Gifts Buttons matching the reference design
           Row(
             children: [
               Expanded(
@@ -111,10 +119,10 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                       SnackBar(content: Text('Opening chat with $userName...'), duration: const Duration(milliseconds: 800)),
                     );
                   },
-                  icon: const Icon(Icons.message, color: Colors.white, size: 18),
+                  icon: const Icon(Icons.message, color: Colors.white, size: 16),
                   label: const Text(
                     'Message',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               ),
@@ -134,16 +142,16 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                       SnackBar(content: Text('Opening gift menu for $userName...'), duration: const Duration(milliseconds: 800)),
                     );
                   },
-                  icon: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+                  icon: const Icon(Icons.card_giftcard, color: Colors.white, size: 16),
                   label: const Text(
                     'Send Gifts',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
         ],
       ),
     );
