@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'gift_bottom_sheet.dart';
+import '../private_chat_screen.dart'; // சரியான பிரைவேட் சாட் ஃபைல் இம்போர்ட்
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
@@ -107,6 +108,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
+              // Message Button -> Jumps directly to PrivateChatScreen with streamerName
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -117,62 +119,11 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close bottom sheet
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Scaffold(
-                          backgroundColor: const Color(0xFF121026),
-                          appBar: AppBar(
-                            backgroundColor: const Color(0xFF1D1B36),
-                            title: Text(userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            iconTheme: const IconThemeData(color: Colors.white),
-                          ),
-                          body: Column(
-                            children: [
-                              Expanded(
-                                child: ListView(
-                                  padding: const EdgeInsets.all(16),
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF1D1B36),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text('Hi! Welcome to private chat with $userName ✨', style: const TextStyle(color: Colors.white, fontSize: 13)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                color: const Color(0xFF1D1B36),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                      child: TextField(
-                                        style: TextStyle(color: Colors.white),
-                                        decoration: InputDecoration(
-                                          hintText: 'Send message...',
-                                          hintStyle: TextStyle(color: Colors.white54),
-                                          border: InputBorder.none,
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.send, color: Colors.cyanAccent),
-                                      onPressed: () {},
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        builder: (context) => PrivateChatScreen(streamerName: userName), // உண்மையான பிரைவேட் சாட் ஸ்கிரீனுக்கு ஜம்ப் ஆகும்[span_1](start_span)[span_1](end_span)
                       ),
                     );
                   },
@@ -184,6 +135,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              // Send Gifts Button -> Opens Gift Bottom Sheet
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -194,7 +146,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close profile sheet
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
