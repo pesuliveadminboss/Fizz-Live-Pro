@@ -14,6 +14,47 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
     this.onSendGift,
   });
 
+  void _openChatDialog(BuildContext context) {
+    final TextEditingController chatController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1D1B36),
+          title: Text('Chat with $userName', style: const TextStyle(color: Colors.white, fontSize: 16)),
+          content: TextField(
+            controller: chatController,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'Type your private message...',
+              hintStyle: TextStyle(color: Colors.white54),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.pinkAccent)),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
+              onPressed: () {
+                if (chatController.text.trim().isNotEmpty) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Message sent to $userName: ${chatController.text.trim()} ✉️'), duration: const Duration(milliseconds: 1000)),
+                  );
+                }
+              },
+              child: const Text('Send', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final followNotifier = StreamerFollowManager().getFollowNotifier(userName);
@@ -107,7 +148,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Message Button -> Jumps to Private Chat area
+              // Message Button -> Opens Direct Chat Dialog
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -118,11 +159,8 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close sheet
-                    // TODO: Replace with your actual Private Chat Screen navigation if available
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Jumping to Private Chat with $userName...'), duration: const Duration(milliseconds: 800)),
-                    );
+                    Navigator.pop(context); // Close bottom sheet
+                    _openChatDialog(context); // Open direct message dialog
                   },
                   icon: const Icon(Icons.message, color: Colors.white, size: 16),
                   label: const Text(
@@ -177,3 +215,4 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
     );
   }
 }
+
