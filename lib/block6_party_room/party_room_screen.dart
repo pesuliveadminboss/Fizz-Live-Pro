@@ -1,54 +1,74 @@
 import 'package:flutter/material.dart';
-import 'live_streamer_model.dart';
-import 'live_room_header.dart';
-import 'live_room_bottom_toolbar.dart';
-import 'live_tools_and_gifts_helper.dart';
-import 'live_ads_integration_helper.dart';
-import 'streamer_follow_manager.dart';
-import 'live_streamer_overlay_manager.dart';
-import '../block6_party_room/party_room_overlay_manager.dart';
+import '../block3_hot_tab/streamer_profile_screen.dart';
+import '../block3_hot_tab/streamer_profile_model.dart';
+import '../block5_live_streaming/streamer_follow_manager.dart';
+import '../block5_live_streaming/live_streamer_overlay_manager.dart';
+import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
-import '../block7_zego_integration/zego_video_call_service.dart';
+import 'party_room_overlay_manager.dart';
+import 'party_room_model.dart';
+import 'party_room_seat_profile_sheet.dart';
 
-class LiveRoomScreen extends StatefulWidget {
-  final LiveStreamer streamer;
-  const LiveRoomScreen({super.key, required this.streamer});
+class PartyRoomScreen extends StatefulWidget {
+  final dynamic room;
+  final String roomTitle;
+  final String selectedTheme;
+  final String audienceMicMode;
+
+  const PartyRoomScreen({
+    super.key,
+    this.room,
+    this.roomTitle = 'Alsha Party Room',
+    this.selectedTheme = 'Candy Fiesta',
+    this.audienceMicMode = 'Free',
+  });
 
   @override
-  State<LiveRoomScreen> createState() => _LiveRoomScreenState();
+  State<PartyRoomScreen> createState() => _PartyRoomScreenState();
 }
 
-class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStateMixin {
-  int _currentIndex = 0;
-  bool _isKeyboardOpen = false;
-  String? activeGiftEffect;
+class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderStateMixin {
+  final TextEditingController _messageController = TextEditingController();
+  final String streamerKey = 'Alsha Live';
 
+  bool isMuted = false;
+  String? activeGiftEffect;
+  
   late AnimationController _animController;
   late Animation<double> _animProgress;
 
-  final Map<int, List<String>> _roomViewersMap = {
-    0: ['Guest_Llw6JP', 'PariUser_99'],
-    1: ['User_TamilNadu', 'Rahul_Live', 'Anitha_2026'],
-    2: ['Kavi_Speaker', 'Deepak_Raj'],
-  };
+  final List<Map<String, String>> chatMessages = [
+    {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful."},
+    {"user": "Raj Shukla", "text": "Nice to meet you! Grab the mic."},
+    {"user": "System", "text": "Karthik Kumar joined the Party Room 🚀"},
+  ];
 
-  final TextEditingController _chatController = TextEditingController();
+  final List<Map<String, String>> roomViewers = [
+    {"name": "Raj Shukla", "status": "Active Listener"},
+    {"name": "Alsha Live (Host)", "status": "Broadcaster"},
+    {"name": "Karthik Kumar", "status": "Joined via For You"},
+    {"name": "Priya Ramesh", "status": "Active Listener"},
+    {"name": "Suresh Babu", "status": "Active Listener"},
+  ];
 
-  final List<Map<String, String>> _liveChats = [
-    {
-      'user': 'System',
-      'message': 'pornographic, vulgar, violent and under age is forbidden to appear in the live. You\'ll be punished seriously once you violate the rules!',
-      'type': 'warning'
-    },
-    {'user': 'PARIHUB', 'message': 'â¤ï¸ Stay and chat with me!'},
-    {'user': 'Guest_Llw6JP', 'message': 'joined the room'},
+  final List<Map<String, dynamic>> voiceSeats = [
+    {'index': 1, 'name': 'Host', 'isOccupied': true, 'isSpeaking': false},
+    {'index': 2, 'name': 'User 2', 'isOccupied': true, 'isSpeaking': true},
+    {'index': 3, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 4, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 5, 'name': 'User 5', 'isOccupied': true, 'isSpeaking': true},
+    {'index': 6, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 7, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 8, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 9, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
+    {'index': 10, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
   ];
 
   @override
   void initState() {
     super.initState();
-    LiveStreamerOverlayManager.hideOverlay();
     PartyRoomOverlayManager.hideOverlay();
+    LiveStreamerOverlayManager.hideOverlay();
 
     _animController = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -57,13 +77,78 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
     _animProgress = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
   }
 
-  void _handleNewMessage(String msg) {
-    if (msg.trim().isEmpty) return;
+  @override
+  void dispose() {
+    _animController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _toggleMute() {
     setState(() {
-      _liveChats.add({'user': 'You', 'message': msg, 'type': 'chat'});
-      _chatController.clear();
-      _isKeyboardOpen = false;
+      isMuted = !isMuted;
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isMuted ? 'Mic Muted 🔇' : 'Mic Unmuted 🎙️'),
+        duration: const Duration(milliseconds: 800),
+      ),
+    );
+  }
+
+  void _openViewersScreen(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RoomViewersScreen(viewers: roomViewers),
+      ),
+    );
+    setState(() {});
+  }
+
+  void _openFullHostProfile(BuildContext context) async {
+    final streamerModel = StreamerProfileModel(
+      name: 'Alsha Live',
+      id: streamerKey,
+      country: 'India',
+      flag: '🇮🇳',
+      age: 22,
+      status: 'Online',
+      intro: 'Welcome to my party room! Enjoy the music & vibes 🎉',
+      language: 'Tamil / English',
+    );
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StreamerProfileScreen(streamer: streamerModel),
+      ),
+    );
+    setState(() {});
+  }
+
+  void _showSeatProfile(BuildContext context, String seatName, String role) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return PartyRoomSeatProfileSheet(userName: seatName, role: role);
+      },
+    );
+  }
+
+  void _sendMessage() {
+    if (_messageController.text.trim().isNotEmpty) {
+      setState(() {
+        chatMessages.add({
+          "user": "You",
+          "text": _messageController.text.trim(),
+        });
+      });
+      _messageController.clear();
+      FocusScope.of(context).unfocus();
+    }
   }
 
   void _triggerGiftEffect(String giftName, int quantity) {
@@ -97,280 +182,287 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
   }
 
   @override
-  void dispose() {
-    _chatController.dispose();
-    _animController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final followNotifier = StreamerFollowManager().getFollowNotifier(streamerKey);
+    
+    final String hostName = widget.room is PartyRoomModel 
+        ? (widget.room as PartyRoomModel).hostName 
+        : 'Alsha Live';
+        
+    final String activeTheme = widget.room is PartyRoomModel 
+        ? (widget.room as PartyRoomModel).theme 
+        : widget.selectedTheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121026),
       body: Stack(
         children: [
-          PageView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: LiveStreamer.dummyStreamers.length,
-            controller: PageController(
-              initialPage: LiveStreamer.dummyStreamers
-                  .indexWhere((s) => s.id == widget.streamer.id)
-                  .clamp(0, LiveStreamer.dummyStreamers.length - 1),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF1A0B2E), Color(0xFF0F051D), Color(0xFF05020A)],
+              ),
             ),
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemBuilder: (context, index) {
-              final streamerItem = LiveStreamer.dummyStreamers[index];
-              final roomViewers = _roomViewersMap[index] ?? [];
-              final followNotifier = StreamerFollowManager().getFollowNotifier(streamerItem.name);
-
-              return Stack(
+            child: SafeArea(
+              child: Column(
                 children: [
-                  Positioned.fill(
-                    child: Container(
-                      color: const Color(0xFF1D1B36),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.person, size: 150, color: Colors.white10),
-                            const SizedBox(height: 10),
-                            Text('Live: ${streamerItem.name}', style: const TextStyle(color: Colors.white38, fontSize: 14)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Top Header Bar
-                  Positioned(
-                    top: 40,
-                    left: 16,
-                    right: 16,
-                    child: LiveRoomHeader(
-                      streamer: streamerItem,
-                      onMinimize: () {
-                        Navigator.pop(context);
-                        LiveStreamerOverlayManager.showFloatingMiniPlayer(
-                          context: context,
-                          streamer: streamerItem,
-                        );
-                      },
-                      viewerCount: roomViewers.length,
-                      viewersList: roomViewers,
-                    ),
-                  ),
-
-                  // Bottom Scrollable Live Chat Feed
-                  Positioned(
-                    bottom: 70,
-                    left: 16,
-                    right: 150,
-                    child: SizedBox(
-                      height: 130,
-                      child: ListView.builder(
-                        reverse: false,
-                        itemCount: _liveChats.length,
-                        itemBuilder: (context, chatIndex) {
-                          final chat = _liveChats[chatIndex];
-                          final isWarning = chat['type'] == 'warning';
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: isWarning ? Colors.amber.withOpacity(0.2) : Colors.black26,
-                                borderRadius: BorderRadius.circular(10),
-                                border: isWarning ? Border.all(color: Colors.amber.withOpacity(0.5)) : null,
-                              ),
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: isWarning ? 'Room: ' : '${chat['user']}: ',
-                                      style: TextStyle(
-                                        color: isWarning ? Colors.amberAccent : Colors.amber,
-                                        fontSize: isWarning ? 8 : 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: chat['message'] ?? '',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: isWarning ? 8 : 11,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-
-                  // Left Side Bottom Toolbar
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    child: LiveRoomBottomToolbar(
-                      onOpenTools: () {},
-                      onVideoCall: () {
-                        ZegoVideoCallService.startRealTimeVideoCall(
-                          context,
-                          receiverName: streamerItem.name,
-                        );
-                      },
-                      onGiftTap: () => _showGiftBottomSheet(context),
-                      onLikeTap: () {},
-                      onSendMessage: _handleNewMessage,
-                    ),
-                  ),
-
-                  // Right Side Bottom Toolbar
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: SizedBox(
-                      width: 150,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              StreamerFollowManager().toggleFollow(streamerItem.name);
-                              final status = StreamerFollowManager().isFollowing(streamerItem.name);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(status ? 'Successfully Followed Streamer â¤ï¸' : 'Unfollowed Streamer'),
-                                  duration: const Duration(milliseconds: 500),
-                                ),
-                              );
-                            },
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: followNotifier,
-                              builder: (context, isFollowing, child) {
-                                return CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: Colors.pinkAccent,
-                                  child: Icon(
-                                    isFollowing ? Icons.favorite : Icons.favorite_border,
-                                    color: Colors.white,
-                                    size: 18,
+                  // Top Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => _openFullHostProfile(context),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: Colors.pinkAccent.withOpacity(0.3),
+                                    child: const Icon(Icons.person, color: Colors.white, size: 20),
                                   ),
-                                );
-                              },
+                                  const SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        hostName,
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                      ),
+                                      Text(
+                                        '${roomViewers.length} Online • Party Room',
+                                        style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _showGiftBottomSheet(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [Colors.pinkAccent, Colors.purpleAccent]),
-                                borderRadius: BorderRadius.circular(18),
+                        ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: followNotifier,
+                          builder: (context, isFollowing, child) {
+                            return GestureDetector(
+                              onTap: () => StreamerFollowManager().toggleFollow(streamerKey),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isFollowing ? Colors.grey.shade800 : Colors.pinkAccent,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  isFollowing ? 'Following' : 'Follow',
+                                  style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              child: const Icon(Icons.card_giftcard, color: Colors.white, size: 18),
-                            ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () => _openViewersScreen(context),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
+                              const SizedBox(width: 3),
+                              Text('${roomViewers.length}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              ZegoVideoCallService.startRealTimeVideoCall(
-                                context,
-                                receiverName: streamerItem.name,
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent,
-                                borderRadius: BorderRadius.circular(18),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            PartyRoomOverlayManager.showFloatingMiniPlayer(
+                              context: context,
+                              room: widget.room,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Voice Seats Grid (10 Seats)
+                  Expanded(
+                    flex: 4,
+                    child: GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 5,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        final seat = voiceSeats[index];
+                        final bool isOccupied = seat['isOccupied'] ?? false;
+                        final bool isSpeaking = seat['isSpeaking'] ?? false;
+                        final String seatUserName = seat['name'];
+                        final String roleDesc = index == 0 ? 'Room Host' : 'Party Participant';
+
+                        return GestureDetector(
+                          onTap: isOccupied 
+                              ? () => _showSeatProfile(context, seatUserName, roleDesc) 
+                              : null,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white38 : Colors.white12),
+                                    width: isSpeaking ? 2.5 : 1.0,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: isOccupied ? Colors.purple.withOpacity(0.4) : Colors.white.withOpacity(0.05),
+                                  child: Icon(
+                                    isOccupied ? Icons.mic : Icons.mic_off, 
+                                    size: 16, 
+                                    color: isOccupied ? Colors.white : Colors.white24,
+                                  ),
+                                ),
                               ),
-                              child: const Icon(Icons.videocam, color: Colors.white, size: 18),
-                            ),
+                              const SizedBox(height: 2),
+                              Text(
+                                seatUserName,
+                                style: TextStyle(
+                                  color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white70 : Colors.white30),
+                                  fontSize: 9,
+                                  fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Center Theme Graphic / Animation View
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.celebration,
+                            size: 60,
+                            color: Colors.pinkAccent.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Active Theme: $activeTheme',
+                            style: const TextStyle(color: Colors.amberAccent, fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                   ),
 
-                  // Right Side Vertical Ads
-                  Positioned(
-                    bottom: 80,
-                    right: 16,
-                    child: LiveAdsIntegrationHelper.buildRightSideVerticalAds(),
-                  ),
-                ],
-              );
-            },
-          ),
-
-          // ðŸ‘‰ Cinematic Gift Animation Overlay Renderer (Perfect Center)
-          if (activeGiftEffect != null)
-            AnimatedBuilder(
-              animation: _animProgress,
-              builder: (context, child) {
-                final String nameLower = activeGiftEffect!.toLowerCase();
-                IconData giftIcon = Icons.card_giftcard;
-
-                if (nameLower.contains('rocket') || nameLower.contains('starship') || nameLower.contains('jet')) {
-                  giftIcon = Icons.rocket_launch;
-                } else if (nameLower.contains('car') || nameLower.contains('exclusive') || nameLower.contains('cruise')) {
-                  giftIcon = Icons.directions_car;
-                } else if (nameLower.contains('flower') || nameLower.contains('rose') || nameLower.contains('ring')) {
-                  giftIcon = Icons.local_florist;
-                } else if (nameLower.contains('airplane') || nameLower.contains('air travel')) {
-                  giftIcon = Icons.airplanemode_active;
-                }
-
-                return Center(
-                  child: Transform.scale(
-                    scale: 0.6 + (_animProgress.value * 0.8),
-                    child: Opacity(
-                      opacity: (1.0 - _animProgress.value).clamp(0.2, 1.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.amberAccent, width: 2.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amberAccent.withOpacity(0.8),
-                              blurRadius: 30,
-                              spreadRadius: 10,
-                            )
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(giftIcon, color: Colors.amberAccent, size: 40),
-                            const SizedBox(width: 14),
-                            Text(
-                              activeGiftEffect!,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.none,
-                              ),
+                  // Chat Messages Box
+                  Container(
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListView.builder(
+                      itemCount: chatMessages.length,
+                      itemBuilder: (context, index) {
+                        final currentMsg = chatMessages[index];
+                        bool isSystem = currentMsg['user'] == "System";
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            isSystem ? "${currentMsg['text']}" : "${currentMsg['user']} : ${currentMsg['text']}",
+                            style: TextStyle(
+                              color: isSystem ? Colors.amberAccent : Colors.white70,
+                              fontSize: 11,
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
+
+                  // Bottom Input & Toolbar
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _messageController,
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            onSubmitted: (_) => _sendMessage(),
+                            decoration: InputDecoration(
+                              hintText: 'Type a message...',
+                              hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.1),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.send, color: Colors.cyanAccent, size: 18),
+                          onPressed: _sendMessage,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.card_giftcard, color: Colors.pinkAccent),
+                          onPressed: () => _showGiftBottomSheet(context),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            isMuted ? Icons.mic_off : Icons.mic,
+                            color: isMuted ? Colors.redAccent : Colors.cyanAccent,
+                          ),
+                          onPressed: _toggleMute,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          if (activeGiftEffect != null)
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.amberAccent, width: 2.5),
+                ),
+                child: Text(
+                  activeGiftEffect!,
+                  style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
         ],
       ),
