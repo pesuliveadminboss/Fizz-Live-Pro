@@ -159,26 +159,28 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     }
   }
 
-  void _triggerGiftEffect(BuildContext dialogContext, String giftName, int quantity) {
-    // Instantly close gift bottom sheet without delay
-    if (Navigator.canPop(dialogContext)) {
-      Navigator.pop(dialogContext);
+  // 👉 கிராஷ் ஆகாமல் இருக்க பாதுகாப்பான பாப் (Safe Sheet Pop) முறை
+  void _triggerGiftEffect(BuildContext sheetContext, String giftName, int quantity) {
+    if (Navigator.canPop(sheetContext)) {
+      Navigator.of(sheetContext).pop();
     }
 
-    setState(() {
-      activeGiftEffect = '$giftName x$quantity';
-    });
-    _animController.forward(from: 0.0);
+    if (mounted) {
+      setState(() {
+        activeGiftEffect = '$giftName x$quantity';
+      });
+      _animController.forward(from: 0.0);
 
-    PartyGiftAnimationHelper.showPartyGiftAnimation(context, giftName, 'Chandran S');
+      PartyGiftAnimationHelper.showPartyGiftAnimation(context, giftName, 'Chandran S');
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        setState(() {
-          activeGiftEffect = null;
-        });
-      }
-    });
+      Future.delayed(const Duration(milliseconds: 2500), () {
+        if (mounted) {
+          setState(() {
+            activeGiftEffect = null;
+          });
+        }
+      });
+    }
   }
 
   void _showGiftBottomSheet(BuildContext context) {
@@ -436,7 +438,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Bottom Input & Toolbar with Send Button
+                  // Bottom Input & Toolbar
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
