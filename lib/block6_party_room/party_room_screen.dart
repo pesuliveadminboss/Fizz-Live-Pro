@@ -147,7 +147,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       _messageController.clear();
       FocusScope.of(context).unfocus();
 
-      // Auto scroll to bottom of chat
       Future.delayed(const Duration(milliseconds: 100), () {
         if (_chatScrollController.hasClients) {
           _chatScrollController.animateTo(
@@ -160,7 +159,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     }
   }
 
-  void _triggerGiftEffect(String giftName, int quantity) {
+  void _triggerGiftEffect(BuildContext dialogContext, String giftName, int quantity) {
+    // Instantly close gift bottom sheet without delay
+    if (Navigator.canPop(dialogContext)) {
+      Navigator.pop(dialogContext);
+    }
+
     setState(() {
       activeGiftEffect = '$giftName x$quantity';
     });
@@ -182,10 +186,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (sheetContext) {
         return GiftBottomSheet(
           onSendGift: (giftName, quantity) {
-            _triggerGiftEffect(giftName, quantity);
+            _triggerGiftEffect(sheetContext, giftName, quantity);
           },
         );
       },
@@ -432,7 +436,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Bottom Input & Toolbar
+                  // Bottom Input & Toolbar with Send Button
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
