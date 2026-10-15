@@ -256,7 +256,7 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
-                    if (selectedGift !=.null) {
+                    if (selectedGift != null) {
                       if (userDiamondBalance >= totalRequiredDiamonds) {
                         widget.onSendGift(selectedGift!['name'], selectedQuantity);
                         Navigator.pop(context);
