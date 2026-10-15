@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 import '../block6_party_room/gift_bottom_sheet.dart';
 
 class ZegoVideoCallService {
@@ -14,16 +15,18 @@ class ZegoVideoCallService {
   // Toggle Camera Front / Back
   static void switchCamera() {
     isFrontCamera = !isFrontCamera;
+    ZegoExpressEngine.instance.useFrontCamera(isFrontCamera);
     debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera");
   }
 
   // Toggle Video On / Off
   static void toggleVideo(bool enable) {
     isVideoEnabled = enable;
+    ZegoExpressEngine.instance.enableCamera(enable);
     debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // 👉 Request Mandatory Permissions (Camera, Microphone, Contacts, Location) then launch Video Call
+  // 👉 Request Permissions & Launch Real-Time Video Call Screen with Zego Camera
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
@@ -48,7 +51,7 @@ class ZegoVideoCallService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Camera and Microphone permissions are required to start Video Call! Please allow them.'),
+            content: Text('Camera and Microphone permissions are required to start Video Call!'),
             backgroundColor: Colors.redAccent,
             duration: Duration(seconds: 3),
           ),
@@ -58,7 +61,7 @@ class ZegoVideoCallService {
   }
 }
 
-// --- FULL FEATURED REAL-TIME VIDEO CALL SCREEN ---
+// --- REAL-TIME VIDEO CALL SCREEN WITH ZEGO CAMERA VIEW ---
 class RealTimeVideoCallScreen extends StatefulWidget {
   final String receiverName;
 
@@ -74,6 +77,31 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
   bool isBeautyModeOn = true;
   bool isFront = true;
   String? activeGiftEffect;
+
+  // Zego Canvas View Controller ID
+  Widget? _zegoCameraView;
+
+  @override
+  void initState() {
+    super.initState();
+    _initZegoPreview();
+  }
+
+  Future<void> _initZegoPreview() async {
+    // Start Zego Local Video Preview
+    ZegoExpressEngine.instance.startPreview();
+    
+    // Create Platform View for Zego Camera
+    ZegoExpressEngine.instance.createCanvasView((viewID) {
+      ZegoExpressEngine.instance.startPreview(
+        canvas: ZegoCanvas(viewID, viewMode: ZegoViewMode.AspectFill),
+      );
+    }).then((canvasViewWidget) {
+      setState(() {
+        _zegoCameraView = canvasViewWidget;
+      });
+    });
+  }
 
   void _showGiftSheet(BuildContext context) {
     showModalBottomSheet(
@@ -100,48 +128,34 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
   }
 
   @override
+  void dispose() {
+    ZegoExpressEngine.instance.stopPreview();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Background Video View
+          // 👉 Real Zego Camera Preview / Video Background
           Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF2C1E4A), Color(0xFF0F0817)],
-                ),
-              ),
-              child: Center(
-                child: isVideoOff
-                    ? const Column(
+            child: isVideoOff
+                ? Container(
+                    color: const Color(0xFF0F0817),
+                    child: const Center(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircleAvatar(radius: 50, backgroundColor: Colors.white24, child: Icon(Icons.person, size: 50, color: Colors.white)),
                           SizedBox(height: 12),
                           Text('Camera Off (Audio Mode)', style: TextStyle(color: Colors.white60, fontSize: 14)),
                         ],
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.videocam, size: 100, color: Colors.cyanAccent),
-                          const SizedBox(height: 10),
-                          Text('Connected with ${widget.receiverName}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          if (isBeautyModeOn)
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(color: Colors.pinkAccent.withOpacity(0.3), borderRadius: BorderRadius.circular(10)),
-                              child: const Text('✨ Beauty Mode Active', style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold)),
-                            ),
-                        ],
                       ),
-              ),
-            ),
+                    ),
+                  )
+                : (_zegoCameraView ?? const Center(child: CircularProgressIndicator(color: Colors.pinkAccent))),
           ),
 
           // Top Header Info
@@ -161,7 +175,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.receiverName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                    const Text('Live Connection • HD', style: TextStyle(color: Colors.cyanAccent, fontSize: 11)),
+                    const Text('Live Zego Call • HD', style: TextStyle(color: Colors.cyanAccent, fontSize: 11)),
                   ],
                 ),
                 const Spacer(),
@@ -217,6 +231,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                     setState(() {
                       isMuted = !isMuted;
                     });
+                    ZegoExpressEngine.instance.muteMicrophone(isMuted);
                   },
                   child: Icon(isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
                 ),
@@ -252,6 +267,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                   heroTag: 'cut_call',
                   backgroundColor: Colors.red,
                   onPressed: () {
+                    ZegoExpressEngine.instance.stopPreview();
                     Navigator.pop(context);
                   },
                   child: const Icon(Icons.call_end, color: Colors.white),
