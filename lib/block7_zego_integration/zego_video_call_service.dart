@@ -23,7 +23,7 @@ class ZegoVideoCallService {
     debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // 👉 Request All Required Permissions (Camera, Microphone, Contacts, Location) then launch Real-Time Video Call
+  // 👉 Request Mandatory Permissions (Camera, Microphone, Contacts, Location)
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
@@ -48,9 +48,9 @@ class ZegoVideoCallService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Camera and Microphone permissions are mandatory for Video/Audio Call!'),
+            content: Text('Camera and Microphone permissions are required to start Video Call! Please allow them.'),
             backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 2),
+            duration: Duration(seconds: 3),
           ),
         );
       }
@@ -105,7 +105,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Background Video View
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -143,8 +142,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
               ),
             ),
           ),
-
-          // Top Header Info
           Positioned(
             top: 45,
             left: 16,
@@ -176,8 +173,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
               ],
             ),
           ),
-
-          // Center Cinematic Gift Animation Overlay
           if (activeGiftEffect != null)
             Center(
               child: Container(
@@ -201,8 +196,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                 ),
               ),
             ),
-
-          // Bottom Controls Toolbar
           Positioned(
             bottom: 30,
             left: 20,
