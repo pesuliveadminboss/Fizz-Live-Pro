@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'gift_bottom_sheet.dart';
-import '../private_chat_screen.dart'; // சரியான ரிலேட்டிவ் பாத்
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
@@ -122,7 +121,58 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PrivateChatScreen(streamerName: userName), // பிரைவேட் சாட் ஸ்கிரீனுக்கு ஜம்ப் ஆகும்[span_0](start_span)[span_0](end_span)
+                        builder: (context) => Scaffold(
+                          backgroundColor: const Color(0xFF121026),
+                          appBar: AppBar(
+                            backgroundColor: const Color(0xFF1D1B36),
+                            title: Text('Private Chat with $userName', style: const TextStyle(color: Colors.white, fontSize: 16)),
+                            iconTheme: const IconThemeData(color: Colors.white),
+                          ),
+                          body: Column(
+                            children: [
+                              Expanded(
+                                child: ListView(
+                                  padding: const EdgeInsets.all(16),
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1D1B36),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text('Hi! Welcome to private chat with $userName ✨', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                color: const Color(0xFF1D1B36),
+                                child: Row(
+                                  children: [
+                                    const Expanded(
+                                      child: TextField(
+                                        style: TextStyle(color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: 'Send message...',
+                                          hintStyle: TextStyle(color: Colors.white54),
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.send, color: Colors.cyanAccent),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     );
                   },
