@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'live_streamer_model.dart';
+import '../block7_zego_integration/zego_video_call_service.dart'; // 👉 Zego Video Call Service Import
 
 class StreamerProfilePopup extends StatelessWidget {
   final LiveStreamer streamer;
@@ -40,7 +41,7 @@ class StreamerProfilePopup extends StatelessWidget {
               ],
             ),
 
-            // Mini Gallery Row matching second screenshot
+            // Mini Gallery Row
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Row(
@@ -166,14 +167,14 @@ class StreamerProfilePopup extends StatelessWidget {
                     ),
                     child: const Text('Arabic', style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
-                  const SizedBox(height: 80), // Bottom padding for toolbar
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
           ],
         ),
       ),
-      // Bottom Action Toolbar (Chat Button + Video Call Button matching second screenshot)
+      // Bottom Action Toolbar with Real-Time Video Call Trigger
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         color: const Color(0xFF121026),
@@ -200,8 +201,10 @@ class StreamerProfilePopup extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
+                    // 👉 Triggers Real-Time Video Call from Profile Popup
+                    ZegoVideoCallService.startRealTimeVideoCall(
+                      context,
+                      receiverName: streamer.name,
                     );
                   },
                   child: Row(
