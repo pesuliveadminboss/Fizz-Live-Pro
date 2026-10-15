@@ -317,7 +317,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
                   
-                  // 👉 Room Type & 33 Themes Horizontal Selector Section
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     padding: const EdgeInsets.all(10),
@@ -461,8 +460,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           ),
                           const SizedBox(height: 4),
                           Text(
-                                                        'Active Theme: $selectedTheme',
-                            style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                            'Active Theme: $selectedTheme',
+                                                        style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -540,7 +539,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
               ),
             ),
           ),
-          // 👉 Cinematic Gift Animation Overlay Renderer (Perfect Center)
           if (activeGiftEffect != null)
             AnimatedBuilder(
               animation: _animProgress,
@@ -604,4 +602,3 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     );
   }
 }
-                  
