@@ -7,7 +7,7 @@ import 'live_ads_integration_helper.dart';
 import 'streamer_follow_manager.dart';
 import 'live_streamer_overlay_manager.dart';
 import '../block6_party_room/party_room_overlay_manager.dart';
-import 'gift_bottom_sheet.dart'; // 👉 Import Gift Bottom Sheet for Live Room
+import 'gift_bottom_sheet.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -221,7 +221,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
                     child: LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {},
-                      onGiftTap: () => _showGiftBottomSheet(context), // 👉 Opens Gift Bottom Sheet
+                      onGiftTap: () => _showGiftBottomSheet(context),
                       onLikeTap: () {},
                       onSendMessage: _handleNewMessage,
                     ),
@@ -264,7 +264,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
-                            onTap: () => _showGiftBottomSheet(context), // 👉 Opens Gift Bottom Sheet
+                            onTap: () => _showGiftBottomSheet(context),
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
