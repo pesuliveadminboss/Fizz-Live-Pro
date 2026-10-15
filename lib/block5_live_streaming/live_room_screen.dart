@@ -6,7 +6,8 @@ import 'live_tools_and_gifts_helper.dart';
 import 'live_ads_integration_helper.dart';
 import 'streamer_follow_manager.dart';
 import 'live_streamer_overlay_manager.dart';
-import '../block6_party_room/party_room_overlay_manager.dart'; // 👉 Import Party Room overlay manager to hide party mini-player
+import '../block6_party_room/party_room_overlay_manager.dart';
+import 'gift_bottom_sheet.dart'; // 👉 Import Gift Bottom Sheet for Live Room
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -16,9 +17,13 @@ class LiveRoomScreen extends StatefulWidget {
   State<LiveRoomScreen> createState() => _LiveRoomScreenState();
 }
 
-class _LiveRoomScreenState extends State<LiveRoomScreen> {
+class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStateMixin {
   int _currentIndex = 0;
   bool _isKeyboardOpen = false;
+  String? activeGiftEffect;
+
+  late AnimationController _animController;
+  late Animation<double> _animProgress;
 
   final Map<int, List<String>> _roomViewersMap = {
     0: ['Guest_Llw6JP', 'PariUser_99'],
@@ -41,9 +46,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void initState() {
     super.initState();
-    // Hide live streamer mini-player and party room overlay when entering live room to avoid overlapping
     LiveStreamerOverlayManager.hideOverlay();
     PartyRoomOverlayManager.hideOverlay();
+
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _animProgress = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
   }
 
   void _handleNewMessage(String msg) {
@@ -55,9 +65,40 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
   }
 
+  void _triggerGiftEffect(String giftName, int quantity) {
+    setState(() {
+      activeGiftEffect = '$giftName x$quantity';
+    });
+    _animController.forward(from: 0.0);
+
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        setState(() {
+          activeGiftEffect = null;
+        });
+      }
+    });
+  }
+
+  void _showGiftBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return GiftBottomSheet(
+          onSendGift: (giftName, quantity) {
+            _triggerGiftEffect(giftName, quantity);
+          },
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _chatController.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
@@ -180,7 +221,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: LiveRoomBottomToolbar(
                       onOpenTools: () {},
                       onVideoCall: () {},
-                      onGiftTap: () {},
+                      onGiftTap: () => _showGiftBottomSheet(context), // 👉 Opens Gift Bottom Sheet
                       onLikeTap: () {},
                       onSendMessage: _handleNewMessage,
                     ),
@@ -223,11 +264,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Opening Gift Panel...'), duration: Duration(seconds: 1)),
-                              );
-                            },
+                            onTap: () => _showGiftBottomSheet(context), // 👉 Opens Gift Bottom Sheet
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -268,6 +305,66 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               );
             },
           ),
+
+          // 👉 Cinematic Gift Animation Overlay Renderer (Perfect Center)
+          if (activeGiftEffect != null)
+            AnimatedBuilder(
+              animation: _animProgress,
+              builder: (context, child) {
+                final String nameLower = activeGiftEffect!.toLowerCase();
+                IconData giftIcon = Icons.card_giftcard;
+
+                if (nameLower.contains('rocket') || nameLower.contains('starship') || nameLower.contains('jet')) {
+                  giftIcon = Icons.rocket_launch;
+                } else if (nameLower.contains('car') || nameLower.contains('exclusive') || nameLower.contains('cruise')) {
+                  giftIcon = Icons.directions_car;
+                } else if (nameLower.contains('flower') || nameLower.contains('rose') || nameLower.contains('ring')) {
+                  giftIcon = Icons.local_florist;
+                } else if (nameLower.contains('airplane') || nameLower.contains('air travel')) {
+                  giftIcon = Icons.airplanemode_active;
+                }
+
+                return Center(
+                  child: Transform.scale(
+                    scale: 0.6 + (_animProgress.value * 0.8),
+                    child: Opacity(
+                      opacity: (1.0 - _animProgress.value).clamp(0.2, 1.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.amberAccent, width: 2.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amberAccent.withOpacity(0.8),
+                              blurRadius: 30,
+                              spreadRadius: 10,
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(giftIcon, color: Colors.amberAccent, size: 40),
+                            const SizedBox(width: 14),
+                            Text(
+                              activeGiftEffect!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
