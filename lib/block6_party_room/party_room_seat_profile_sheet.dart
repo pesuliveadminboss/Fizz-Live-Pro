@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'gift_bottom_sheet.dart';
-import '../private_chat_screen.dart'; // சரியான பிரைவேட் சாட் ஃபைல் இம்போர்ட்
+import '../private_chat_screen.dart'; // சரியான ரிலேட்டிவ் பாத்
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
@@ -108,7 +108,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Message Button -> Jumps directly to PrivateChatScreen with streamerName
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -123,7 +122,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PrivateChatScreen(streamerName: userName), // உண்மையான பிரைவேட் சாட் ஸ்கிரீனுக்கு ஜம்ப் ஆகும்[span_1](start_span)[span_1](end_span)
+                        builder: (context) => PrivateChatScreen(streamerName: userName), // பிரைவேட் சாட் ஸ்கிரீனுக்கு ஜம்ப் ஆகும்[span_0](start_span)[span_0](end_span)
                       ),
                     );
                   },
@@ -135,7 +134,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Send Gifts Button -> Opens Gift Bottom Sheet
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -146,7 +144,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close profile sheet
+                    Navigator.pop(context);
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
