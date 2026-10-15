@@ -25,7 +25,6 @@ class ZegoVideoCallService {
 
   // 👉 Request All Required Permissions (Camera, Microphone, Contacts, Location) then launch Real-Time Video Call
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
-    // Requesting Camera, Microphone, Contacts, and Location permissions
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
       Permission.microphone,
