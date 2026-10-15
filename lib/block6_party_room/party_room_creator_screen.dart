@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'party_room_theme_helper.dart';
-import 'party_room_screen.dart';
 
 class PartyRoomCreatorScreen extends StatefulWidget {
   const PartyRoomCreatorScreen({super.key});
@@ -134,20 +133,18 @@ class _PartyRoomCreatorScreenState extends State<PartyRoomCreatorScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 ),
                 onPressed: () {
-                  String finalRoomName = _roomNameController.text.trim().isEmpty 
-                      ? 'Alsha Party Room' 
-                      : _roomNameController.text.trim();
+                  if (_roomNameController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a room name!')),
+                    );
+                    return;
+                  }
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PartyRoomScreen(
-                        roomTitle: finalRoomName,
-                        selectedTheme: selectedTheme,
-                        audienceMicMode: audienceMicMode,
-                      ),
-                    ),
-                  );
+                  Navigator.pop(context, {
+                    'roomName': _roomNameController.text.trim(),
+                    'theme': selectedTheme,
+                    'micMode': audienceMicMode,
+                  });
                 },
                 child: const Text(
                   'Launch Party Room 🚀',
