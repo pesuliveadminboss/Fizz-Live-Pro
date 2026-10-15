@@ -8,6 +8,7 @@ import 'streamer_follow_manager.dart';
 import 'live_streamer_overlay_manager.dart';
 import '../block6_party_room/party_room_overlay_manager.dart';
 import 'gift_bottom_sheet.dart';
+import 'zego_video_call_service.dart'; // 👉 Zego Video Call Service Import
 
 class LiveRoomScreen extends StatefulWidget {
   final LiveStreamer streamer;
@@ -220,7 +221,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
                     left: 16,
                     child: LiveRoomBottomToolbar(
                       onOpenTools: () {},
-                      onVideoCall: () {},
+                      onVideoCall: () {
+                        // 👉 Triggers Real-Time Video Call with Permissions
+                        ZegoVideoCallService.startRealTimeVideoCall(
+                          context,
+                          receiverName: streamerItem.name,
+                        );
+                      },
                       onGiftTap: () => _showGiftBottomSheet(context),
                       onLikeTap: () {},
                       onSendMessage: _handleNewMessage,
@@ -277,8 +284,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> with TickerProviderStat
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Initiating Video Call...'), duration: Duration(seconds: 1)),
+                              // 👉 Triggers Real-Time Video Call with Permissions
+                              ZegoVideoCallService.startRealTimeVideoCall(
+                                context,
+                                receiverName: streamerItem.name,
                               );
                             },
                             child: Container(
