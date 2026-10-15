@@ -14,47 +14,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
     this.onSendGift,
   });
 
-  void _openChatDialog(BuildContext context) {
-    final TextEditingController chatController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1D1B36),
-          title: Text('Chat with $userName', style: const TextStyle(color: Colors.white, fontSize: 16)),
-          content: TextField(
-            controller: chatController,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              hintText: 'Type your private message...',
-              hintStyle: TextStyle(color: Colors.white54),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.pinkAccent)),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
-              onPressed: () {
-                if (chatController.text.trim().isNotEmpty) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Message sent to $userName: ${chatController.text.trim()} ✉️'), duration: const Duration(milliseconds: 1000)),
-                  );
-                }
-              },
-              child: const Text('Send', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final followNotifier = StreamerFollowManager().getFollowNotifier(userName);
@@ -148,7 +107,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Message Button -> Opens Direct Chat Dialog
+              // Message Button -> Jumps directly to Full Private Chat Screen
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -159,8 +118,65 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close bottom sheet
-                    _openChatDialog(context); // Open direct message dialog
+                    Navigator.pop(context); // Close the profile bottom sheet
+                    // Jumps directly to Full Private Chat Screen like the profile tap
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          backgroundColor: const Color(0xFF121026),
+                          appBar: AppBar(
+                            backgroundColor: const Color(0xFF1D1B36),
+                            title: Text(userName, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                            iconTheme: const IconThemeData(color: Colors.white),
+                          ),
+                          body: Column(
+                            children: [
+                              Expanded(
+                                child: ListView(
+                                  padding: const EdgeInsets.all(16),
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1D1B36),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text('Hi! Welcome to my private chat with $userName ✨', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                color: const Color(0xFF1D1B36),
+                                child: Row(
+                                  children: [
+                                    const Expanded(
+                                      child: TextField(
+                                        style: TextStyle(color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: 'Send message...',
+                                          hintStyle: TextStyle(color: Colors.white54),
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.send, color: Colors.cyanAccent),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.message, color: Colors.white, size: 16),
                   label: const Text(
@@ -215,4 +231,3 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
     );
   }
 }
-
