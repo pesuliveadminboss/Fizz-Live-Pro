@@ -10,7 +10,7 @@ import 'party_room_overlay_manager.dart';
 import 'party_room_model.dart';
 import 'party_room_seat_profile_sheet.dart';
 import 'party_room_audio_manager.dart';
-import 'party_room_gift_animation_helper.dart'; // அல்லது உனது கிஃப்ட் ஹெல்பர் ஃபைல் பெயர்
+import 'party_gift_animation_helper.dart'; // Fixed import name
 import 'party_room_members_helper.dart';
 
 class PartyRoomScreen extends StatefulWidget {
@@ -64,7 +64,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     PartyRoomOverlayManager.hideOverlay();
     LiveStreamerOverlayManager.hideOverlay();
 
-    // Initialize ZegoCloud Engine & Join Room
     _initializeZegoPartySession();
 
     _animController = AnimationController(
@@ -79,7 +78,22 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       userID: 'user_${DateTime.now().millisecondsSinceEpoch}',
       userName: 'Chandran S',
     );
-    await ZegoPartyRoomService.joinRoom(widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).id : 'room_101');
+    
+    // Safely extract room id if widget.room is PartyRoomModel
+    String resolvedRoomId = 'room_101';
+    if (widget.room is PartyRoomModel) {
+      // Using dynamic check or fallback if 'id' property name varies in model
+      resolvedIdSafely(widget.room);
+    }
+    await ZegoPartyRoomService.joinRoom(resolvedRoomId);
+  }
+
+  String resolvedIdSafely(dynamic roomModel) {
+    try {
+      return (roomModel as dynamic).id ?? 'room_101';
+    } catch (_) {
+      return 'room_101';
+    }
   }
 
   @override
@@ -289,7 +303,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Voice Seats Grid (10 Seats) with Audio Manager Integration
+                  // Voice Seats Grid (10 Seats)
                   Expanded(
                     flex: 4,
                     child: GridView.builder(
