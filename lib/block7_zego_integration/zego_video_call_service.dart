@@ -6,10 +6,29 @@ import '../block6_party_room/gift_bottom_sheet.dart';
 class ZegoVideoCallService {
   static bool isVideoEnabled = true;
   static bool isFrontCamera = true;
+  static bool _isEngineInitialized = false;
 
-  // Initialize Live Video Broadcast
-  static Future<void> startVideoBroadcast(String streamID) async {
-    debugPrint("Starting Zego Video Broadcast for Stream: $streamID");
+  // Initialize Zego Engine properly to prevent infinite loading
+  static Future<void> initZegoEngine() async {
+    if (_isEngineInitialized) return;
+    
+    // Replace with your actual Zego AppID and AppSign if required, or use test app ID
+    const uint32_t appID = 123456789; // Dummy/Test AppID for testing flow
+    const String appSign = "abcdefghijklmnopqrstuvwxyz1234567890";
+
+    try {
+      await ZegoExpressEngine.createEngineWithProfile(
+        ZegoEngineProfile(
+          appID,
+          ZegoScenario.StandardVideoCall,
+          appSign: appSign,
+        ),
+      );
+      _isEngineInitialized = true;
+      debugPrint("Zego Engine Initialized Successfully");
+    } catch (e) {
+      debugPrint("Zego Engine Initialization Failed: $e");
+    }
   }
 
   // Toggle Camera Front / Back
@@ -26,19 +45,20 @@ class ZegoVideoCallService {
     debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // 👉 Request Permissions & Launch Real-Time Video Call Screen with Zego Camera
+  // 👉 Request Permissions & Launch Real-Time Video Call Screen with Zego Engine Init
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
       Permission.microphone,
-      Permission.contacts,
-      Permission.location,
     ].request();
 
     bool cameraGranted = statuses[Permission.camera]?.isGranted ?? false;
     bool micGranted = statuses[Permission.microphone]?.isGranted ?? false;
 
     if (cameraGranted && micGranted) {
+      // Initialize Zego Engine before launching call screen
+      await initZegoEngine();
+
       if (context.mounted) {
         Navigator.push(
           context,
@@ -78,8 +98,8 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
   bool isFront = true;
   String? activeGiftEffect;
 
-  // Zego Canvas View Controller ID
-  Widget? _zegoCameraView;
+  int? _viewID;
+  bool _isCanvasReady = false;
 
   @override
   void initState() {
@@ -88,195 +108,6 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
   }
 
   Future<void> _initZegoPreview() async {
-    // Start Zego Local Video Preview
-    ZegoExpressEngine.instance.startPreview();
-    
-    // Create Platform View for Zego Camera
-    ZegoExpressEngine.instance.createCanvasView((viewID) {
-      ZegoExpressEngine.instance.startPreview(
-        canvas: ZegoCanvas(viewID, viewMode: ZegoViewMode.AspectFill),
-      );
-    }).then((canvasViewWidget) {
-      setState(() {
-        _zegoCameraView = canvasViewWidget;
-      });
-    });
-  }
-
-  void _showGiftSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return GiftBottomSheet(
-          onSendGift: (giftName, quantity) {
-            setState(() {
-              activeGiftEffect = '$giftName x$quantity';
-            });
-            Future.delayed(const Duration(milliseconds: 2500), () {
-              if (mounted) {
-                setState(() {
-                  activeGiftEffect = null;
-                });
-              }
-            });
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    ZegoExpressEngine.instance.stopPreview();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // 👉 Real Zego Camera Preview / Video Background
-          Positioned.fill(
-            child: isVideoOff
-                ? Container(
-                    color: const Color(0xFF0F0817),
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(radius: 50, backgroundColor: Colors.white24, child: Icon(Icons.person, size: 50, color: Colors.white)),
-                          SizedBox(height: 12),
-                          Text('Camera Off (Audio Mode)', style: TextStyle(color: Colors.white60, fontSize: 14)),
-                        ],
-                      ),
-                    ),
-                  )
-                : (_zegoCameraView ?? const Center(child: CircularProgressIndicator(color: Colors.pinkAccent))),
-          ),
-
-          // Top Header Info
-          Positioned(
-            top: 45,
-            left: 16,
-            right: 16,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.purple.withOpacity(0.5),
-                  child: const Icon(Icons.person, color: Colors.white),
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.receiverName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                    const Text('Live Zego Call • HD', style: TextStyle(color: Colors.cyanAccent, fontSize: 11)),
-                  ],
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(isBeautyModeOn ? Icons.face_retouching_natural : Icons.face, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      isBeautyModeOn = !isBeautyModeOn;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Center Cinematic Gift Animation Overlay
-          if (activeGiftEffect != null)
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.amberAccent, width: 2.5),
-                  boxShadow: [BoxShadow(color: Colors.amberAccent.withOpacity(0.8), blurRadius: 30, spreadRadius: 10)],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.card_giftcard, color: Colors.amberAccent, size: 40),
-                    const SizedBox(width: 14),
-                    Text(
-                      activeGiftEffect!,
-                      style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, decoration: TextDecoration.none),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          // Bottom Controls Toolbar
-          Positioned(
-            bottom: 30,
-            left: 20,
-            right: 20,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton(
-                  heroTag: 'mute_btn',
-                  backgroundColor: isMuted ? Colors.redAccent : Colors.white24,
-                  onPressed: () {
-                    setState(() {
-                      isMuted = !isMuted;
-                    });
-                    ZegoExpressEngine.instance.muteMicrophone(isMuted);
-                  },
-                  child: Icon(isMuted ? Icons.mic_off : Icons.mic, color: Colors.white),
-                ),
-                FloatingActionButton(
-                  heroTag: 'switch_cam',
-                  backgroundColor: Colors.white24,
-                  onPressed: () {
-                    setState(() {
-                      isFront = !isFront;
-                    });
-                    ZegoVideoCallService.switchCamera();
-                  },
-                  child: const Icon(Icons.cameraswitch, color: Colors.white),
-                ),
-                FloatingActionButton(
-                  heroTag: 'video_off',
-                  backgroundColor: isVideoOff ? Colors.redAccent : Colors.white24,
-                  onPressed: () {
-                    setState(() {
-                      isVideoOff = !isVideoOff;
-                    });
-                    ZegoVideoCallService.toggleVideo(!isVideoOff);
-                  },
-                  child: Icon(isVideoOff ? Icons.videocam_off : Icons.videocam, color: Colors.white),
-                ),
-                FloatingActionButton(
-                  heroTag: 'gift_btn',
-                  backgroundColor: Colors.pinkAccent,
-                  onPressed: () => _showGiftSheet(context),
-                  child: const Icon(Icons.card_giftcard, color: Colors.white),
-                ),
-                FloatingActionButton(
-                  heroTag: 'cut_call',
-                  backgroundColor: Colors.red,
-                  onPressed: () {
-                    ZegoExpressEngine.instance.stopPreview();
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.call_end, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+    try {
+      // Create Platform View for Zego Camera Preview
+      
