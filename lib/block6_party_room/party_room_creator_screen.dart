@@ -1,0 +1,163 @@
+import 'package:flutter/material.dart';
+import 'party_room_theme_helper.dart';
+import 'party_room_screen.dart';
+
+class PartyRoomCreatorScreen extends StatefulWidget {
+  const PartyRoomCreatorScreen({super.key});
+
+  @override
+  State<PartyRoomCreatorScreen> createState() => _PartyRoomCreatorScreenState();
+}
+
+class _PartyRoomCreatorScreenState extends State<PartyRoomCreatorScreen> {
+  final TextEditingController _roomNameController = TextEditingController();
+  String selectedTheme = 'Candy Fiesta';
+  String audienceMicMode = 'Free';
+
+  @override
+  void dispose() {
+    _roomNameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF121026),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1D1B36),
+        title: const Text('Create Party Room 🚢', style: TextStyle(color: Colors.white, fontSize: 16)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Room Name', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _roomNameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Enter cinematic party room name...',
+                hintStyle: const TextStyle(color: Colors.white38),
+                filled: true,
+                fillColor: const Color(0xFF1D1B36),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text('Room Type', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            PartyRoomThemeHelper.buildRoomTypeSelector(),
+            const SizedBox(height: 20),
+            const Text('Audience Take Mic', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                PartyRoomThemeHelper.showAudienceMicDialog(context, (mode) {
+                  setState(() {
+                    audienceMicMode = mode;
+                  });
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1D1B36),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Mode: $audienceMicMode', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                    const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text('Select Cinematic Theme (33 Options)', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 45,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: PartyRoomThemeHelper.partyThemes.length,
+                itemBuilder: (context, index) {
+                  final theme = PartyRoomThemeHelper.partyThemes[index];
+                  bool isSelected = selectedTheme == theme;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedTheme = theme;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.pinkAccent : const Color(0xFF1D1B36),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isSelected ? Colors.white : Colors.white24),
+                      ),
+                      child: Center(
+                        child: Text(
+                          theme,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFEC4899),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                onPressed: () {
+                  String finalRoomName = _roomNameController.text.trim().isEmpty 
+                      ? 'Alsha Party Room' 
+                      : _roomNameController.text.trim();
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PartyRoomScreen(
+                        roomTitle: finalRoomName,
+                        selectedTheme: selectedTheme,
+                        audienceMicMode: audienceMicMode,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Launch Party Room 🚀',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
