@@ -8,17 +8,15 @@ class ZegoVideoCallService {
   static bool isFrontCamera = true;
   static bool _isEngineInitialized = false;
 
-  // Initialize Zego Engine properly
   static Future<void> initZegoEngine() async {
     if (_isEngineInitialized) return;
 
     try {
-      // Removed 'const' keyword to fix the compilation error
       await ZegoExpressEngine.createEngineWithProfile(
         ZegoEngineProfile(
-          123456789, // Replace with your valid Zego AppID integer if needed
+          821340860, // Valid AppID
           ZegoScenario.StandardVideoCall,
-          appSign: "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz12",
+          appSign: "9d54b18680b7bd20f42dc3b7cdd1680e63b420a1e64aa0168cd7b167d1bb72dd",
         ),
       );
       _isEngineInitialized = true;
@@ -28,21 +26,18 @@ class ZegoVideoCallService {
     }
   }
 
-  // Toggle Camera Front / Back
   static void switchCamera() {
     isFrontCamera = !isFrontCamera;
     ZegoExpressEngine.instance.useFrontCamera(isFrontCamera);
     debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera");
   }
 
-  // Toggle Video On / Off
   static void toggleVideo(bool enable) {
     isVideoEnabled = enable;
     ZegoExpressEngine.instance.enableCamera(enable);
     debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // Request Permissions & Launch Real-Time Video Call Screen
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
@@ -77,7 +72,6 @@ class ZegoVideoCallService {
   }
 }
 
-// --- REAL-TIME VIDEO CALL SCREEN WITH ZEGO CAMERA VIEW ---
 class RealTimeVideoCallScreen extends StatefulWidget {
   final String receiverName;
 
@@ -105,6 +99,9 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
 
   Future<void> _initZegoPreview() async {
     try {
+      ZegoExpressEngine.instance.enableCamera(true);
+      ZegoExpressEngine.instance.useFrontCamera(true);
+      
       await ZegoExpressEngine.instance.createCanvasView((viewID) {
         if (mounted) {
           setState(() {
@@ -220,7 +217,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
           if (activeGiftEffect != null)
             Center(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(30),
