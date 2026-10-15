@@ -98,11 +98,12 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
   }
 
   void _submitMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      widget.onSendMessage(_messageController.text.trim());
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
+      widget.onSendMessage(text);
       _messageController.clear();
       setState(() {
-        _isTypingOpen = false;
+        _isTypingOpen = false; // Send பண்ணியவுடன் மீண்டும் சின்ன ஐகானாக மறைந்துவிடும்
       });
     }
   }
@@ -111,32 +112,33 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
   Widget build(BuildContext context) {
     if (_isTypingOpen) {
       return Container(
-        width: 260,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        width: 240,
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(21),
           border: Border.all(color: Colors.pinkAccent, width: 1.5),
         ),
-        child: TextField(
-          controller: _messageController,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white, fontSize: 13),
-          decoration: InputDecoration(
-            hintText: 'Say something...',
-            hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
-            border: InputBorder.none,
-            isDense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            // 👉 டெக்ஸ்ட் பாரின் உள்ளேயே வலது பக்கத்தில் சென்ட் பட்டன்
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 18),
-              constraints: const BoxConstraints(),
-              padding: EdgeInsets.zero,
-              onPressed: _submitMessage,
+        child: Center(
+          child: TextField(
+            controller: _messageController,
+            autofocus: true,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+            decoration: InputDecoration(
+              hintText: 'Say something...',
+              hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+              border: InputBorder.none,
+              isDense: true,
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.send, color: Colors.pinkAccent, size: 18),
+                constraints: const BoxConstraints(),
+                padding: EdgeInsets.zero,
+                onPressed: _submitMessage,
+              ),
             ),
+            onSubmitted: (_) => _submitMessage(),
           ),
-          onSubmitted: (_) => _submitMessage(),
         ),
       );
     }
@@ -146,7 +148,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         GestureDetector(
           onTap: () {
             setState(() {
-              _isTypingOpen = true;
+              _isTypingOpen = true; // சாட் ஐகானை அழுத்தினால் மட்டுமே இன்புட் பார் ஓபன் ஆகும்
             });
           },
           child: Container(
