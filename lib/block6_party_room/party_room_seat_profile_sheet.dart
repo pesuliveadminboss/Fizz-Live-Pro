@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import 'gift_bottom_sheet.dart';
-// பிரைவேட் சாட் ஸ்கிரீன் ரூட் சரியாக இணைக்கப்பட்டுள்ளது
-import '../../lib/private_chat_screen.dart'; // அல்லது ப்ராஜெக்ட் அமைப்பிற்கு ஏற்ப சரியான பாத்
+import '../../private_chat_screen.dart'; // சரியான ரிலேட்டிவ் பாத்
 
 class PartyRoomSeatProfileSheet extends StatelessWidget {
   final String userName;
