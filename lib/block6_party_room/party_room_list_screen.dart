@@ -36,9 +36,10 @@ class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
         children: [
           Column(
             children: [
+              // AdMob Banner Slot
               Container(
                 height: 35,
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1D1B36),
                   borderRadius: BorderRadius.circular(6),
@@ -46,11 +47,12 @@ class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
                 ),
                 child: const Center(
                   child: Text(
-                    "AdMob Hub Banner Slot [Button Size]",
+                    "AdMob Hub Banner Slot",
                     style: TextStyle(color: Colors.white54, fontSize: 10),
                   ),
                 ),
               ),
+              // Rooms List directly without tabs
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -113,7 +115,7 @@ class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
               ),
             ],
           ),
-          // Start Party Floating Button[span_3](start_span)[span_3](end_span)
+          // Start Party Floating Button at bottom
           Positioned(
             bottom: 20,
             left: 0,
