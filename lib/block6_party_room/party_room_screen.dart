@@ -28,6 +28,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   final TextEditingController _messageController = TextEditingController();
 
   final String streamerKey = 'Alsha Live';
+  String roomTitle = 'Alsha Party Room';
+  String audienceMicMode = 'Free';
+  String selectedTheme = 'Candy Fiesta';
 
   bool isMuted = false;
   String? activeGiftEffect;
@@ -213,9 +216,24 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Alsha Live',
-                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            roomTitle,
+                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          GestureDetector(
+                                            onTap: () {
+                                              PartyRoomThemeHelper.showRoomTitleDialog(context, roomTitle, (newTitle) {
+                                                setState(() {
+                                                  roomTitle = newTitle;
+                                                });
+                                              });
+                                            },
+                                            child: const Icon(Icons.edit, color: Colors.pinkAccent, size: 14),
+                                          ),
+                                        ],
                                       ),
                                       Text(
                                         '${roomViewers.length} Online • Party Room',
@@ -286,16 +304,99 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                           onPressed: () {
-                            Navigator.pop(context);
-                            PartyRoomOverlayManager.showFloatingMiniPlayer(
-                              context: context,
-                              room: widget.room,
-                            );
+                            PartyRoomThemeHelper.showCloseRoomDialog(context, () {
+                              Navigator.pop(context);
+                              PartyRoomOverlayManager.showFloatingMiniPlayer(
+                                context: context,
+                                room: widget.room,
+                              );
+                            });
                           },
                         ),
                       ],
                     ),
                   ),
+                  
+                  // 👉 Room Type & 33 Themes Horizontal Selector Section
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text('Room Type: ', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                            PartyRoomThemeHelper.buildRoomTypeSelector(),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {
+                                PartyRoomThemeHelper.showAudienceMicDialog(context, (mode) {
+                                  setState(() {
+                                    audienceMicMode = mode;
+                                  });
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.purple.withOpacity(0.4),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text('Mic: $audienceMicMode', style: const TextStyle(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('Room Theme (33 Options):', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          height: 32,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: PartyRoomThemeHelper.partyThemes.length,
+                            itemBuilder: (context, index) {
+                              final theme = PartyRoomThemeHelper.partyThemes[index];
+                              bool isSelected = selectedTheme == theme;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedTheme = theme;
+                                  });
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.pinkAccent : const Color(0xFF2C2445),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: isSelected ? Colors.white : Colors.white24),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      theme,
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white : Colors.white70,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   Expanded(
                     flex: 3,
                     child: GridView.builder(
@@ -319,7 +420,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                                                    color: isSpeaking ? Colors.cyanAccent : Colors.white24,
+                                  color: isSpeaking ? Colors.cyanAccent : Colors.white24,
                                   width: isSpeaking ? 2.5 : 1.0,
                                 ),
                                 boxShadow: isSpeaking
@@ -348,17 +449,27 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
                   Expanded(
-                    flex: 3,
+                    flex: 2,
                     child: Center(
-                      child: Icon(
-                        Icons.directions_boat,
-                        size: 90,
-                        color: Colors.purpleAccent.withOpacity(0.3),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.celebration,
+                            size: 70,
+                            color: Colors.pinkAccent.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                                                        'Active Theme: $selectedTheme',
+                            style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   Container(
-                    height: 100,
+                    height: 80,
                     margin: const EdgeInsets.symmetric(horizontal: 12),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -493,4 +604,4 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     );
   }
 }
-                                  
+                  
