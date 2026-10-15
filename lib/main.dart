@@ -113,7 +113,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/login');
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     });
   }
 
@@ -157,7 +159,7 @@ class LoginAuthScreenProfileBridge extends StatelessWidget {
   }
 }
 
-// --- POPUPS WRAPPER (Optimized: Auto-dismiss within 2 seconds) ---
+// --- POPUPS WRAPPER (Safely Handled to prevent crash & dismiss issues) ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
@@ -170,18 +172,20 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) {
-          Future.delayed(const Duration(seconds: 2), () {
-            if (Navigator.canPop(context)) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
-          });
-          return const DailyRewardsDialog();
-        },
-      );
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (dialogContext) {
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted && Navigator.canPop(dialogContext)) {
+                Navigator.of(dialogContext).pop();
+              }
+            });
+            return const DailyRewardsDialog();
+          },
+        );
+      }
     });
   }
 
