@@ -3,11 +3,15 @@ import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
 import '../block5_live_streaming/live_streamer_overlay_manager.dart';
+import '../block7_zego_integration/zego_party_room_service.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_overlay_manager.dart';
 import 'party_room_model.dart';
 import 'party_room_seat_profile_sheet.dart';
+import 'party_room_audio_manager.dart';
+import 'party_room_gift_animation_helper.dart'; // அல்லது உனது கிஃப்ட் ஹெல்பர் ஃபைல் பெயர்
+import 'party_room_members_helper.dart';
 
 class PartyRoomScreen extends StatefulWidget {
   final dynamic room;
@@ -31,6 +35,9 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   final TextEditingController _messageController = TextEditingController();
   final String streamerKey = 'Alsha Live';
 
+  final PartyRoomAudioManager _audioManager = PartyRoomAudioManager();
+  final PartyRoomMembersHelper _membersHelper = PartyRoomMembersHelper();
+
   bool isMuted = false;
   String? activeGiftEffect;
   
@@ -38,7 +45,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   late Animation<double> _animProgress;
 
   final List<Map<String, String>> chatMessages = [
-    {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful."},
+    {"user": "System", "text": "Welcome to Party Room! ZegoCloud Engine Connected 🎙️"},
     {"user": "Raj Shukla", "text": "Nice to meet you! Grab the mic."},
     {"user": "System", "text": "Karthik Kumar joined the Party Room 🚀"},
   ];
@@ -51,24 +58,14 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     {"name": "Suresh Babu", "status": "Active Listener"},
   ];
 
-  final List<Map<String, dynamic>> voiceSeats = [
-    {'index': 1, 'name': 'Host', 'isOccupied': true, 'isSpeaking': false},
-    {'index': 2, 'name': 'User 2', 'isOccupied': true, 'isSpeaking': true},
-    {'index': 3, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 4, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 5, 'name': 'User 5', 'isOccupied': true, 'isSpeaking': true},
-    {'index': 6, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 7, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 8, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 9, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-    {'index': 10, 'name': 'Empty Seat', 'isOccupied': false, 'isSpeaking': false},
-  ];
-
   @override
   void initState() {
     super.initState();
     PartyRoomOverlayManager.hideOverlay();
     LiveStreamerOverlayManager.hideOverlay();
+
+    // Initialize ZegoCloud Engine & Join Room
+    _initializeZegoPartySession();
 
     _animController = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -77,23 +74,29 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     _animProgress = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
   }
 
+  Future<void> _initializeZegoPartySession() async {
+    await ZegoPartyRoomService.initZegoEngine(
+      userID: 'user_${DateTime.now().millisecondsSinceEpoch}',
+      userName: 'Chandran S',
+    );
+    await ZegoPartyRoomService.joinRoom(widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).id : 'room_101');
+  }
+
   @override
   void dispose() {
+    ZegoPartyRoomService.leaveRoom();
     _animController.dispose();
     _messageController.dispose();
     super.dispose();
   }
 
-  void _toggleMute() {
+  void _toggleAudioMute() {
     setState(() {
       isMuted = !isMuted;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(isMuted ? 'Mic Muted 🔇' : 'Mic Unmuted 🎙️'),
-        duration: const Duration(milliseconds: 800),
-      ),
-    );
+    _audioManager.toggleMute(0);
+    ZegoPartyRoomService.setMicrophoneMute(isMuted);
+    PartyRoomAudioManager.showAudioStatus(context, isMuted);
   }
 
   void _openViewersScreen(BuildContext context) async {
@@ -127,15 +130,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     setState(() {});
   }
 
-  void _showSeatProfile(BuildContext context, String seatName, String role) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return PartyRoomSeatProfileSheet(userName: seatName, role: role);
-      },
-    );
+  void _showSeatProfile(BuildContext context, int seatIndex, String seatName, String role) {
+    _membersHelper.showSeatManagementDialog(context, seatIndex, () {
+      setState(() {});
+    });
   }
 
   void _sendMessage() {
@@ -156,6 +154,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       activeGiftEffect = '$giftName x$quantity';
     });
     _animController.forward(from: 0.0);
+
+    PartyGiftAnimationHelper.showPartyGiftAnimation(context, giftName, 'Chandran S');
 
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
@@ -234,7 +234,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                                       ),
                                       Text(
-                                        '${roomViewers.length} Online • Party Room',
+                                        '${roomViewers.length} Online • Zego Live',
                                         style: const TextStyle(color: Colors.white60, fontSize: 10),
                                       ),
                                     ],
@@ -265,7 +265,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                         ),
                         const SizedBox(width: 8),
                         InkWell(
-                          onTap: () => _openViewersScreen(context),
+                          onTap: () => PartyRoomMembersHelper.showMembersListDialog(context, roomViewers.length),
                           child: Row(
                             children: [
                               const Icon(Icons.remove_red_eye, color: Colors.cyanAccent, size: 14),
@@ -289,7 +289,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Voice Seats Grid (10 Seats)
+                  // Voice Seats Grid (10 Seats) with Audio Manager Integration
                   Expanded(
                     flex: 4,
                     child: GridView.builder(
@@ -303,49 +303,52 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                       ),
                       itemCount: 10,
                       itemBuilder: (context, index) {
-                        final seat = voiceSeats[index];
-                        final bool isOccupied = seat['isOccupied'] ?? false;
-                        final bool isSpeaking = seat['isSpeaking'] ?? false;
-                        final String seatUserName = seat['name'];
-                        final String roleDesc = index == 0 ? 'Room Host' : 'Party Participant';
+                        final occupant = _membersHelper.getOccupant(index);
+                        final bool isOccupied = occupant != null || index == 0;
+                        final String seatUserName = occupant ?? (index == 0 ? hostName : 'Empty Seat');
+                        final bool seatMuted = _audioManager.isMuted(index);
 
                         return GestureDetector(
-                          onTap: isOccupied 
-                              ? () => _showSeatProfile(context, seatUserName, roleDesc) 
-                              : null,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white38 : Colors.white12),
-                                    width: isSpeaking ? 2.5 : 1.0,
+                          onTap: () => _showSeatProfile(context, index, seatUserName, index == 0 ? 'Room Host' : 'Party Participant'),
+                          child: _audioManager.buildSpeakingIndicator(
+                            index,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 20,
+                                      backgroundColor: isOccupied ? Colors.purple.withOpacity(0.4) : Colors.white.withOpacity(0.05),
+                                      child: Icon(
+                                        isOccupied ? Icons.person : Icons.event_seat, 
+                                        size: 16, 
+                                        color: isOccupied ? Colors.white : Colors.white24,
+                                      ),
+                                    ),
+                                    if (isOccupied)
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 0,
+                                        child: Icon(
+                                          seatMuted ? Icons.mic_off : Icons.mic,
+                                          size: 12,
+                                          color: seatMuted ? Colors.redAccent : Colors.greenAccent,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  seatUserName,
+                                  style: TextStyle(
+                                    color: isOccupied ? Colors.white70 : Colors.white30,
+                                    fontSize: 9,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: isOccupied ? Colors.purple.withOpacity(0.4) : Colors.white.withOpacity(0.05),
-                                  child: Icon(
-                                    isOccupied ? Icons.mic : Icons.mic_off, 
-                                    size: 16, 
-                                    color: isOccupied ? Colors.white : Colors.white24,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                seatUserName,
-                                style: TextStyle(
-                                  color: isSpeaking ? Colors.cyanAccent : (isOccupied ? Colors.white70 : Colors.white30),
-                                  fontSize: 9,
-                                  fontWeight: isSpeaking ? FontWeight.bold : FontWeight.normal,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -439,7 +442,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                             isMuted ? Icons.mic_off : Icons.mic,
                             color: isMuted ? Colors.redAccent : Colors.cyanAccent,
                           ),
-                          onPressed: _toggleMute,
+                          onPressed: _toggleAudioMute,
                         ),
                       ],
                     ),
