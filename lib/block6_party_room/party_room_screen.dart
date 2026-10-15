@@ -6,7 +6,6 @@ import '../block5_live_streaming/live_streamer_overlay_manager.dart';
 import 'room_viewers_screen.dart';
 import 'gift_bottom_sheet.dart';
 import 'party_room_overlay_manager.dart';
-import 'party_room_theme_helper.dart';
 import 'party_room_model.dart';
 
 class PartyRoomScreen extends StatefulWidget {
@@ -167,8 +166,15 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     final followNotifier = StreamerFollowManager().getFollowNotifier(streamerKey);
-    final String activeTitle = widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).roomName : widget.roomTitle;
-    final String activeTheme = widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).theme : widget.selectedTheme;
+    
+    // Host / Streamer name handling (No cinematic room name on top header)
+    final String hostName = widget.room is PartyRoomModel 
+        ? (widget.room as PartyRoomModel).hostName 
+        : 'Alsha Live';
+        
+    final String activeTheme = widget.room is PartyRoomModel 
+        ? (widget.room as PartyRoomModel).theme 
+        : widget.selectedTheme;
 
     return Scaffold(
       body: Stack(
@@ -184,7 +190,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
             child: SafeArea(
               child: Column(
                 children: [
-                  // Top Header
+                  // Top Header with Host Name & Direct Minimize on Close
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
@@ -207,7 +213,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        activeTitle,
+                                        hostName,
                                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                                       ),
                                       Text(
@@ -254,56 +260,26 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Close / Minimize Button
+                        // Direct Minimize on Close Button (No dialog popup)
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white70, size: 20),
                           onPressed: () {
-                            PartyRoomThemeHelper.showCloseRoomDialog(context, () {
-                              Navigator.pop(context);
-                              PartyRoomOverlayManager.showFloatingMiniPlayer(
-                                context: context,
-                                room: widget.room,
-                              );
-                            });
+                            Navigator.pop(context);
+                            PartyRoomOverlayManager.showFloatingMiniPlayer(
+                              context: context,
+                              room: widget.room,
+                            );
                           },
                         ),
                       ],
                     ),
                   ),
 
-                  // Room Type & Selected Active Theme Banner
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Text('Type: ', style: TextStyle(color: Colors.white60, fontSize: 11)),
-                            PartyRoomThemeHelper.buildRoomTypeSelector(),
-                          ],
-                        ),
-                        Text(
-                          'Mic: ${widget.audienceMicMode}',
-                          style: const TextStyle(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Theme: $activeTheme',
-                          style: const TextStyle(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // (Type, Mic, Theme banner removed completely as requested)
 
                   // Voice Seats Grid (10 Seats)
                   Expanded(
-                    flex: 3,
+                    flex: 4,
                     child: GridView.builder(
                       padding: const EdgeInsets.all(12),
                       physics: const NeverScrollableScrollPhysics(),
@@ -385,12 +361,13 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     child: ListView.builder(
                       itemCount: chatMessages.length,
                       itemBuilder: (context, index) {
-                        final msg = chatMessages[index];
-                        bool isSystem = msg['user'] == "System";
+                        final msg = chatMessages.last; // or list index
+                        final currentMsg = chatMessages[index];
+                        bool isSystem = currentMsg['user'] == "System";
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
-                            isSystem ? "${msg['text']}" : "${msg['user']} : ${msg['text']}",
+                            isSystem ? "${currentMsg['text']}" : "${currentMsg['user']} : ${currentMsg['text']}",
                             style: TextStyle(
                               color: isSystem ? Colors.amberAccent : Colors.white70,
                               fontSize: 11,
