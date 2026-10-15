@@ -23,7 +23,7 @@ class ZegoVideoCallService {
     debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // 👉 Request Mandatory Permissions (Camera, Microphone, Contacts, Location)
+  // 👉 Request Mandatory Permissions (Camera, Microphone, Contacts, Location) then launch Video Call
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
@@ -105,6 +105,7 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
+          // Background Video View
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -142,6 +143,8 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
               ),
             ),
           ),
+
+          // Top Header Info
           Positioned(
             top: 45,
             left: 16,
@@ -173,6 +176,8 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
               ],
             ),
           ),
+
+          // Center Cinematic Gift Animation Overlay
           if (activeGiftEffect != null)
             Center(
               child: Container(
@@ -196,6 +201,8 @@ class _RealTimeVideoCallScreenState extends State<RealTimeVideoCallScreen> {
                 ),
               ),
             ),
+
+          // Bottom Controls Toolbar
           Positioned(
             bottom: 30,
             left: 20,
