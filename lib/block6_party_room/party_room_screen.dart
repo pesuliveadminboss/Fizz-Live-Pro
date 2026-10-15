@@ -169,6 +169,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     final followNotifier = StreamerFollowManager().getFollowNotifier(streamerKey);
     final String activeTitle = widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).roomName : widget.roomTitle;
     final String activeTheme = widget.room is PartyRoomModel ? (widget.room as PartyRoomModel).theme : widget.selectedTheme;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -280,7 +281,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                       border: Border.all(color: Colors.white12),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
@@ -468,4 +469,3 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     );
   }
 }
-    
