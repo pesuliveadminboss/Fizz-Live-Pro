@@ -10,7 +10,7 @@ import 'party_room_overlay_manager.dart';
 import 'party_room_model.dart';
 import 'party_room_seat_profile_sheet.dart';
 import 'party_room_audio_manager.dart';
-import 'party_gift_animation_helper.dart'; // Fixed import name
+import 'party_gift_animation_helper.dart';
 import 'party_room_members_helper.dart';
 
 class PartyRoomScreen extends StatefulWidget {
@@ -33,6 +33,7 @@ class PartyRoomScreen extends StatefulWidget {
 
 class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _chatScrollController = ScrollController();
   final String streamerKey = 'Alsha Live';
 
   final PartyRoomAudioManager _audioManager = PartyRoomAudioManager();
@@ -42,12 +43,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   String? activeGiftEffect;
   
   late AnimationController _animController;
-  late Animation<double> _animProgress;
 
   final List<Map<String, String>> chatMessages = [
-    {"user": "System", "text": "Welcome to Party Room! ZegoCloud Engine Connected 🎙️"},
+    {"user": "System", "text": "Welcome to Party Room! Keep it clean and respectful. 🎙️"},
     {"user": "Raj Shukla", "text": "Nice to meet you! Grab the mic."},
-    {"user": "System", "text": "Karthik Kumar joined the Party Room 🚀"},
+    {"user": "System", "text": "Karthik Kumar joined the Party Ship 🚀"},
   ];
 
   final List<Map<String, String>> roomViewers = [
@@ -70,7 +70,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _animProgress = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
   }
 
   Future<void> _initializeZegoPartySession() async {
@@ -78,22 +77,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       userID: 'user_${DateTime.now().millisecondsSinceEpoch}',
       userName: 'Chandran S',
     );
-    
-    // Safely extract room id if widget.room is PartyRoomModel
-    String resolvedRoomId = 'room_101';
-    if (widget.room is PartyRoomModel) {
-      // Using dynamic check or fallback if 'id' property name varies in model
-      resolvedIdSafely(widget.room);
-    }
-    await ZegoPartyRoomService.joinRoom(resolvedRoomId);
-  }
-
-  String resolvedIdSafely(dynamic roomModel) {
-    try {
-      return (roomModel as dynamic).id ?? 'room_101';
-    } catch (_) {
-      return 'room_101';
-    }
+    await ZegoPartyRoomService.joinRoom('room_101');
   }
 
   @override
@@ -101,6 +85,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     ZegoPartyRoomService.leaveRoom();
     _animController.dispose();
     _messageController.dispose();
+    _chatScrollController.dispose();
     super.dispose();
   }
 
@@ -151,15 +136,27 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
       setState(() {
         chatMessages.add({
-          "user": "You",
-          "text": _messageController.text.trim(),
+          "user": "Chandran S",
+          "text": text,
         });
       });
       _messageController.clear();
       FocusScope.of(context).unfocus();
+
+      // Auto scroll to bottom of chat
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (_chatScrollController.hasClients) {
+          _chatScrollController.animateTo(
+            _chatScrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     }
   }
 
@@ -391,27 +388,43 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                     ),
                   ),
 
-                  // Chat Messages Box
+                  // Live Chat & Joining Scrollable Box
                   Container(
-                    height: 80,
+                    height: 100,
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withOpacity(0.4),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white12),
                     ),
                     child: ListView.builder(
+                      controller: _chatScrollController,
                       itemCount: chatMessages.length,
                       itemBuilder: (context, index) {
                         final currentMsg = chatMessages[index];
                         bool isSystem = currentMsg['user'] == "System";
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Text(
-                            isSystem ? "${currentMsg['text']}" : "${currentMsg['user']} : ${currentMsg['text']}",
-                            style: TextStyle(
-                              color: isSystem ? Colors.amberAccent : Colors.white70,
-                              fontSize: 11,
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: isSystem ? "📢 " : "${currentMsg['user']}: ",
+                                  style: TextStyle(
+                                    color: isSystem ? Colors.cyanAccent : Colors.pinkAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "${currentMsg['text']}",
+                                  style: TextStyle(
+                                    color: isSystem ? Colors.amberAccent : Colors.white,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
@@ -430,7 +443,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                             style: const TextStyle(color: Colors.white, fontSize: 13),
                             onSubmitted: (_) => _sendMessage(),
                             decoration: InputDecoration(
-                              hintText: 'Type a message...',
+                              hintText: 'Say something to party...',
                               hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.1),
