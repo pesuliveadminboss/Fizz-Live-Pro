@@ -14,14 +14,14 @@ class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
   final List<Map<String, dynamic>> sampleRooms = [
     {
       'roomID': 'room_101',
-      'roomName': 'Party Ship Cinematic Voyage 🚢✨',
+      'roomName': 'Party Ship Cinematic Voyage 🚢',
       'hostName': 'Captain Chandran',
       'onlineCount': 25,
       'theme': 'party_ship_cinematic',
     },
     {
       'roomID': 'room_102',
-      'roomName': 'Royal Night Celebration 🌙🎉',
+      'roomName': 'Royal Night Celebration 👑',
       'hostName': 'Aisha Live',
       'onlineCount': 14,
       'theme': 'royal_night',
@@ -113,7 +113,7 @@ class _PartyRoomListScreenState extends State<PartyRoomListScreen> {
               ),
             ],
           ),
-          // Start Party Floating Button matching the first screenshot[span_2](start_span)[span_2](end_span)
+          // Start Party Floating Button[span_3](start_span)[span_3](end_span)
           Positioned(
             bottom: 20,
             left: 0,
