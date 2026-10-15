@@ -8,24 +8,24 @@ class ZegoVideoCallService {
 
   // Initialize Live Video Broadcast
   static Future<void> startVideoBroadcast(String streamID) async {
-    debugPrint("Starting Zego Video Broadcast for Stream: $streamID[span_0](start_span)[span_0](end_span)");
+    debugPrint("Starting Zego Video Broadcast for Stream: $streamID");
   }
 
   // Toggle Camera Front / Back
   static void switchCamera() {
     isFrontCamera = !isFrontCamera;
-    debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera[span_1](start_span)[span_1](end_span)");
+    debugPrint("Zego Camera Switched. Front Camera: $isFrontCamera");
   }
 
   // Toggle Video On / Off
   static void toggleVideo(bool enable) {
     isVideoEnabled = enable;
-    debugPrint("Zego Video Enabled: $isVideoEnabled[span_2](start_span)[span_2](end_span)");
+    debugPrint("Zego Video Enabled: $isVideoEnabled");
   }
 
-  // 👉 Request All Permissions (Camera, Mic, Contacts, Location) then launch Real-Time Video Call
+  // 👉 Request All Required Permissions (Camera, Microphone, Contacts, Location) then launch Real-Time Video Call
   static Future<void> startRealTimeVideoCall(BuildContext context, {required String receiverName}) async {
-    // Request permissions for Camera, Microphone, Contacts, and Location
+    // Requesting Camera, Microphone, Contacts, and Location permissions
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
       Permission.microphone,
@@ -33,11 +33,10 @@ class ZegoVideoCallService {
       Permission.location,
     ].request();
 
-    bool allGranted = statuses[Permission.camera]!.isGranted &&
-        statuses[Permission.microphone]!.isGranted;
+    bool cameraGranted = statuses[Permission.camera]?.isGranted ?? false;
+    bool micGranted = statuses[Permission.microphone]?.isGranted ?? false;
 
-    if (allGranted) {
-      // If permissions granted, open Real-Time Video Call Screen
+    if (cameraGranted && micGranted) {
       if (context.mounted) {
         Navigator.push(
           context,
@@ -47,11 +46,10 @@ class ZegoVideoCallService {
         );
       }
     } else {
-      // If permission denied, show alert
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Camera and Microphone permissions are required for Video Call!'),
+            content: Text('Camera and Microphone permissions are mandatory for Video/Audio Call!'),
             backgroundColor: Colors.redAccent,
             duration: Duration(seconds: 2),
           ),
