@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'streamer_profile_model.dart';
 import 'profile_actions_dialogs.dart';
-import 'profile_interaction_handler.dart';
 import '../block4_private_chat/private_chat_screen.dart';
 import '../block5_live_streaming/streamer_follow_manager.dart';
+import '../block7_zego_integration/zego_video_call_service.dart'; // 👉 Zego Video Call Service Import
 
 class StreamerProfileScreen extends StatefulWidget {
   final StreamerProfileModel streamer;
@@ -292,7 +292,13 @@ class _StreamerProfileScreenState extends State<StreamerProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 ),
-                onPressed: () => ProfileInteractionHandler.startVideoCall(context, widget.streamer.name),
+                onPressed: () {
+                  // 👉 Triggers Real-Time Video Call directly from Profile Screen with permissions
+                  ZegoVideoCallService.startRealTimeVideoCall(
+                    context,
+                    receiverName: widget.streamer.name,
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
