@@ -107,7 +107,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              // Message Button -> Jumps to Private Chat Screen directly
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -118,7 +117,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close bottom sheet
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -185,7 +184,6 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Send Gifts Button -> Opens Gift Bottom Sheet
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -196,7 +194,7 @@ class PartyRoomSeatProfileSheet extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close profile sheet
+                    Navigator.pop(context);
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
