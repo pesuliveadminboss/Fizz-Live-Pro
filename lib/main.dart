@@ -64,7 +64,6 @@ import 'block6_party_room/party_ads_integration_helper.dart';
 import 'block6_party_room/party_room_audio_manager.dart';
 import 'block6_party_room/party_room_members_helper.dart';
 import 'block6_party_room/party_room_theme_helper.dart';
-import 'block6_party_room/gift_bottom_sheet.dart';
 import 'block6_party_room/party_room_follow_manager.dart';
 import 'block6_party_room/party_room_seat_profile_sheet.dart';
 import 'block6_party_room/room_viewers_screen.dart';
@@ -124,6 +123,10 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
+        // 👉 Added Direct Routes for Follow Tab Navigation:
+        '/live_room_screen': (context) => const LiveRoomScreen(streamerName: 'Live Host', streamerId: 'live_001'),
+        '/party_room_screen': (context) => const PartyRoomScreen(roomId: 'party_001', roomTitle: 'Party Room'),
+        '/streamer_profile_screen': (context) => const StreamerProfileScreen(streamerId: 'profile_001', streamerName: 'User Profile'),
       },
     );
   }
