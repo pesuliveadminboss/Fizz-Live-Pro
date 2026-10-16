@@ -33,14 +33,26 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      // 👉 Jump directly into the Streamer's Live Room Screen (Not just the list tab)
-      Navigator.pushNamed(context, '/live_room_screen', arguments: {'streamerName': user.name, 'streamerId': user.id});
+      // 👉 Jump directly into the Streamer's Live Room Screen (with video, chat & call buttons)
+      Navigator.pushNamed(
+        context,
+        '/live_room_screen',
+        arguments: {'streamerName': user.name, 'streamerId': user.id},
+      );
     } else if (user.status == 'Party') {
-      // 👉 Jump directly inside the specific Party Room (Not just the party hub list)
-      Navigator.pushNamed(context, '/party_room_screen', arguments: {'roomName': user.name, 'roomId': user.id});
+      // 👉 Jump directly inside the specific Party Room (with 10 seats & minimize header)
+      Navigator.pushNamed(
+        context,
+        '/party_room_screen',
+        arguments: {'roomName': user.name, 'roomId': user.id},
+      );
     } else {
-      // 👉 Jump directly to Streamer's Full Profile Screen for Active/Busy status
-      Navigator.pushNamed(context, '/streamer_profile_screen', arguments: {'streamerId': user.id, 'streamerName': user.name});
+      // 👉 Jump directly to Streamer's Full Profile Screen for Active/Busy status (with profile actions & chat)
+      Navigator.pushNamed(
+        context,
+        '/streamer_profile_screen',
+        arguments: {'streamerId': user.id, 'streamerName': user.name},
+      );
     }
   }
 
