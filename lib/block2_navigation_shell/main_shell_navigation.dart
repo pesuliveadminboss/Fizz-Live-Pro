@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block1_auth_onboarding/login_auth_screen.dart';
 import 'hot_and_live_container_tab.dart';
+import '../block8_match_tab/match_screen.dart'; // 👉 Block 8 Match Tab இம்போர்ட் செய்யப்பட்டுள்ளது
 
 class MainShellNavigation extends StatefulWidget {
   const MainShellNavigation({super.key});
@@ -19,6 +20,7 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
     final List<Widget> pages = [
       const HotAndLiveContainerTab(),
       const Center(child: Text('Follow Screen', style: TextStyle(color: Colors.white))),
+      const MatchScreen(), // 👉 Block 8 Match Tab ஸ்கிரீன் இங்கே இணைக்கப்பட்டுள்ளது
       if (isFemaleStreamer) const Center(child: Text('Go Live Screen', style: TextStyle(color: Colors.white))),
       const Center(child: Text('Game Screen', style: TextStyle(color: Colors.white))),
       const Center(child: Text('Messages Screen', style: TextStyle(color: Colors.white))),
@@ -37,6 +39,7 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.thumb_up), label: 'For You'),
           const BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Follow'),
+          const BottomNavigationBarItem(icon: Icon(Icons.radar, color: Colors.cyanAccent), label: 'Match'), // 👉 பாட்டம் நேவிகேஷனில் Match டேப் ஐகான்
           if (isFemaleStreamer) const BottomNavigationBarItem(icon: Icon(Icons.live_tv, color: Colors.pinkAccent), label: 'Go Live'),
           const BottomNavigationBarItem(icon: Icon(Icons.games), label: 'Game'),
           const BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
@@ -46,4 +49,3 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
     );
   }
 }
-
