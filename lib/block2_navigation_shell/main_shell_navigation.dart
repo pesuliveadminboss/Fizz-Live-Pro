@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../block1_auth_onboarding/login_auth_screen.dart';
 import 'hot_and_live_container_tab.dart';
-import '../block9_follow_tab/follow_tab_container_screen.dart'; // 👉 Block 9 Follow Tab இம்போர்ட் செய்யப்பட்டுள்ளது
+import '../block9_follow_tab/follow_container_hub_screen.dart';
 
 class MainShellNavigation extends StatefulWidget {
   const MainShellNavigation({super.key});
@@ -18,8 +18,8 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
     bool isFemaleStreamer = (GlobalAuthRegistry.userGender == 'Female');
 
     final List<Widget> pages = [
-      const HotAndLiveContainerTab(), // 👉 Hot, Live, Party மற்றும் Match டாப் டேப்கள் உள்ளன
-      const FollowTabContainerScreen(), // 👉 இங்கு நமது Block 9 Follow Tab இணைக்கப்பட்டுள்ளது!
+      const HotAndLiveContainerTab(),
+      const FollowContainerHubScreen(),
       if (isFemaleStreamer) const Center(child: Text('Go Live Screen', style: TextStyle(color: Colors.white))),
       const Center(child: Text('Game Screen', style: TextStyle(color: Colors.white))),
       const Center(child: Text('Messages Screen', style: TextStyle(color: Colors.white))),
