@@ -93,7 +93,6 @@ import 'block9_follow_tab/follow_container_hub_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize ZegoCloud Engine with Official Production Credentials
   await ZegoPartyRoomService.initZegoEngine(
     userID: 'user_chandran_007',
     userName: 'Chandran S',
@@ -123,10 +122,36 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-        // 👉 Safe & Error-Free Route Mappings:
-        '/live_room_screen': (context) => const LiveTabScreen(),
-        '/party_room_screen': (context) => const PartyRoomHub(),
-        '/streamer_profile_screen': (context) => const MainShellNavigation(),
+        // 👉 Direct Room & Profile Screen Routes:
+        '/live_room_screen': (context) => LiveRoomScreen(
+          streamer: LiveStreamer(
+            streamerId: 'live_001',
+            streamerName: 'Live Host',
+            avatarUrl: '',
+            roomTitle: 'Live Room',
+            viewersCount: 200,
+            isLive: true,
+          ),
+        ),
+        '/party_room_screen': (context) => PartyRoomScreen(
+          room: PartyRoomModel(
+            roomId: 'party_001',
+            roomTitle: 'Exclusive Party Room',
+            hostName: 'Host Name',
+            hostAvatarUrl: '',
+            activeMembersCount: 10,
+          ),
+        ),
+        '/streamer_profile_screen': (context) => StreamerProfileScreen(
+          streamer: StreamerProfileModel(
+            name: 'User Profile',
+            avatarUrl: '',
+            bio: 'Active User Profile',
+            followersCount: 300,
+            followingCount: 120,
+            isFollowing: true,
+          ),
+        ),
       },
     );
   }
