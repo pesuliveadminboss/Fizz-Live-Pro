@@ -161,8 +161,12 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
 
   // 👉 கிராஷ் ஆகாமல் இருக்க பாதுகாப்பான பாப் (Safe Sheet Pop) முறை
   void _triggerGiftEffect(BuildContext sheetContext, String giftName, int quantity) {
-    if (Navigator.canPop(sheetContext)) {
-      Navigator.of(sheetContext).pop();
+    try {
+      Navigator.of(sheetContext, rootNavigator: true).pop();
+    } catch (_) {
+      if (Navigator.canPop(sheetContext)) {
+        Navigator.pop(sheetContext);
+      }
     }
 
     if (mounted) {
@@ -488,7 +492,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
           if (activeGiftEffect != null)
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(30),
