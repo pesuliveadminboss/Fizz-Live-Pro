@@ -28,7 +28,7 @@ import 'block4_private_chat/voice_recorder_helper.dart';
 import 'block4_private_chat/image_picker_helper.dart';
 import 'block4_private_chat/audio_player_helper.dart';
 
-// --- BLOCK 5 IMPORTS (Modular Files for Live Streaming & Monetization) ---
+// --- BLOCK 5 IMPORTS (Live Streaming & Smart Hub/Overlay/Scroll Files) ---
 import 'block5_live_streaming/live_streamer_model.dart';
 import 'block5_live_streaming/live_category_filter_bar.dart';
 import 'block5_live_streaming/live_ads_integration_helper.dart';
@@ -41,8 +41,14 @@ import 'block5_live_streaming/live_tools_and_gifts_helper.dart';
 import 'block5_live_streaming/live_room_screen.dart';
 import 'block5_live_streaming/streamer_follow_manager.dart';
 import 'block5_live_streaming/live_streamer_overlay_manager.dart';
+import 'block5_live_streaming/streamer_session_model.dart';
+import 'block5_live_streaming/streamer_blur_overlay.dart';
+import 'block5_live_streaming/live_queue_scroll_manager.dart';
+import 'block5_live_streaming/smart_live_streaming_hub.dart';
+import 'block5_live_streaming/gift_bottom_sheet.dart';
+import 'block5_live_streaming/live_viewers_list_helper.dart';
 
-// --- BLOCK 6 IMPORTS (Party Room Module - All 15 Files) ---
+// --- BLOCK 6 IMPORTS (Party Room Module - All Files Included) ---
 import 'block6_party_room/party_room_model.dart';
 import 'block6_party_room/party_room_list_screen.dart';
 import 'block6_party_room/party_room_hub.dart';
@@ -58,6 +64,11 @@ import 'block6_party_room/party_ads_integration_helper.dart';
 import 'block6_party_room/party_room_audio_manager.dart';
 import 'block6_party_room/party_room_members_helper.dart';
 import 'block6_party_room/party_room_theme_helper.dart';
+import 'block6_party_room/gift_bottom_sheet.dart';
+import 'block6_party_room/party_room_follow_manager.dart';
+import 'block6_party_room/party_room_seat_profile_sheet.dart';
+import 'block6_party_room/room_viewers_screen.dart';
+import 'block6_party_room/party_room_minimize_helper.dart';
 
 // --- BLOCK 7 IMPORTS (ZegoCloud Integration & Audio/Video Services) ---
 import 'block7_zego_integration/zego_party_room_service.dart';
@@ -69,6 +80,16 @@ import 'block7_zego_integration/zego_live_tools_service.dart';
 import 'block8_match_tab/match_call_helper.dart';
 import 'block8_match_tab/match_profile_widget.dart';
 import 'block8_match_tab/match_screen.dart';
+
+// --- BLOCK 9 IMPORTS (Follow Tab & Smart Sync Hub Module) ---
+import 'block9_follow_tab/follow_tab_model.dart';
+import 'block9_follow_tab/follow_manager_service.dart';
+import 'block9_follow_tab/follow_girls_grid_view.dart';
+import 'block9_follow_tab/follow_room_grid_view.dart';
+import 'block9_follow_tab/follow_tab_container_screen.dart';
+import 'block9_follow_tab/follow_sync_service.dart';
+import 'block9_follow_tab/smart_follow_grid_view.dart';
+import 'block9_follow_tab/follow_container_hub_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +122,8 @@ class FizzLiveProApp extends StatelessWidget {
         '/live_tab': (context) => const LiveTabScreen(),
         '/party_room_hub': (context) => const PartyRoomHub(),
         '/match_tab': (context) => const MatchScreen(),
+        '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
+        '/follow_hub': (context) => const FollowContainerHubScreen(),
       },
     );
   }
@@ -165,7 +188,7 @@ class LoginAuthScreenProfileBridge extends StatelessWidget {
   }
 }
 
-// --- POPUPS WRAPPER (Safely Handled to prevent crash & dismiss issues) ---
+// --- POPUPS WRAPPER ---
 class PopupsHomeWrapper extends StatefulWidget {
   const PopupsHomeWrapper({super.key});
 
