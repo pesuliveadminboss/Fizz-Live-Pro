@@ -159,16 +159,8 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     }
   }
 
-  // 👉 கிராஷ் ஆகாமல் இருக்க பாதுகாப்பான பாப் (Safe Sheet Pop) முறை
-  void _triggerGiftEffect(BuildContext sheetContext, String giftName, int quantity) {
-    try {
-      Navigator.of(sheetContext, rootNavigator: true).pop();
-    } catch (_) {
-      if (Navigator.canPop(sheetContext)) {
-        Navigator.pop(sheetContext);
-      }
-    }
-
+  // 👉 கிஃப்ட் ஷீட் கிராஷ் ஆகாமல் இருக்க பாதுகாப்பான முறை
+  void _triggerGiftEffect(String giftName, int quantity) {
     if (mounted) {
       setState(() {
         activeGiftEffect = '$giftName x$quantity';
@@ -195,7 +187,13 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       builder: (sheetContext) {
         return GiftBottomSheet(
           onSendGift: (giftName, quantity) {
-            _triggerGiftEffect(sheetContext, giftName, quantity);
+            // முதலில் ஷீட்டை மட்டும் தனியாக க்ளோஸ் செய்கிறோம்
+            Navigator.of(sheetContext).pop();
+            
+            // அதன் பிறகு பாதுகாப்பாக கிஃப்ட் எஃபெக்ட்டை இயக்குகிறோம்
+            Future.delayed(const Duration(milliseconds: 50), () {
+              _triggerGiftEffect(giftName, quantity);
+            });
           },
         );
       },
@@ -492,7 +490,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
           if (activeGiftEffect != null)
             Center(
               child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(30),
