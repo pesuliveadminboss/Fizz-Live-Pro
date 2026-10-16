@@ -65,6 +65,11 @@ import 'block7_zego_integration/zego_voice_speaking_effect_helper.dart';
 import 'block7_zego_integration/zego_video_call_service.dart';
 import 'block7_zego_integration/zego_live_tools_service.dart';
 
+// --- BLOCK 8 IMPORTS (Random Match Tab Module) ---
+import 'block8_match_tab/match_call_helper.dart';
+import 'block8_match_tab/match_profile_widget.dart';
+import 'block8_match_tab/match_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -95,6 +100,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/private_chat': (context) => const PrivateChatScreen(),
         '/live_tab': (context) => const LiveTabScreen(),
         '/party_room_hub': (context) => const PartyRoomHub(),
+        '/match_tab': (context) => const MatchScreen(),
       },
     );
   }
