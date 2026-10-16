@@ -33,20 +33,20 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Jumping to ${user.name}\'s Live Room...'), duration: const Duration(seconds: 1)),
-      );
-      // TODO: Navigate to Live Room screen
+      // 👉 Jump directly to Live Room when status is Live
+      Navigator.pushNamed(context, '/live_tab');
     } else if (user.status == 'Party') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Jumping to ${user.name}\'s Party Room...'), duration: const Duration(seconds: 1)),
-      );
-      // TODO: Navigate to Party Room Hub / Detail screen
+      // 👉 Jump directly to Party Room Hub when status is Party
+      Navigator.pushNamed(context, '/party_room_hub');
     } else {
+      // 👉 Open Full Profile & Chat options when status is Active or Busy
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Opening ${user.name}\'s Full Profile...'), duration: const Duration(seconds: 1)),
+        SnackBar(
+          content: Text('Opening ${user.name}\'s Full Profile & Chat...'),
+          duration: const Duration(seconds: 1),
+        ),
       );
-      // TODO: Navigate to Streamer Full Profile Screen
+      // You can add Navigator.pushNamed(context, '/private_chat') or Profile screen here if needed
     }
   }
 
