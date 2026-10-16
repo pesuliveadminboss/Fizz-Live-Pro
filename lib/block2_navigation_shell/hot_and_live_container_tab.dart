@@ -5,6 +5,7 @@ import '../block5_live_streaming/live_tab_screen.dart';
 import '../block5_live_streaming/live_streamer_model.dart';
 import '../block5_live_streaming/live_streamer_grid_card.dart';
 import '../block6_party_room/party_room_hub.dart';
+import '../block8_match_tab/match_screen.dart'; // 👉 Block 8 Match Screen இம்போர்ட் செய்யப்பட்டுள்ளது
 
 class HotAndLiveContainerTab extends StatefulWidget {
   const HotAndLiveContainerTab({super.key});
@@ -133,17 +134,8 @@ class _HotAndLiveContainerTabState extends State<HotAndLiveContainerTab> with Si
               children: const [
                 HotTabGridScreen(),
                 LiveTabScreen(),
-                PartyRoomHub(), // Connected properly to PartyRoomHub
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.people_alt, size: 64, color: Colors.white24),
-                      SizedBox(height: 12),
-                      Text('Matchmaking Coming Soon 💖', style: TextStyle(color: Colors.white60, fontSize: 14)),
-                    ],
-                  ),
-                ),
+                PartyRoomHub(), 
+                MatchScreen(), // 👉 இப்போது Match டேப் கிளிக் செய்தால் நமது முழுமையான ரேண்டம் மேட்ச் ஸ்கிரீன் வேலை செய்யும்!
               ],
             ),
     );
