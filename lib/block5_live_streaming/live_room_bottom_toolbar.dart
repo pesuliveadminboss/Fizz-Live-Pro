@@ -103,7 +103,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
       widget.onSendMessage(text);
       _messageController.clear();
       setState(() {
-        _isTypingOpen = false; // Send பண்ணியவுடன் மீண்டும் சின்ன ஐகானாக மறைந்துவிடும்
+        _isTypingOpen = false;
       });
     }
   }
@@ -112,13 +112,13 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
   Widget build(BuildContext context) {
     if (_isTypingOpen) {
       return Container(
-        width: 240,
-        height: 42,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        width: 195, // 👉 அகலத்தைக் குறைத்து வலது பக்க பட்டன்களில் மோதாதவாறு சரிசெய்யப்பட்டுள்ளது
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(21),
-          border: Border.all(color: Colors.pinkAccent, width: 1.5),
+          color: Colors.black.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(20),
+          // 👉 பிங்க் கலர் கேப்சூல் அவுட்லைன் பார்டர் முழுமையாக நீக்கப்பட்டது
         ),
         child: Center(
           child: TextField(
@@ -148,7 +148,7 @@ class _LiveRoomBottomToolbarState extends State<LiveRoomBottomToolbar> {
         GestureDetector(
           onTap: () {
             setState(() {
-              _isTypingOpen = true; // சாட் ஐகானை அழுத்தினால் மட்டுமே இன்புட் பார் ஓபன் ஆகும்
+              _isTypingOpen = true;
             });
           },
           child: Container(
