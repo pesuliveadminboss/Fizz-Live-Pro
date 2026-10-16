@@ -123,10 +123,18 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-        // 👉 Added Direct Routes for Follow Tab Navigation:
-        '/live_room_screen': (context) => const LiveRoomScreen(streamerName: 'Live Host', streamerId: 'live_001'),
-        '/party_room_screen': (context) => const PartyRoomScreen(roomId: 'party_001', roomTitle: 'Party Room'),
-        '/streamer_profile_screen': (context) => const StreamerProfileScreen(streamerId: 'profile_001', streamerName: 'User Profile'),
+        // 👉 Corrected Routes matching exact constructor requirements:
+        '/live_room_screen': (context) => const LiveRoomScreen(streamer: 'Live Host'),
+        '/party_room_screen': (context) => const PartyRoomScreen(),
+        '/streamer_profile_screen': (context) => const StreamerProfileScreen(streamer: StreamerProfileModel(
+          streamerId: 'profile_001',
+          name: 'User Profile',
+          avatarUrl: '',
+          bio: '',
+          followersCount: 0,
+          followingCount: 0,
+          isFollowing: false,
+        )),
       },
     );
   }
