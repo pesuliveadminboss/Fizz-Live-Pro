@@ -159,7 +159,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     }
   }
 
-  // 👉 கிஃப்ட் ஷீட் கிராஷ் ஆகாமல் இருக்க பாதுகாப்பான முறை
+  // 👉 கிஃப்ட் எஃபெக்ட் சரியாக 2.5 நொடிகளில் ஆட்டோமேட்டிக்காக மறையும் முறை
   void _triggerGiftEffect(String giftName, int quantity) {
     if (mounted) {
       setState(() {
@@ -169,6 +169,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
 
       PartyGiftAnimationHelper.showPartyGiftAnimation(context, giftName, 'Chandran S');
 
+      // 2.5 நொடிகளுக்குப் பிறகு ஆட்டோமேட்டிக்காக எஃபெக்டை மட்டும் மறைக்கிறோம் (ரூம் கிராஷ் ஆகாது)
       Future.delayed(const Duration(milliseconds: 2500), () {
         if (mounted) {
           setState(() {
@@ -187,13 +188,11 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       builder: (sheetContext) {
         return GiftBottomSheet(
           onSendGift: (giftName, quantity) {
-            // முதலில் ஷீட்டை மட்டும் தனியாக க்ளோஸ் செய்கிறோம்
+            // முதலில் கிஃப்ட் ஷீட்டை மட்டும் பாதுகாப்பாக க்ளோஸ் செய்கிறோம்
             Navigator.of(sheetContext).pop();
             
-            // அதன் பிறகு பாதுகாப்பாக கிஃப்ட் எஃபெக்ட்டை இயக்குகிறோம்
-            Future.delayed(const Duration(milliseconds: 50), () {
-              _triggerGiftEffect(giftName, quantity);
-            });
+            // உடனடியாக கிஃப்ட் எஃபெக்ட்டை இயக்குகிறோம்
+            _triggerGiftEffect(giftName, quantity);
           },
         );
       },
