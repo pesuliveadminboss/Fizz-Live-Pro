@@ -258,8 +258,9 @@ class _GiftBottomSheetState extends State<GiftBottomSheet> {
                   onTap: () {
                     if (selectedGift != null) {
                       if (userDiamondBalance >= totalRequiredDiamonds) {
+                        // 👉 இங்கே இருந்த Navigator.pop(context) நீக்கப்பட்டுவிட்டது. 
+                        // இது PartyRoomScreen-ல் உள்ள callback-ஆல் பாதுகாப்பாக நிர்வகிக்கப்படும்.
                         widget.onSendGift(selectedGift!['name'], selectedQuantity);
-                        Navigator.pop(context);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Insufficient Diamonds!'), duration: Duration(seconds: 1)),
