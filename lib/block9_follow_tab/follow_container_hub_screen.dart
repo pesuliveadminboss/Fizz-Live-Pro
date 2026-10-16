@@ -33,20 +33,14 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      // 👉 Jump directly to Live Room when status is Live
-      Navigator.pushNamed(context, '/live_tab');
+      // 👉 Jump directly into the Streamer's Live Room Screen (Not just the list tab)
+      Navigator.pushNamed(context, '/live_room_screen', arguments: {'streamerName': user.name, 'streamerId': user.id});
     } else if (user.status == 'Party') {
-      // 👉 Jump directly to Party Room Hub when status is Party
-      Navigator.pushNamed(context, '/party_room_hub');
+      // 👉 Jump directly inside the specific Party Room (Not just the party hub list)
+      Navigator.pushNamed(context, '/party_room_screen', arguments: {'roomName': user.name, 'roomId': user.id});
     } else {
-      // 👉 Open Full Profile & Chat options when status is Active or Busy
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Opening ${user.name}\'s Full Profile & Chat...'),
-          duration: const Duration(seconds: 1),
-        ),
-      );
-      // You can add Navigator.pushNamed(context, '/private_chat') or Profile screen here if needed
+      // 👉 Jump directly to Streamer's Full Profile Screen for Active/Busy status
+      Navigator.pushNamed(context, '/streamer_profile_screen', arguments: {'streamerId': user.id, 'streamerName': user.name});
     }
   }
 
