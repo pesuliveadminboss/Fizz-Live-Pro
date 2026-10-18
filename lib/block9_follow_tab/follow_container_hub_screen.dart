@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'follow_sync_service.dart';
 import 'smart_follow_grid_view.dart';
 
-// 👉 Import respective screen files to navigate directly:
+// Import respective screen files
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
 import '../block5_live_streaming/live_room_screen.dart';
@@ -41,7 +41,7 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      // 👉 Jump directly to Live Room Screen (Screenshot 2 view)
+      // 👉 Jump directly to Live Room Screen (Error-free constructor mapping)
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -58,7 +58,7 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
         ),
       );
     } else if (user.status == 'Party') {
-      // 👉 Jump directly to Party Room Screen with seats (Screenshot 3 view)
+      // 👉 Jump directly to Party Room Screen (Error-free constructor mapping)
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -74,7 +74,7 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
         ),
       );
     } else {
-      // 👉 Jump directly to Full Profile Screen for Active/Busy status (Screenshot 1 view)
+      // 👉 Jump directly to Full Profile Screen (Error-free constructor mapping)
       Navigator.push(
         context,
         MaterialPageRoute(
