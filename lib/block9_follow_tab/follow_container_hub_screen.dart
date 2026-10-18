@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'follow_sync_service.dart';
 import 'smart_follow_grid_view.dart';
 
+// 👉 Import respective screen files to navigate directly:
+import '../block3_hot_tab/streamer_profile_screen.dart';
+import '../block3_hot_tab/streamer_profile_model.dart';
+import '../block5_live_streaming/live_room_screen.dart';
+import '../block5_live_streaming/live_streamer_model.dart';
+import '../block6_party_room/party_room_screen.dart';
+import '../block6_party_room/party_room_model.dart';
+
 class FollowContainerHubScreen extends StatefulWidget {
   const FollowContainerHubScreen({super.key});
 
@@ -33,25 +41,54 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      // 👉 Jump directly into the Streamer's Live Room Screen (with video, chat & call buttons)
-      Navigator.pushNamed(
+      // 👉 Jump directly to Live Room Screen (Screenshot 2 view)
+      Navigator.push(
         context,
-        '/live_room_screen',
-        arguments: {'streamerName': user.name, 'streamerId': user.id},
+        MaterialPageRoute(
+          builder: (context) => LiveRoomScreen(
+            streamer: LiveStreamer(
+              streamerId: user.id,
+              streamerName: user.name,
+              avatarUrl: user.avatarUrl,
+              roomTitle: 'Live Room',
+              viewersCount: 150,
+              isLive: true,
+            ),
+          ),
+        ),
       );
     } else if (user.status == 'Party') {
-      // 👉 Jump directly inside the specific Party Room (with 10 seats & minimize header)
-      Navigator.pushNamed(
+      // 👉 Jump directly to Party Room Screen with seats (Screenshot 3 view)
+      Navigator.push(
         context,
-        '/party_room_screen',
-        arguments: {'roomName': user.name, 'roomId': user.id},
+        MaterialPageRoute(
+          builder: (context) => PartyRoomScreen(
+            room: PartyRoomModel(
+              roomId: user.id,
+              roomTitle: '${user.name}\'s Party Ship',
+              hostName: user.name,
+              hostAvatarUrl: user.avatarUrl,
+              activeMembersCount: 5,
+            ),
+          ),
+        ),
       );
     } else {
-      // 👉 Jump directly to Streamer's Full Profile Screen for Active/Busy status (with profile actions & chat)
-      Navigator.pushNamed(
+      // 👉 Jump directly to Full Profile Screen for Active/Busy status (Screenshot 1 view)
+      Navigator.push(
         context,
-        '/streamer_profile_screen',
-        arguments: {'streamerId': user.id, 'streamerName': user.name},
+        MaterialPageRoute(
+          builder: (context) => StreamerProfileScreen(
+            streamer: StreamerProfileModel(
+              name: user.name,
+              avatarUrl: user.avatarUrl,
+              bio: 'Welcome to my profile!',
+              followersCount: 450,
+              followingCount: 180,
+              isFollowing: true,
+            ),
+          ),
+        ),
       );
     }
   }
