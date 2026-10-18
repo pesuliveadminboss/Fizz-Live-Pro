@@ -2,14 +2,6 @@ import 'package:flutter/material.dart';
 import 'follow_sync_service.dart';
 import 'smart_follow_grid_view.dart';
 
-// Import respective screen files
-import '../block3_hot_tab/streamer_profile_screen.dart';
-import '../block3_hot_tab/streamer_profile_model.dart';
-import '../block5_live_streaming/live_room_screen.dart';
-import '../block5_live_streaming/live_streamer_model.dart';
-import '../block6_party_room/party_room_screen.dart';
-import '../block6_party_room/party_room_model.dart';
-
 class FollowContainerHubScreen extends StatefulWidget {
   const FollowContainerHubScreen({super.key});
 
@@ -41,55 +33,14 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
 
   void _handleUserTap(FollowUserModel user) {
     if (user.status == 'Live') {
-      // 👉 Jump directly to Live Room Screen (Error-free constructor mapping)
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LiveRoomScreen(
-            streamer: LiveStreamer(
-              streamerId: user.id,
-              streamerName: user.name,
-              avatarUrl: user.avatarUrl,
-              roomTitle: 'Live Room',
-              viewersCount: 150,
-              isLive: true,
-            ),
-          ),
-        ),
-      );
+      // 👉 Jump directly to Live Room using named route without model conflicts
+      Navigator.pushNamed(context, '/live_tab');
     } else if (user.status == 'Party') {
-      // 👉 Jump directly to Party Room Screen (Error-free constructor mapping)
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PartyRoomScreen(
-            room: PartyRoomModel(
-              roomId: user.id,
-              roomTitle: '${user.name}\'s Party Ship',
-              hostName: user.name,
-              hostAvatarUrl: user.avatarUrl,
-              activeMembersCount: 5,
-            ),
-          ),
-        ),
-      );
+      // 👉 Jump directly to Party Room Hub without model conflicts
+      Navigator.pushNamed(context, '/party_room_hub');
     } else {
-      // 👉 Jump directly to Full Profile Screen (Error-free constructor mapping)
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StreamerProfileScreen(
-            streamer: StreamerProfileModel(
-              name: user.name,
-              avatarUrl: user.avatarUrl,
-              bio: 'Welcome to my profile!',
-              followersCount: 450,
-              followingCount: 180,
-              isFollowing: true,
-            ),
-          ),
-        ),
-      );
+      // 👉 Jump directly for Active/Busy status using main shell or profile route
+      Navigator.pushNamed(context, '/main_shell');
     }
   }
 
