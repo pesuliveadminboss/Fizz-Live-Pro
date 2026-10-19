@@ -31,4 +31,3 @@ class VipTierManager {
     return null; // Normal or VIP users do not trigger full room alerts
   }
 }
-
