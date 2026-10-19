@@ -123,7 +123,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
         
-        // 👉 Fully Corrected Route Mappings with all required parameters included:
+        // 👉 All required parameters fully populated without const errors:
         '/live_room_screen': (context) => const LiveRoomScreen(
           streamer: LiveStreamer(
             id: 'live_001',
@@ -134,7 +134,7 @@ class FizzLiveProApp extends StatelessWidget {
             bio: 'Welcome to my live room!',
           ),
         ),
-        '/party_room_screen': (context) => const PartyRoomScreen(
+        '/party_room_screen': (context) => PartyRoomScreen(
           room: PartyRoomModel(
             roomID: 'party_001',
             roomName: 'Party Room',
@@ -143,7 +143,7 @@ class FizzLiveProApp extends StatelessWidget {
             theme: 'default',
           ),
         ),
-        '/streamer_profile_screen': (context) => const StreamerProfileScreen(
+        '/streamer_profile_screen': (context) => StreamerProfileScreen(
           streamer: StreamerProfileModel(
             id: 'user_001',
             name: 'User Profile',
@@ -152,6 +152,7 @@ class FizzLiveProApp extends StatelessWidget {
             age: 24,
             status: 'Active',
             intro: 'Welcome to my profile!',
+            language: 'English',
           ),
         ),
       },
