@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../block3_hot_tab/streamer_profile_screen.dart';
 import '../block3_hot_tab/streamer_profile_model.dart';
@@ -31,17 +32,104 @@ class PartyRoomScreen extends StatefulWidget {
   State<PartyRoomScreen> createState() => _PartyRoomScreenState();
 }
 
-class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderStateMixin {
+class _PartyRoomScreenState extends State<PartyRoomScreen> {
+  final PageController _pageController = PageController();
+
+  // ரேண்டமாக ரூம்களை மாற்றுவதற்காக சில சாம்பிள் ஹோஸ்ட் மற்றும் தீம் டேட்டா
+  final List<Map<String, String>> _randomRoomsPool = [
+    {"host": "Alsha Live", "theme": "Candy Fiesta", "id": "room_101"},
+    {"host": "Priya Sharma", "theme": "Midnight Neon", "id": "room_102"},
+    {"host": "Kavitha Raj", "theme": "Royal Palace", "id": "room_103"},
+    {"host": "Deepika Sen", "theme": "Cyberpunk Beats", "id": "room_104"},
+    {"host": "Ananya Roy", "theme": "Sunset Beach", "id": "room_105"},
+    {"host": "Sneha Reddy", "theme": "Galaxy Dream", "id": "room_106"},
+  ];
+
+  late String currentHost;
+  late String currentTheme;
+  late String currentRoomId;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialRoom = widget.room is PartyRoomModel ? (widget.room as PartyRoomModel) : null;
+    currentHost = initialRoom?.hostName ?? widget.roomTitle;
+    currentTheme = initialRoom?.theme ?? widget.selectedTheme;
+    currentRoomId = initialRoom?.roomID ?? 'room_101';
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  // ஸ்க்ரோல் செய்யும்போது அடுத்த ரூம்காக ரேண்டமாக ஒரு ரூமைத் தேர்ந்தெடுக்கும் முறை
+  void _loadRandomRoom(int index) {
+    final random = Random();
+    // தற்போதைய ஹோஸ்ட் அல்லாத வேறு ஒருவரை ரேண்டமாகத் தேர்ந்தெடுக்கிறோம்
+    List<Map<String, String>> availableRooms = _randomRoomsPool.where((r) => r['host'] != currentHost).toList();
+    if (availableRooms.isEmpty) availableRooms = _randomRoomsPool;
+
+    final selected = availableRooms[random.nextInt(availableRooms.length)];
+
+    setState(() {
+      currentHost = selected['host']!;
+      currentTheme = selected['theme']!;
+      currentRoomId = selected['id']!;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        onPageChanged: (index) {
+          _loadRandomRoom(index);
+        },
+        itemBuilder: (context, index) {
+          return SinglePartyRoomInstance(
+            hostName: currentHost,
+            selectedTheme: currentTheme,
+            roomId: currentRoomId,
+            originalWidgetRoom: widget.room,
+          );
+        },
+      ),
+    );
+  }
+}
+
+// தனிப்பட்ட ஒரு பார்ட்டி ரூம் இன்ஸ்டன்ஸ் (UI மற்றும் லாஜிக்)
+class SinglePartyRoomInstance extends StatefulWidget {
+  final String hostName;
+  final String selectedTheme;
+  final String roomId;
+  final dynamic originalWidgetRoom;
+
+  const SinglePartyRoomInstance({
+    super.key,
+    required this.hostName,
+    required this.selectedTheme,
+    required this.roomId,
+    this.originalWidgetRoom,
+  });
+
+  @override
+  State<SinglePartyRoomInstance> createState() => _SinglePartyRoomInstanceState();
+}
+
+class _SinglePartyRoomInstanceState extends State<SinglePartyRoomInstance> with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
-  final String streamerKey = 'Alsha Live';
-
+  
   final PartyRoomAudioManager _audioManager = PartyRoomAudioManager();
   final PartyRoomMembersHelper _membersHelper = PartyRoomMembersHelper();
 
   bool isMuted = false;
   String? activeGiftEffect;
-  
   late AnimationController _animController;
 
   final List<Map<String, String>> chatMessages = [
@@ -52,8 +140,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
 
   final List<Map<String, String>> roomViewers = [
     {"name": "Raj Shukla", "status": "Active Listener"},
-    {"name": "Alsha Live (Host)", "status": "Broadcaster"},
-    {"name": "Karthik Kumar", "status": "Joined via For You"},
+    {"name": "Karthik Kumar", "status": "Active Listener"},
     {"name": "Priya Ramesh", "status": "Active Listener"},
     {"name": "Suresh Babu", "status": "Active Listener"},
   ];
@@ -77,7 +164,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       userID: 'user_${DateTime.now().millisecondsSinceEpoch}',
       userName: 'Chandran S',
     );
-    await ZegoPartyRoomService.joinRoom('room_101');
+    await ZegoPartyRoomService.joinRoom(widget.roomId);
   }
 
   @override
@@ -98,20 +185,10 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     PartyRoomAudioManager.showAudioStatus(context, isMuted);
   }
 
-  void _openViewersScreen(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RoomViewersScreen(viewers: roomViewers),
-      ),
-    );
-    setState(() {});
-  }
-
   void _openFullHostProfile(BuildContext context) async {
     final streamerModel = StreamerProfileModel(
-      name: 'Alsha Live',
-      id: streamerKey,
+      name: widget.hostName,
+      id: widget.roomId,
       country: 'India',
       flag: '🇮🇳',
       age: 22,
@@ -159,7 +236,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
     }
   }
 
-  // 👉 கிஃப்ட் எஃபெக்ட் சரியாக 2.5 நொடிகளில் ஆட்டோமேட்டிக்காக மறையும் முறை
   void _triggerGiftEffect(String giftName, int quantity) {
     if (mounted) {
       setState(() {
@@ -169,7 +245,6 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
 
       PartyGiftAnimationHelper.showPartyGiftAnimation(context, giftName, 'Chandran S');
 
-      // 2.5 நொடிகளுக்குப் பிறகு ஆட்டோமேட்டிக்காக எஃபெக்டை மட்டும் மறைக்கிறோம் (ரூம் கிராஷ் ஆகாது)
       Future.delayed(const Duration(milliseconds: 2500), () {
         if (mounted) {
           setState(() {
@@ -188,10 +263,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
       builder: (sheetContext) {
         return GiftBottomSheet(
           onSendGift: (giftName, quantity) {
-            // முதலில் கிஃப்ட் ஷீட்டை மட்டும் பாதுகாப்பாக க்ளோஸ் செய்கிறோம்
             Navigator.of(sheetContext).pop();
-            
-            // உடனடியாக கிஃப்ட் எஃபெக்ட்டை இயக்குகிறோம்
             _triggerGiftEffect(giftName, quantity);
           },
         );
@@ -201,15 +273,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final followNotifier = StreamerFollowManager().getFollowNotifier(streamerKey);
-    
-    final String hostName = widget.room is PartyRoomModel 
-        ? (widget.room as PartyRoomModel).hostName 
-        : 'Alsha Live';
-        
-    final String activeTheme = widget.room is PartyRoomModel 
-        ? (widget.room as PartyRoomModel).theme 
-        : widget.selectedTheme;
+    final followNotifier = StreamerFollowManager().getFollowNotifier(widget.hostName);
 
     return Scaffold(
       body: Stack(
@@ -248,7 +312,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        hostName,
+                                        widget.hostName,
                                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                                       ),
                                       Text(
@@ -266,7 +330,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           valueListenable: followNotifier,
                           builder: (context, isFollowing, child) {
                             return GestureDetector(
-                              onTap: () => StreamerFollowManager().toggleFollow(streamerKey),
+                              onTap: () => StreamerFollowManager().toggleFollow(widget.hostName),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
@@ -299,7 +363,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                             Navigator.pop(context);
                             PartyRoomOverlayManager.showFloatingMiniPlayer(
                               context: context,
-                              room: widget.room,
+                              room: widget.originalWidgetRoom,
                             );
                           },
                         ),
@@ -323,7 +387,7 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                       itemBuilder: (context, index) {
                         final occupant = _membersHelper.getOccupant(index);
                         final bool isOccupied = occupant != null || index == 0;
-                        final String seatUserName = occupant ?? (index == 0 ? hostName : 'Empty Seat');
+                        final String seatUserName = occupant ?? (index == 0 ? widget.hostName : 'Empty Seat');
                         final bool seatMuted = _audioManager.isMuted(index);
 
                         return GestureDetector(
@@ -387,8 +451,13 @@ class _PartyRoomScreenState extends State<PartyRoomScreen> with TickerProviderSt
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Active Theme: $activeTheme',
+                            'Active Theme: ${widget.selectedTheme}',
                             style: const TextStyle(color: Colors.amberAccent, fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '👆 Swipe up/down for random rooms',
+                            style: TextStyle(color: Colors.white38, fontSize: 10),
                           ),
                         ],
                       ),
