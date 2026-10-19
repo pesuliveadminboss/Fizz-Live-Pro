@@ -128,7 +128,7 @@ class FizzLiveProApp extends StatelessWidget {
           streamer: LiveStreamer(
             id: 'live_001',
             name: 'Live Streamer',
-            viewers: 150,
+            viewers: '150',
             category: 'General',
             profileImageUrl: '',
             bio: 'Welcome to my live room!',
@@ -140,6 +140,7 @@ class FizzLiveProApp extends StatelessWidget {
             roomName: 'Party Room',
             hostName: 'Host Name',
             onlineCount: 10,
+            theme: 'default',
           ),
         ),
         '/streamer_profile_screen': (context) => const StreamerProfileScreen(
@@ -150,6 +151,7 @@ class FizzLiveProApp extends StatelessWidget {
             flag: '🇮🇳',
             age: 24,
             status: 'Active',
+            intro: 'Welcome to my profile!',
           ),
         ),
       },
