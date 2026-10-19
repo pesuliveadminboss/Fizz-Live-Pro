@@ -113,7 +113,6 @@ void main() async {
     userName: 'Chandran S',
   );
 
-  // Initialize Monetization SDK / AdMob Helper
   AdmobMonetizationHelper.initializeAdSdk();
 
   runApp(const FizzLiveProApp());
@@ -142,7 +141,6 @@ class FizzLiveProApp extends StatelessWidget {
         '/follow_hub': (context) => const FollowContainerHubScreen(),
         '/games_hub': (context) => const GamesHubScreen(),
         
-        // 👉 All required parameters fully populated without const errors:
         '/live_room_screen': (context) => const LiveRoomScreen(
           streamer: LiveStreamer(
             id: 'live_001',
