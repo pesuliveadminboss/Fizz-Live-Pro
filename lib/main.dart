@@ -122,29 +122,17 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-      },
-      // 👉 Direct Routing to the exact target screens without any constructor/parameter conflicts:
-      onGenerateRoute: (settings) {
-        if (settings.name == '/live_room_screen') {
-          return MaterialPageRoute(
-            builder: (context) => const LiveRoomScreen(
-              streamer: LiveStreamer(),
-            ),
-          );
-        } else if (settings.name == '/party_room_screen') {
-          return MaterialPageRoute(
-            builder: (context) => const PartyRoomScreen(
-              room: PartyRoomModel(),
-            ),
-          );
-        } else if (settings.name == '/streamer_profile_screen') {
-          return MaterialPageRoute(
-            builder: (context) => const StreamerProfileScreen(
-              streamer: StreamerProfileModel(),
-            ),
-          );
-        }
-        return null;
+        
+        // 👉 Error-Free Direct Target Screen Route Mappings with required parameters:
+        '/live_room_screen': (context) => const LiveRoomScreen(
+          streamer: LiveStreamer(id: 'live_001'),
+        ),
+        '/party_room_screen': (context) => const PartyRoomScreen(
+          room: PartyRoomModel(roomID: 'party_001'),
+        ),
+        '/streamer_profile_screen': (context) => const StreamerProfileScreen(
+          streamer: StreamerProfileModel(id: 'user_001'),
+        ),
       },
     );
   }
