@@ -74,6 +74,7 @@ import 'block7_zego_integration/zego_party_room_service.dart';
 import 'block7_zego_integration/zego_voice_speaking_effect_helper.dart';
 import 'block7_zego_integration/zego_video_call_service.dart';
 import 'block7_zego_integration/zego_live_tools_service.dart';
+import 'block7_zego_integration/user_identity_generator.dart';
 
 // --- BLOCK 8 IMPORTS (Random Match Tab Module) ---
 import 'block8_match_tab/match_call_helper.dart';
@@ -90,6 +91,13 @@ import 'block9_follow_tab/follow_sync_service.dart';
 import 'block9_follow_tab/smart_follow_grid_view.dart';
 import 'block9_follow_tab/follow_container_hub_screen.dart';
 
+// --- BLOCK 10 IMPORTS (Monetization, VIP Tiers, Recharge Plans & Ads) ---
+import 'block10_monetization/monetization_config.dart';
+import 'block10_monetization/vip_tier_manager.dart';
+import 'block10_monetization/recharge_bottom_sheet_ui.dart';
+import 'block10_monetization/revenue_commission_calculator.dart';
+import 'block10_monetization/admob_monetization_helper.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -97,6 +105,9 @@ void main() async {
     userID: 'user_chandran_007',
     userName: 'Chandran S',
   );
+
+  // Initialize Monetization SDK / AdMob Helper
+  AdmobMonetizationHelper.initializeAdSdk();
 
   runApp(const FizzLiveProApp());
 }
