@@ -123,42 +123,24 @@ class FizzLiveProApp extends StatelessWidget {
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
       },
-      // 👉 Using onGenerateRoute to handle dynamic arguments passed from Follow Tab safely:
+      // 👉 Direct Routing to the exact target screens without any constructor/parameter conflicts:
       onGenerateRoute: (settings) {
         if (settings.name == '/live_room_screen') {
-          final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
-            builder: (context) => LiveRoomScreen(
-              streamer: LiveStreamer(
-                streamerName: args?['streamerName'] ?? 'Live Host',
-                roomTitle: 'Live Room',
-                viewersCount: 150,
-                isLive: true,
-              ),
+            builder: (context) => const LiveRoomScreen(
+              streamer: LiveStreamer(),
             ),
           );
         } else if (settings.name == '/party_room_screen') {
-          final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
-            builder: (context) => PartyRoomScreen(
-              room: PartyRoomModel(
-                roomTitle: args?['roomTitle'] ?? 'Party Room',
-                hostName: 'Host',
-                activeMembersCount: 8,
-              ),
+            builder: (context) => const PartyRoomScreen(
+              room: PartyRoomModel(),
             ),
           );
         } else if (settings.name == '/streamer_profile_screen') {
-          final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
-            builder: (context) => StreamerProfileScreen(
-              streamer: StreamerProfileModel(
-                name: args?['streamerName'] ?? 'User Profile',
-                bio: 'Welcome to my profile!',
-                followersCount: 450,
-                followingCount: 120,
-                isFollowing: true,
-              ),
+            builder: (context) => const StreamerProfileScreen(
+              streamer: StreamerProfileModel(),
             ),
           );
         }
