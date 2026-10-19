@@ -122,33 +122,47 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-        
-        // 👉 Direct Routing to Individual Target Screens matching your screenshots:
-        '/live_room_screen': (context) => LiveRoomScreen(
-          streamer: LiveStreamer(
-            streamerName: 'Live Streamer',
-            roomTitle: 'Live Room',
-            viewersCount: 150,
-            isLive: true,
-          ),
-        ),
-        '/party_room_screen': (context) => PartyRoomScreen(
-          room: PartyRoomModel(
-            roomId: 'party_001',
-            roomTitle: 'Party Room',
-            hostName: 'Party Host',
-            activeMembersCount: 8,
-          ),
-        ),
-        '/streamer_profile_screen': (context) => StreamerProfileScreen(
-          streamer: StreamerProfileModel(
-            name: 'User Profile',
-            bio: 'Welcome to my profile!',
-            followersCount: 500,
-            followingCount: 150,
-            isFollowing: true,
-          ),
-        ),
+      },
+      // 👉 Using onGenerateRoute to handle dynamic arguments passed from Follow Tab safely:
+      onGenerateRoute: (settings) {
+        if (settings.name == '/live_room_screen') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => LiveRoomScreen(
+              streamer: LiveStreamer(
+                streamerName: args?['streamerName'] ?? 'Live Host',
+                roomTitle: 'Live Room',
+                viewersCount: 150,
+                isLive: true,
+              ),
+            ),
+          );
+        } else if (settings.name == '/party_room_screen') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => PartyRoomScreen(
+              room: PartyRoomModel(
+                roomTitle: args?['roomTitle'] ?? 'Party Room',
+                hostName: 'Host',
+                activeMembersCount: 8,
+              ),
+            ),
+          );
+        } else if (settings.name == '/streamer_profile_screen') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => StreamerProfileScreen(
+              streamer: StreamerProfileModel(
+                name: args?['streamerName'] ?? 'User Profile',
+                bio: 'Welcome to my profile!',
+                followersCount: 450,
+                followingCount: 120,
+                isFollowing: true,
+              ),
+            ),
+          );
+        }
+        return null;
       },
     );
   }
