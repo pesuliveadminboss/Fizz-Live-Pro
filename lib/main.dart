@@ -122,7 +122,7 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-        // 👉 Error-Free Clean Route Mappings (Using default constructors to avoid parameter mismatch):
+        // 👉 Corrected Route Mappings for Direct Navigation from Follow Tab:
         '/live_room_screen': (context) => const LiveTabScreen(),
         '/party_room_screen': (context) => const PartyRoomHub(),
         '/streamer_profile_screen': (context) => const MainShellNavigation(),
@@ -225,4 +225,3 @@ class _PopupsHomeWrapperState extends State<PopupsHomeWrapper> {
     return const MainShellNavigation();
   }
 }
-               
