@@ -129,13 +129,13 @@ class FizzLiveProApp extends StatelessWidget {
             id: 'live_001',
             name: 'Live Streamer',
             viewers: 150,
+            category: 'General',
           ),
         ),
         '/party_room_screen': (context) => const PartyRoomScreen(
           room: PartyRoomModel(
             roomID: 'party_001',
             roomName: 'Party Room',
-            hostname: 'Host Name',
           ),
         ),
         '/streamer_profile_screen': (context) => const StreamerProfileScreen(
@@ -143,6 +143,7 @@ class FizzLiveProApp extends StatelessWidget {
             id: 'user_001',
             name: 'User Profile',
             country: 'India',
+            flag: '🇮🇳',
           ),
         ),
       },
