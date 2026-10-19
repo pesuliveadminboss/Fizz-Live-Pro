@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'monetization_config.h'; // or relative import as needed
+import 'monetization_config.dart';
 
 class RechargeBottomSheetUi extends StatelessWidget {
   final Function(RechargePlanModel selectedPlan) onPlanSelected;
@@ -19,7 +19,7 @@ class RechargeBottomSheetUi extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.between,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👉 Corrected here
             children: [
               const Text(
                 '💎 Recharge Coins & Gems',
