@@ -74,7 +74,6 @@ import 'block7_zego_integration/zego_party_room_service.dart';
 import 'block7_zego_integration/zego_voice_speaking_effect_helper.dart';
 import 'block7_zego_integration/zego_video_call_service.dart';
 import 'block7_zego_integration/zego_live_tools_service.dart';
-import 'block7_zego_integration/user_identity_generator.dart';
 
 // --- BLOCK 8 IMPORTS (Random Match Tab Module) ---
 import 'block8_match_tab/match_call_helper.dart';
@@ -98,13 +97,6 @@ import 'block10_monetization/recharge_bottom_sheet_ui.dart';
 import 'block10_monetization/revenue_commission_calculator.dart';
 import 'block10_monetization/admob_monetization_helper.dart';
 
-// --- BLOCK 11 IMPORTS (Games Arena Module - 100% Admin Revenue & Betting) ---
-import 'block11_games/game_economy_config.dart';
-import 'block11_games/game_model.dart';
-import 'block11_games/game_wallet_manager.dart';
-import 'block11_games/game_matchmaking_service.dart';
-import 'block11_games/games_hub_screen.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -113,6 +105,7 @@ void main() async {
     userName: 'Chandran S',
   );
 
+  // Initialize Monetization & Ad SDK
   AdmobMonetizationHelper.initializeAdSdk();
 
   runApp(const FizzLiveProApp());
@@ -139,8 +132,8 @@ class FizzLiveProApp extends StatelessWidget {
         '/match_tab': (context) => const MatchScreen(),
         '/smart_live_hub': (context) => const SmartLiveStreamingHub(),
         '/follow_hub': (context) => const FollowContainerHubScreen(),
-        '/games_hub': (context) => const GamesHubScreen(),
         
+        // 👉 All required parameters fully populated without const errors:
         '/live_room_screen': (context) => const LiveRoomScreen(
           streamer: LiveStreamer(
             id: 'live_001',
