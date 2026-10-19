@@ -40,7 +40,6 @@ class _FollowContainerHubScreenState extends State<FollowContainerHubScreen> wit
         arguments: {
           'streamerId': user.id,
           'streamerName': user.name,
-          'avatarUrl': user.avatarUrl,
         },
       );
     } else if (user.status == 'Party') {
