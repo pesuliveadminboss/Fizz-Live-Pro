@@ -1,12 +1,17 @@
-class GameMatchmakingService {
-  // Simulate finding an opponent or hard AI for 1v1 betting matches
-  static Future<String> findMatchOrOpponent(String gameId) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return 'Matched with Expert AI Opponent (High Difficulty)';
-  }
+import 'dart:math';
 
-  static bool calculateGameOutcome(bool playerWon) {
-    // Ensuring the house/admin always secures its margin
-    return playerWon;
+class GameMatchmakingService {
+  // Determine if player wins or system wins based on bet size and difficulty
+  static Future<bool> playAgainstSystemAI({required int betAmount}) async {
+    await Future.delayed(const Duration(seconds: 1)); // Simulate match delay
+
+    // Logic: If bet is high (>= 150 gems), Expert AI rigorously wins to protect house margin
+    if (betAmount >= 150) {
+      // High stakes: System wins 85% of the time
+      return Random().nextDouble() > 0.85; 
+    } else {
+      // Low stakes (50-100 gems): Give user occasional wins to keep engagement high
+      return Random().nextDouble() > 0.45;
+    }
   }
 }
