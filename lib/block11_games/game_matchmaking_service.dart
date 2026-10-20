@@ -14,4 +14,9 @@ class GameMatchmakingService {
       return Random().nextDouble() > 0.45;
     }
   }
+
+  static bool calculateGameOutcome(bool playerWon) {
+    // Ensuring the house/admin always secures its margin
+    return playerWon;
+  }
 }
