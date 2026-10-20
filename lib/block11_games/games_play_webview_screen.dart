@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'game_wallet_manager.dart';
+import '../block10_monetization/admob_monetization_helper.dart'; // 👉 AdMob integration for revenue
 
 class GamesPlayWebviewScreen extends StatefulWidget {
   final String gameTitle;
@@ -25,8 +26,24 @@ class _GamesPlayWebviewScreenState extends State<GamesPlayWebviewScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Trigger AdMob interstitial/banner helper when game starts
+    AdmobMonetizationHelper.initializeAdSdk();
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        'FizzGameSync',
+        onMessageReceived: (JavaScriptMessage message) {
+          // Handle score/win sync from HTML5 Game JS if supported
+          if (message.message == 'player_won') {
+            GameWalletManager.settleGameOutcome(betAmount: widget.betAmount, didPlayerWin: true);
+          } else if (message.message == 'player_lost') {
+            GameWalletManager.settleGameOutcome(betAmount: widget.betAmount, didPlayerWin: false);
+          }
+          setState(() {});
+        },
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
