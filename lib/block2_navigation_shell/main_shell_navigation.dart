@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../block1_auth_onboarding/login_auth_screen.dart';
 import 'hot_and_live_container_tab.dart';
 import '../block9_follow_tab/follow_container_hub_screen.dart';
+import '../block11_games/games_hub_screen.dart'; // 👉 Games Hub import added here
 
 class MainShellNavigation extends StatefulWidget {
   const MainShellNavigation({super.key});
@@ -21,7 +22,7 @@ class _MainShellNavigationState extends State<MainShellNavigation> {
       const HotAndLiveContainerTab(),
       const FollowContainerHubScreen(),
       if (isFemaleStreamer) const Center(child: Text('Go Live Screen', style: TextStyle(color: Colors.white))),
-      const Center(child: Text('Game Screen', style: TextStyle(color: Colors.white))),
+      const GamesHubScreen(), // 👉 Replaced placeholder text with actual Games Hub screen
       const Center(child: Text('Messages Screen', style: TextStyle(color: Colors.white))),
       const Center(child: Text('Me Profile Screen', style: TextStyle(color: Colors.white))),
     ];
