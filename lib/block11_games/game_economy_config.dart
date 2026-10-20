@@ -10,4 +10,3 @@ class GameEconomyConfig {
   static const int maxDailyWinningLimit = 3600; // Equal to max 2 video calls worth
   static const String currencyLabel = 'Gems / Coins';
 }
-
