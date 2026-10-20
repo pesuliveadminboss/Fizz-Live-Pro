@@ -3,7 +3,7 @@ import 'game_economy_config.dart';
 import 'game_model.dart';
 import 'game_wallet_manager.dart';
 import 'game_matchmaking_service.dart';
-import 'games_play_webview_screen.dart'; // 👉 Corrected import name here
+import 'games_play_webview_screen.dart';
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -54,7 +54,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Banner Section
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -70,20 +69,18 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Play Mini Games Free & Win! 🔥',
+                    'Play Mini Games & Win Rewards! 🔥',
                     style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Select your bet amount below, play against AI, and win rewards securely.',
+                    'Select bet, battle against AI, and enjoy seamless HTML5 gameplay.',
                     style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            
-            // Bet Selector Chips
             const Text(
               'Select Bet Amount (Gems):',
               style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
@@ -121,8 +118,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            
-            // Grid View for Games
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -192,18 +187,17 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                       return;
                                     }
 
-                                    // Trigger AI Matchmaking outcome check
                                     bool playerWon = await GameMatchmakingService.playAgainstSystemAI(betAmount: selectedBetAmount);
                                     GameWalletManager.settleGameOutcome(betAmount: selectedBetAmount, didPlayerWin: playerWon);
                                     setState(() {});
 
-                                    // Open WebView Game Screen
+                                    // 👉 Opens respective game URL in WebView
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => GamesPlayWebviewScreen(
                                           gameTitle: game.title,
-                                          gameUrl: 'https://html5games.com/',
+                                          gameUrl: game.gameUrl,
                                           betAmount: selectedBetAmount,
                                         ),
                                       ),
