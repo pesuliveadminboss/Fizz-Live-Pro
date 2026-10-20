@@ -17,67 +17,164 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
       backgroundColor: const Color(0xFF0F051D),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A0B2E),
-        title: const Text('🎮 Fizz Games Arena (100% Admin Revenue)', style: TextStyle(color: Colors.white, fontSize: 16)),
+        elevation: 0,
+        title: const Text(
+          '🎮 Fizz Games Arena',
+          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         actions: [
           Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Text(
-                '💎 ${GameWalletManager.currentUserGemsBalance} Gems',
-                style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.amberAccent.withOpacity(0.5)),
+              ),
+              child: Row(
+                children: [
+                  const Text('💎 ', style: TextStyle(fontSize: 14)),
+                  Text(
+                    '${GameWalletManager.currentUserGemsBalance}',
+                    style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: GamesDataPool.availableGames.length,
-        itemBuilder: (context, index) {
-          final game = GamesDataPool.availableGames[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(12),
-              title: Text(game.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              subtitle: Column(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Banner Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF7928CA), Color(0xFFFF0080)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 4),
-                  Text('Category: ${game.category} • Difficulty: ${game.difficulty}', style: const TextStyle(color: Colors.white60, fontSize: 11)),
-                  const SizedBox(height: 2),
-                  Text('Entry Bet: ${game.entryFee} Gems | Win Pool: ${game.prizePool} Gems', style: const TextStyle(color: Colors.cyanAccent, fontSize: 12)),
+                  Text(
+                    'Play 1v1 & Win Big! 🔥',
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Battle with players or expert AI, use gems, and win real rewards securely.',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ],
               ),
-              trailing: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pinkAccent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Featured Games',
+              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            
+            // Grid View for Games (Instead of vertical lines)
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 14,
+                  childAspectRatio: 0.75,
                 ),
-                onPressed: () {
-                  bool success = GameWalletManager.deductEntryFee(game.entryFee);
-                  if (success) {
-                    setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Joined ${game.title}! ${game.entryFee} Gems deducted. Good luck!')),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Insufficient Gems! Please recharge via Block 10 plans.')),
-                    );
-                  }
+                itemCount: GamesDataPool.availableGames.length,
+                itemBuilder: (context, index) {
+                  final game = GamesDataPool.availableGames[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A0B2E),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Game Header / Image Placeholder Box
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.purple.withOpacity(0.3),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                            ),
+                            child: Center(
+                              child: Text(
+                                game.category == 'Board' ? '🎲' : (game.category == 'Sports' ? '🎱' : '🎡'),
+                                style: const TextStyle(fontSize: 40),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                game.title,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Entry: ${game.entryFee} Gems',
+                                style: const TextStyle(color: Colors.cyanAccent, fontSize: 11),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 32,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.pinkAccent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  onPressed: () {
+                                    bool success = GameWalletManager.deductEntryFee(game.entryFee);
+                                    if (success) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Joined ${game.title}! Match starting...')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Insufficient Gems! Please recharge.')),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Play Now', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 },
-                child: const Text('Play Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
 }
+
