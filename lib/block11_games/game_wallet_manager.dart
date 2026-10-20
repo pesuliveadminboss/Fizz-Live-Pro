@@ -15,4 +15,3 @@ class GameWalletManager {
     currentUserGemsBalance += rewardAmount;
   }
 }
-
