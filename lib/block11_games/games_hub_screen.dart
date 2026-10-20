@@ -3,7 +3,7 @@ import 'game_economy_config.dart';
 import 'game_model.dart';
 import 'game_wallet_manager.dart';
 import 'game_matchmaking_service.dart';
-import 'game_play_webview_screen.dart';
+import 'games_play_webview_screen.dart'; // 👉 Corrected import name here
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -152,7 +152,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                             child: Center(
                               child: Text(
                                 game.category == 'Board' ? '🎲' : (game.category == 'Sports' ? '🎱' : '🎡'),
-                                style: TextStyle(fontSize: 36),
+                                style: const TextStyle(fontSize: 36),
                               ),
                             ),
                           ),
@@ -201,9 +201,9 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => GamePlayWebviewScreen(
+                                        builder: (context) => GamesPlayWebviewScreen(
                                           gameTitle: game.title,
-                                          gameUrl: 'https://html5games.com/', // Sample HTML5 mini games portal
+                                          gameUrl: 'https://html5games.com/',
                                           betAmount: selectedBetAmount,
                                         ),
                                       ),
