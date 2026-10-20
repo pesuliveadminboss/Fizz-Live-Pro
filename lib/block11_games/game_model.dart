@@ -6,6 +6,7 @@ class GameItemModel {
   final int prizePool;
   final String difficulty;
   final String imageUrl;
+  final String gameUrl; // 👉 Individual HTML5 game web URL
 
   const GameItemModel({
     required this.gameId,
@@ -15,6 +16,7 @@ class GameItemModel {
     required this.prizePool,
     required this.difficulty,
     required this.imageUrl,
+    required this.gameUrl,
   });
 }
 
@@ -25,27 +27,30 @@ class GamesDataPool {
       title: 'Royal Ludo 1v1',
       category: 'Board',
       entryFee: 50,
-      prizePool: 90, // House takes 10 coins commission
-      difficulty: 'Hard (Competitive AI)',
+      prizePool: 100,
+      difficulty: 'Hard (Expert AI)',
       imageUrl: 'assets/games/ludo.png',
+      gameUrl: 'https://html5games.com/Game/Ludo-Hero', // Sample Ludo HTML5 game link
     ),
     GameItemModel(
       gameId: 'game_carrom_pro',
       title: 'Pro Carrom Arena',
       category: 'Sports',
       entryFee: 100,
-      prizePool: 180,
+      prizePool: 200,
       difficulty: 'Expert',
       imageUrl: 'assets/games/carrom.png',
+      gameUrl: 'https://html5games.com/Game/Billiards-Master', // Sample Carrom/Cue HTML5 game link
     ),
     GameItemModel(
       gameId: 'game_spin_wheel',
       title: 'Lucky Fortune Wheel',
       category: 'Arcade',
       entryFee: 30,
-      prizePool: 50,
+      prizePool: 60,
       difficulty: 'Medium',
       imageUrl: 'assets/games/wheel.png',
+      gameUrl: 'https://html5games.com/Game/Wheel-of-Fortune', // Sample Wheel HTML5 game link
     ),
   ];
 }
