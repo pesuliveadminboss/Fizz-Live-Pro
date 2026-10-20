@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'game_economy_config.dart';
 import 'game_model.dart';
 import 'game_wallet_manager.dart';
+import 'game_matchmaking_service.dart';
+import 'game_play_webview_screen.dart';
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -11,6 +13,8 @@ class GamesHubScreen extends StatefulWidget {
 }
 
 class _GamesHubScreenState extends State<GamesHubScreen> {
+  int selectedBetAmount = 50; // Default starting bet
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,8 +23,8 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         backgroundColor: const Color(0xFF1A0B2E),
         elevation: 0,
         title: const Text(
-          '🎮 Fizz Games Arena',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          '🎮 Fizz Games Arena (Free Entry)',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         actions: [
           Center(
@@ -36,7 +40,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 children: [
                   const Text('💎 ', style: TextStyle(fontSize: 14)),
                   Text(
-                    '${GameWalletManager.currentUserGemsBalance}',
+                    '${GameWalletManager.currentUserGemsBalance} Gems',
                     style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ],
@@ -66,32 +70,66 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Play 1v1 & Win Big! 🔥',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    'Play Mini Games Free & Win! 🔥',
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 6),
+                  SizedBox(height: 4),
                   Text(
-                    'Battle with players or expert AI, use gems, and win real rewards securely.',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    'Select your bet amount below, play against AI, and win rewards securely.',
+                    style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Featured Games',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             
-            // Grid View for Games (Instead of vertical lines)
+            // Bet Selector Chips
+            const Text(
+              'Select Bet Amount (Gems):',
+              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [50, 100, 150, 200, 250, 300].map((amount) {
+                  bool isSelected = (selectedBetAmount == amount);
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text('$amount Gems'),
+                      selected: isSelected,
+                      selectedColor: Colors.pinkAccent,
+                      backgroundColor: const Color(0xFF1A0B2E),
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.white70,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      onSelected: (selected) {
+                        setState(() {
+                          selectedBetAmount = amount;
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Featured HTML5 Mini Games',
+              style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            
+            // Grid View for Games
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.72,
                 ),
                 itemCount: GamesDataPool.availableGames.length,
                 itemBuilder: (context, index) {
@@ -105,7 +143,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Game Header / Image Placeholder Box
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
@@ -115,7 +152,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                             child: Center(
                               child: Text(
                                 game.category == 'Board' ? '🎲' : (game.category == 'Sports' ? '🎱' : '🎡'),
-                                style: const TextStyle(fontSize: 40),
+                                style: TextStyle(fontSize: 36),
                               ),
                             ),
                           ),
@@ -127,39 +164,52 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                             children: [
                               Text(
                                 game.title,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               Text(
-                                'Entry: ${game.entryFee} Gems',
+                                'Bet: $selectedBetAmount Gems',
                                 style: const TextStyle(color: Colors.cyanAccent, fontSize: 11),
                               ),
                               const SizedBox(height: 8),
                               SizedBox(
                                 width: double.infinity,
-                                height: 32,
+                                height: 30,
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.pinkAccent,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     padding: EdgeInsets.zero,
                                   ),
-                                  onPressed: () {
-                                    bool success = GameWalletManager.deductEntryFee(game.entryFee);
-                                    if (success) {
-                                      setState(() {});
+                                  onPressed: () async {
+                                    bool canPlay = GameWalletManager.placeBetAndPlay(betAmount: selectedBetAmount);
+                                    if (!canPlay) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Joined ${game.title}! Match starting...')),
+                                        const SnackBar(content: Text('Insufficient Gems balance!')),
                                       );
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Insufficient Gems! Please recharge.')),
-                                      );
+                                      return;
                                     }
+
+                                    // Trigger AI Matchmaking outcome check
+                                    bool playerWon = await GameMatchmakingService.playAgainstSystemAI(betAmount: selectedBetAmount);
+                                    GameWalletManager.settleGameOutcome(betAmount: selectedBetAmount, didPlayerWin: playerWon);
+                                    setState(() {});
+
+                                    // Open WebView Game Screen
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GamePlayWebviewScreen(
+                                          gameTitle: game.title,
+                                          gameUrl: 'https://html5games.com/', // Sample HTML5 mini games portal
+                                          betAmount: selectedBetAmount,
+                                        ),
+                                      ),
+                                    );
                                   },
-                                  child: const Text('Play Now', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                  child: const Text('Play Now', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                                 ),
                               ),
                             ],
@@ -177,4 +227,3 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
     );
   }
 }
-
