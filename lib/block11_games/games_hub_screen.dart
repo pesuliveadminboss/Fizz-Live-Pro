@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'game_economy_config.dart';
 import 'game_model.dart';
 import 'game_wallet_manager.dart';
-import 'game_matchmaking_service.dart';
-import 'games_play_webview_screen.dart';
+import 'game_sound_helper.dart';
+import 'games_play_native_screen.dart'; // 👉 Native offline-ready screen
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -13,7 +13,7 @@ class GamesHubScreen extends StatefulWidget {
 }
 
 class _GamesHubScreenState extends State<GamesHubScreen> {
-  int selectedBetAmount = 50; // Default starting bet
+  int selectedBetAmount = 50;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         backgroundColor: const Color(0xFF1A0B2E),
         elevation: 0,
         title: const Text(
-          '🎮 Fizz Games Arena (Free Entry)',
+          '🎮 Fizz Games Arena (Offline Ready)',
           style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -69,12 +69,12 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Play Mini Games & Win Rewards! 🔥',
+                    'Instant Play & AI Battles! 🔥',
                     style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Select bet, battle against AI, and enjoy seamless HTML5 gameplay.',
+                    'No network errors. Works smoothly offline with instant wallet sync.',
                     style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                 ],
@@ -103,6 +103,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                       onSelected: (selected) {
+                        GameSoundHelper.playClickSound();
                         setState(() {
                           selectedBetAmount = amount;
                         });
@@ -114,7 +115,7 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Featured HTML5 Mini Games',
+              'Featured Native Mini Games',
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -178,26 +179,22 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     padding: EdgeInsets.zero,
                                   ),
-                                  onPressed: () async {
+                                  onPressed: () {
+                                    GameSoundHelper.playClickSound();
                                     bool canPlay = GameWalletManager.placeBetAndPlay(betAmount: selectedBetAmount);
                                     if (!canPlay) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Insufficient Gems balance!')),
+                                        const SnackBar(content: Text('Insufficient Gems balance! Please recharge.')),
                                       );
                                       return;
                                     }
 
-                                    bool playerWon = await GameMatchmakingService.playAgainstSystemAI(betAmount: selectedBetAmount);
-                                    GameWalletManager.settleGameOutcome(betAmount: selectedBetAmount, didPlayerWin: playerWon);
-                                    setState(() {});
-
-                                    // 👉 Opens respective game URL in WebView
+                                    // 👉 Opens offline-ready Native Game Screen
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => GamesPlayWebviewScreen(
+                                        builder: (context) => GamesPlayNativeScreen(
                                           gameTitle: game.title,
-                                          gameUrl: game.gameUrl,
                                           betAmount: selectedBetAmount,
                                         ),
                                       ),
