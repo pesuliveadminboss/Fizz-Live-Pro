@@ -30,7 +30,7 @@ class GamesDataPool {
       prizePool: 100,
       difficulty: 'Hard (Expert AI)',
       imageUrl: 'assets/games/ludo.png',
-      gameUrl: 'https://html5games.com/Game/Ludo-Hero', // Sample Ludo HTML5 game link
+      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
     ),
     GameItemModel(
       gameId: 'game_carrom_pro',
@@ -40,7 +40,7 @@ class GamesDataPool {
       prizePool: 200,
       difficulty: 'Expert',
       imageUrl: 'assets/games/carrom.png',
-      gameUrl: 'https://html5games.com/Game/Billiards-Master', // Sample Carrom/Cue HTML5 game link
+      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
     ),
     GameItemModel(
       gameId: 'game_spin_wheel',
@@ -50,7 +50,7 @@ class GamesDataPool {
       prizePool: 60,
       difficulty: 'Medium',
       imageUrl: 'assets/games/wheel.png',
-      gameUrl: 'https://html5games.com/Game/Wheel-of-Fortune', // Sample Wheel HTML5 game link
+      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
     ),
   ];
 }
