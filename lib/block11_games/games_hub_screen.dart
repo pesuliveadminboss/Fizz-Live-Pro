@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'game_economy_config.dart';
 import 'game_model.dart';
-import 'game_wallet_manager.dart';
 import 'game_sound_helper.dart';
-import 'games_play_native_screen.dart'; // 👉 Native offline-ready screen
+import 'games_play_native_screen.dart';
+import '../block10_monetization/admob_monetization_helper.dart'; // AdMob helper
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -13,8 +12,6 @@ class GamesHubScreen extends StatefulWidget {
 }
 
 class _GamesHubScreenState extends State<GamesHubScreen> {
-  int selectedBetAmount = 50;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,37 +20,16 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         backgroundColor: const Color(0xFF1A0B2E),
         elevation: 0,
         title: const Text(
-          '🎮 Fizz Games Arena (Offline Ready)',
+          '🎮 Fizz Free Arcade & Games',
           style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(right: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.amberAccent.withOpacity(0.5)),
-              ),
-              child: Row(
-                children: [
-                  const Text('💎 ', style: TextStyle(fontSize: 14)),
-                  Text(
-                    '${GameWalletManager.currentUserGemsBalance} Gems',
-                    style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Banner promo
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -69,12 +45,12 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Instant Play & AI Battles! 🔥',
+                    'Play Unlimited Free Games! 🔥',
                     style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'No network errors. Works smoothly offline with instant wallet sync.',
+                    'Zero bets, zero entry fees. Just pure entertainment and fun!',
                     style: TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                 ],
@@ -82,50 +58,19 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Select Bet Amount (Gems):',
-              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [50, 100, 150, 200, 250, 300].map((amount) {
-                  bool isSelected = (selectedBetAmount == amount);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text('$amount Gems'),
-                      selected: isSelected,
-                      selectedColor: Colors.pinkAccent,
-                      backgroundColor: const Color(0xFF1A0B2E),
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onSelected: (selected) {
-                        GameSoundHelper.playClickSound();
-                        setState(() {
-                          selectedBetAmount = amount;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Featured Native Mini Games',
+              'Available Mini Games',
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+            
+            // Grid of Free Games
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.72,
+                  childAspectRatio: 0.78,
                 ),
                 itemCount: GamesDataPool.availableGames.length,
                 itemBuilder: (context, index) {
@@ -165,9 +110,9 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                'Bet: $selectedBetAmount Gems',
-                                style: const TextStyle(color: Colors.cyanAccent, fontSize: 11),
+                              const Text(
+                                'Free Entry (100% Fun)',
+                                style: TextStyle(color: Colors.greenAccent, fontSize: 11),
                               ),
                               const SizedBox(height: 8),
                               SizedBox(
@@ -181,26 +126,20 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                   ),
                                   onPressed: () {
                                     GameSoundHelper.playClickSound();
-                                    bool canPlay = GameWalletManager.placeBetAndPlay(betAmount: selectedBetAmount);
-                                    if (!canPlay) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Insufficient Gems balance! Please recharge.')),
-                                      );
-                                      return;
-                                    }
+                                    
+                                    // Trigger AdMob Interstitial Ad before opening game
+                                    AdmobMonetizationHelper.initializeAdSdk();
 
-                                    // 👉 Opens offline-ready Native Game Screen
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => GamesPlayNativeScreen(
                                           gameTitle: game.title,
-                                          betAmount: selectedBetAmount,
                                         ),
                                       ),
                                     );
                                   },
-                                  child: const Text('Play Now', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  child: const Text('Play Free', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                                 ),
                               ),
                             ],
