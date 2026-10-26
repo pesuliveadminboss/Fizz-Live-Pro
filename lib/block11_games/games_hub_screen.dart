@@ -126,11 +126,13 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                     
                                     AdmobMonetizationHelper.initializeAdSdk();
 
+                                    // 👉 Passes the real HTML5 game URL to WebView screen
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => GamesPlayNativeScreen(
                                           gameTitle: game.title,
+                                          gameUrl: game.gameUrl,
                                         ),
                                       ),
                                     );
