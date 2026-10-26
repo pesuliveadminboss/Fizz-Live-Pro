@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'game_wallet_manager.dart';
-import 'game_matchmaking_service.dart';
 import 'game_sound_helper.dart';
+import '../block10_monetization/admob_monetization_helper.dart'; // AdMob integration
 
 class GamesPlayNativeScreen extends StatefulWidget {
   final String gameTitle;
-  final int betAmount;
 
   const GamesPlayNativeScreen({
     super.key,
     required this.gameTitle,
-    required this.betAmount,
   });
 
   @override
@@ -18,10 +15,8 @@ class GamesPlayNativeScreen extends StatefulWidget {
 }
 
 class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with SingleTickerProviderStateMixin {
-  bool _isCompeting = false;
-  String _gameStatusMessage = "Tap 'Roll & Play Now' to battle AI!";
-  bool? _didPlayerWin;
-  
+  bool _isPlaying = false;
+  String _statusText = "Tap 'Start Game' to play!";
   late AnimationController _animationController;
 
   @override
@@ -39,39 +34,27 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
     super.dispose();
   }
 
-  void _startNativeGamePlay() async {
+  void _startFreeGame() async {
     GameSoundHelper.playSpinSound();
     setState(() {
-      _isCompeting = true;
-      _gameStatusMessage = "Battling with Expert AI Bot...";
-      _didPlayerWin = null;
+      _isPlaying = true;
+      _statusText = "Game in progress... Have fun!";
     });
 
     _animationController.repeat();
 
-    // Simulate match processing delay
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     _animationController.stop();
 
-    // Check matchmaking outcome (Smart AI control & House margin protection)
-    bool playerWon = await GameMatchmakingService.playAgainstSystemAI(betAmount: widget.betAmount);
-    
-    // 👉 Corrected Wallet Settlement Logic for Win & Loss
-    GameWalletManager.settleGameOutcome(betAmount: widget.betAmount, didPlayerWin: playerWon);
-
-    if (playerWon) {
-      GameSoundHelper.playWinSound();
-    } else {
-      GameSoundHelper.playLossSound();
-    }
+    GameSoundHelper.playWinSound();
 
     setState(() {
-      _isCompeting = false;
-      _didPlayerWin = playerWon;
-      _gameStatusMessage = playerWon
-          ? "🎉 You Won! Double prize added (+${widget.betAmount * 2} Gems)."
-          : "😢 You Lost! Bet amount taken by Admin/Bot (-${widget.betAmount} Gems).";
+      _isPlaying = false;
+      _statusText = "🎉 Awesome Match! Play again for more fun.";
     });
+
+    // Trigger AdMob ad on game completion (End of game ad)
+    AdmobMonetizationHelper.initializeAdSdk();
   }
 
   @override
@@ -81,17 +64,6 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A0B2E),
         title: Text(widget.gameTitle, style: const TextStyle(color: Colors.white, fontSize: 16)),
-        actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Text(
-                '💎 Gems: ${GameWalletManager.currentUserGemsBalance}',
-                style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -102,13 +74,6 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
               color: const Color(0xFF1A0B2E),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.pinkAccent.withOpacity(0.5), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.pinkAccent.withOpacity(0.1),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                )
-              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -118,20 +83,12 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.cyanAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    'Active Bet: ${widget.betAmount} Gems',
-                    style: const TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
+                const Text(
+                  'Free Entertainment Mode',
+                  style: TextStyle(color: Colors.greenAccent, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 30),
                 
-                // Interactive Rotating Wheel / Loader Animation
                 RotationTransition(
                   turns: _animationController,
                   child: Container(
@@ -140,35 +97,22 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: const LinearGradient(
-                        colors: [Colors.pinkAccent, Colors.purpleAccent, Colors.amber],
+                        colors: [Colors.pinkAccent, Colors.purpleAccent, Colors.cyan],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.purple.withOpacity(0.5),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
                     child: const Center(
                       child: Text('🎯', style: TextStyle(fontSize: 36)),
                     ),
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 30),
                 
                 Text(
-                  _gameStatusMessage,
+                  _statusText,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _didPlayerWin == true
-                        ? Colors.greenAccent
-                        : (_didPlayerWin == false ? Colors.redAccent : Colors.white70),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 30),
                 
@@ -177,17 +121,17 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
                   height: 45,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isCompeting ? Colors.grey : Colors.pinkAccent,
+                      backgroundColor: _isPlaying ? Colors.grey : Colors.pinkAccent,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                     ),
-                    onPressed: _isCompeting
+                    onPressed: _isPlaying
                         ? null
                         : () {
                             GameSoundHelper.playClickSound();
-                            _startNativeGamePlay();
+                            _startFreeGame();
                           },
                     child: Text(
-                      _isCompeting ? 'Battling AI...' : '🎮 Roll & Play Now',
+                      _isPlaying ? 'Playing...' : '🎮 Start Game Now',
                       style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -200,4 +144,3 @@ class _GamesPlayNativeScreenState extends State<GamesPlayNativeScreen> with Sing
     );
   }
 }
-
