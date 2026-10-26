@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'game_model.dart';
 import 'game_sound_helper.dart';
 import 'games_play_native_screen.dart';
-import '../block10_monetization/admob_monetization_helper.dart'; // AdMob helper
+import '../block10_monetization/admob_monetization_helper.dart';
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -29,7 +29,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Banner promo
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -62,8 +61,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            
-            // Grid of Free Games
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -127,7 +124,6 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                                   onPressed: () {
                                     GameSoundHelper.playClickSound();
                                     
-                                    // Trigger AdMob Interstitial Ad before opening game
                                     AdmobMonetizationHelper.initializeAdSdk();
 
                                     Navigator.push(
