@@ -6,7 +6,7 @@ class GameItemModel {
   final int prizePool;
   final String difficulty;
   final String imageUrl;
-  final String gameUrl; // 👉 Individual HTML5 game web URL
+  final String gameUrl; // 👉 WebView HTML5 Game URL
 
   const GameItemModel({
     required this.gameId,
@@ -23,34 +23,34 @@ class GameItemModel {
 class GamesDataPool {
   static const List<GameItemModel> availableGames = [
     GameItemModel(
+      gameId: 'game_bubble_tower',
+      title: 'Bubble Tower 3D',
+      category: 'Arcade',
+      entryFee: 0,
+      prizePool: 0,
+      difficulty: 'Easy',
+      imageUrl: 'assets/games/bubble.png',
+      gameUrl: 'https://html5games.com/Game/Bubble-Tower-3D/1385d98a-b5f2-4339-bce7-b99a8dd2e8b0', // 👉 Real HTML5 game link
+    ),
+    GameItemModel(
       gameId: 'game_ludo_1v1',
       title: 'Royal Ludo 1v1',
       category: 'Board',
-      entryFee: 50,
-      prizePool: 100,
-      difficulty: 'Hard (Expert AI)',
+      entryFee: 0,
+      prizePool: 0,
+      difficulty: 'Medium',
       imageUrl: 'assets/games/ludo.png',
-      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
+      gameUrl: 'https://html5games.com/Game/Bubble-Tower-3D/1385d98a-b5f2-4339-bce7-b99a8dd2e8b0',
     ),
     GameItemModel(
       gameId: 'game_carrom_pro',
       title: 'Pro Carrom Arena',
       category: 'Sports',
-      entryFee: 100,
-      prizePool: 200,
+      entryFee: 0,
+      prizePool: 0,
       difficulty: 'Expert',
       imageUrl: 'assets/games/carrom.png',
-      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
-    ),
-    GameItemModel(
-      gameId: 'game_spin_wheel',
-      title: 'Lucky Fortune Wheel',
-      category: 'Arcade',
-      entryFee: 30,
-      prizePool: 60,
-      difficulty: 'Medium',
-      imageUrl: 'assets/games/wheel.png',
-      gameUrl: 'https://gamedistribution.com/', // Working HTML5 games portal
+      gameUrl: 'https://html5games.com/Game/Bubble-Tower-3D/1385d98a-b5f2-4339-bce7-b99a8dd2e8b0',
     ),
   ];
 }
