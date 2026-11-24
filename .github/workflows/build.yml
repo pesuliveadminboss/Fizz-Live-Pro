@@ -3,6 +3,7 @@ name: Build Fizz Live Pro release APK
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,10 +14,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
+          cache: true
       - name: Generate and copy Android scaffold properly
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
@@ -24,6 +27,8 @@ jobs:
           cp -r temp_app/android/* android/
           rm -rf temp_app
           sed -i 's/gradle-.*-all.zip/gradle-8.3-all.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
+          sed -i 's/com.android.application" version ".*"/com.android.application" version "8.1.4"/g' android/settings.gradle || true
+          sed -i 's/com.android.tools.build:gradle:.*"/com.android.tools.build:gradle:8.1.4"/g' android/build.gradle || true
           cat << 'EOF' > patch_manifest.py
           import os
           manifest_path = 'android/app/src/main/AndroidManifest.xml'
