@@ -57,25 +57,6 @@ jobs:
           except Exception:
               pass
           EOF
-          mkdir -p ~/.gradle/init.d
-          cat << 'EOF' > ~/.gradle/init.d/mirrors.gradle
-          allprojects {
-              buildscript {
-                  repositories {
-                      maven { url "https://maven.aliyun.com/repository/central" }
-                      maven { url "https://maven.aliyun.com/repository/google" }
-                      google()
-                      mavenCentral()
-                  }
-              }
-              repositories {
-                  maven { url "https://maven.aliyun.com/repository/central" }
-                  maven { url "https://maven.aliyun.com/repository/google" }
-                  google()
-                  mavenCentral()
-              }
-          }
-          EOF
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
