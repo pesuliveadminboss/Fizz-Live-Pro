@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+import '../block2_navigation_shell/streamer_model_data.dart';
+import '../block3_hot_tab/streamer_profile_model.dart';
+
+class ChatSyncStore {
+  ChatSyncStore._internal();
+  static final ChatSyncStore instance = ChatSyncStore._internal();
+
+  final Map<String, ValueNotifier<List>>> _threads = {};
+
+  ValueNotifier<List>> threadNotifierFor(String peerName) {
+    final key = peerName.trim().toLowerCase();
+    return _threads.putIfAbsent(
+      key,
+      () => ValueNotifier<List>>([
+        {
+          'sender': 'streamer',
+          'text': 'Hi! Welcome to my private chat ✨',
+          'type': 'text',
+        },
+      ]),
+    );
+  }
+
+  void addMessage(
+    String peerName, {
+    required String sender,
+    required String text,
+    String type = 'text',
+  }) {
+    final notifier = threadNotifierFor(peerName);
+    final updated = List>.from(notifier.value)
+      ..add({
+        'sender': sender,
+        'text': text,
+        'type': type,
+      });
+    notifier.value = updated;
+  }
+
+  String lastMessagePreview(String peerName) {
+    final list = threadNotifierFor(peerName).value;
+    if (list.isEmpty) return 'Tap to start private chat';
+    return (list.last['text'] as String?) ?? 'Tap to start private chat';
+  }
+
+  StreamerProfileModel profileFromStreamer(StreamerItem item) {
+    return StreamerProfileModel(
+      id: item.id,
+      name: item.name,
+      country: item.country,
+      flag: item.flag,
+      age: item.age,
+      status: item.status,
+      intro: item.intro,
+      language: item.language,
+      isVerified: true,
+    );
+  }
+}
+
