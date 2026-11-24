@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chat_sync_store.dart';
 import 'recharge_gems_dialog.dart';
 import 'voice_recorder_helper.dart';
 import '../block3_hot_tab/profile_actions_dialogs.dart';
@@ -6,7 +7,13 @@ import '../block3_hot_tab/streamer_profile_model.dart';
 
 class PrivateChatScreen extends StatefulWidget {
   final String streamerName;
-  const PrivateChatScreen({super.key, this.streamerName = 'sara'});
+  final StreamerProfileModel? streamerProfile;
+
+  const PrivateChatScreen({
+    super.key,
+    this.streamerName = 'sara',
+    this.streamerProfile,
+  });
 
   @override
   State<PrivateChatScreen> createState() => _PrivateChatScreenState();
@@ -15,24 +22,39 @@ class PrivateChatScreen extends StatefulWidget {
 class _PrivateChatScreenState extends State<PrivateChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   bool _isEmojiPickerVisible = false;
+  late final ValueNotifier<List>> _messagesNotifier;
 
   final List<String> _emojis = [
     '😊', '😂', '😍', '😲', '😢', '😡', '😎', '🔥',
     '❤️', '👍', '💋', '🎉', '✨', '🌹', '💎', '🎁'
   ];
 
-  final List<Map<String, dynamic>> _messages = [
-    {'sender': 'streamer', 'text': 'Hi! Welcome to my private chat ✨', 'type': 'text'},
-    {'sender': 'user', 'text': 'Hello! How are you doing?', 'type': 'text'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _messagesNotifier = ChatSyncStore.instance.threadNotifierFor(widget.streamerName);
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
 
   void _sendMessage({String? customText, String type = 'text'}) {
     final textToSend = customText ?? _messageController.text.trim();
     if (textToSend.isEmpty) return;
-    setState(() {
-      _messages.add({'sender': 'user', 'text': textToSend, 'type': type});
-      if (customText == null) _messageController.clear();
-    });
+
+    ChatSyncStore.instance.addMessage(
+      widget.streamerName,
+      sender: 'user',
+      text: textToSend,
+      type: type,
+    );
+
+    if (customText == null) {
+      _messageController.clear();
+    }
   }
 
   void _addEmoji(String emoji) {
@@ -65,7 +87,10 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  Text('Send Gift to Streamer 🎁', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Send Gift to Streamer 🎁',
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   Icon(Icons.diamond, color: Colors.amber),
                 ],
               ),
@@ -110,8 +135,14 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
           children: [
             Icon(Icons.card_giftcard, color: color, size: 28),
             const SizedBox(height: 4),
-            Text(name, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-            Text(price, style: const TextStyle(color: Colors.amber, fontSize: 10)),
+            Text(
+              name,
+              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              price,
+              style: const TextStyle(color: Colors.amber, fontSize: 10),
+            ),
           ],
         ),
       ),
@@ -120,6 +151,19 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileModel = widget.streamerProfile ??
+        StreamerProfileModel(
+          id: '1',
+          name: widget.streamerName,
+          country: 'Egypt',
+          flag: '🇪🇬',
+          age: 23,
+          status: 'live',
+          intro: 'Live streaming star',
+          language: 'Arabic, English',
+          isVerified: true,
+        );
+
     return Scaffold(
       backgroundColor: const Color(0xFF121026),
       appBar: AppBar(
@@ -136,9 +180,12 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               child: Icon(Icons.person, size: 16, color: Colors.white),
             ),
             const SizedBox(width: 8),
-            Text(
-              widget.streamerName,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                widget.streamerName,
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(width: 4),
             const Icon(Icons.verified, color: Colors.blueAccent, size: 14),
@@ -148,20 +195,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
           IconButton(
             icon: const Icon(Icons.more_horiz, color: Colors.white),
             onPressed: () {
-              final dummyModel = StreamerProfileModel(
-                id: '1',
-                name: widget.streamerName,
-                country: 'Egypt',
-                flag: '🇪🇬',
-                age: 23,
-                status: 'live',
-                intro: 'Live streaming star',
-                language: 'Arabic, English',
-                isVerified: true,
-              );
               ProfileActionsDialogs.showMoreOptionsSheet(
                 context,
-                dummyModel,
+                profileModel,
                 () => setState(() {}),
               );
             },
@@ -228,43 +264,50 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isUser = msg['sender'] == 'user';
-                final isAudio = msg['type'] == 'audio';
+            child: ValueListenableBuilder<List>>(
+              valueListenable: _messagesNotifier,
+              builder: (context, messages, _) {
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    final isUser = msg['sender'] == 'user';
+                    final isAudio = msg['type'] == 'audio';
 
-                return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isUser ? const Color(0xFF6366F1) : const Color(0xFF1D1B36),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isAudio) ...[
-                          const Icon(Icons.play_arrow, color: Colors.white, size: 20),
-                          const SizedBox(width: 6),
-                          Container(
-                            width: 80,
-                            height: 4,
-                            color: Colors.white54,
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        Text(
-                          msg['text']!,
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                    return Align(
+                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isUser ? const Color(0xFF6366F1) : const Color(0xFF1D1B36),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      ],
-                    ),
-                  ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isAudio) ...[
+                              const Icon(Icons.play_arrow, color: Colors.white, size: 20),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 80,
+                                height: 4,
+                                color: Colors.white54,
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            Flexible(
+                              child: Text(
+                                msg['text'] as String? ?? '',
+                                style: const TextStyle(color: Colors.white, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -343,7 +386,10 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                           children: const [
                             Icon(Icons.videocam, color: Colors.white, size: 16),
                             SizedBox(width: 4),
-                            Text('1800/min', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            Text(
+                              '1800/min',
+                              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                       ),
