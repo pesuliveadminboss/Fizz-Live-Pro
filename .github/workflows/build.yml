@@ -14,12 +14,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.x'
           channel: 'stable'
-          cache: true
       - name: Generate and copy Android scaffold properly
         run: |
           flutter create temp_app --platforms=android --project-name=fizz_live_pro
