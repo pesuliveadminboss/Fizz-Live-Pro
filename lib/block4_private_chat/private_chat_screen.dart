@@ -22,7 +22,7 @@ class PrivateChatScreen extends StatefulWidget {
 class _PrivateChatScreenState extends State<PrivateChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   bool _isEmojiPickerVisible = false;
-  late final ValueNotifier<List>> _messagesNotifier;
+  late final ValueNotifier<ChatMessageList> _messagesNotifier;
 
   final List<String> _emojis = [
     '😊', '😂', '😍', '😲', '😢', '😡', '😎', '🔥',
@@ -264,7 +264,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
             ),
           ),
           Expanded(
-            child: ValueListenableBuilder<List>>(
+            child: ValueListenableBuilder<ChatMessageList>(
               valueListenable: _messagesNotifier,
               builder: (context, messages, _) {
                 return ListView.builder(
