@@ -25,13 +25,23 @@ jobs:
           cp -r temp_app/android/* android/
           rm -rf temp_app
           sed -i 's/gradle-.*-all.zip/gradle-8.3-all.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
-          sed -i 's/com.android.application" version ".*"/com.android.application" version "8.1.4"/g' android/settings.gradle || true
-          sed -i 's/com.android.tools.build:gradle:.*"/com.android.tools.build:gradle:8.1.4"/g' android/build.gradle || true
-          cat << 'EOF' > patch_manifest.py
-          import os
+          python3 - << 'EOF'
+          import glob
+
+          for path in glob.glob('android/**/*.gradle*', recursive=True):
+              try:
+                  with open(path, 'r', encoding='utf-8') as f:
+                      text = f.read()
+                  new_text = text.replace('7.3.0', '8.1.4')
+                  if new_text != text:
+                      with open(path, 'w', encoding='utf-8') as f:
+                          f.write(new_text)
+              except Exception:
+                  pass
+
           manifest_path = 'android/app/src/main/AndroidManifest.xml'
-          if os.path.exists(manifest_path):
-              with open(manifest_path, 'r') as f:
+          try:
+              with open(manifest_path, 'r', encoding='utf-8') as f:
                   content = f.read()
               perms = '''
           <uses-permission android:name="android.permission.INTERNET"/>
@@ -41,11 +51,31 @@ jobs:
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
           '''
               if '<application' in content and 'INTERNET' not in content:
-                  content = content.replace('<application', perms + '<application')
-              with open(manifest_path, 'w') as f:
+                  content = content.replace('<application', perms + '<application', 1)
+              with open(manifest_path, 'w', encoding='utf-8') as f:
                   f.write(content)
+          except Exception:
+              pass
           EOF
-          python3 patch_manifest.py
+          mkdir -p ~/.gradle/init.d
+          cat << 'EOF' > ~/.gradle/init.d/mirrors.gradle
+          allprojects {
+              buildscript {
+                  repositories {
+                      maven { url "https://maven.aliyun.com/repository/central" }
+                      maven { url "https://maven.aliyun.com/repository/google" }
+                      google()
+                      mavenCentral()
+                  }
+              }
+              repositories {
+                  maven { url "https://maven.aliyun.com/repository/central" }
+                  maven { url "https://maven.aliyun.com/repository/google" }
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
